@@ -21,3 +21,15 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+body {
+	height: auto;
+	min-height: 100%;
+}
+
+.scroll, .angular-leaflet-map {
+  height: 100%;
+}
+
+.leaflet-bottom {
+  bottom : 10px;
+}
