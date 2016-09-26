@@ -1,4 +1,10 @@
-<ion-view view-title="Dashboard">
+<ion-view view-title="WikiOSMark">
+  <ion-nav-buttons side="primary">
+    <button ng-click="locateMe();" class="button">Locate me</button>
+  </ion-nav-buttons>
+    <ion-nav-buttons side="secondary">
+    <button ng-click="findOSMObjects();" class="button">List OSM objects</button>
+  </ion-nav-buttons>
   <ion-content data-tap-disabled="true">
      <leaflet defaults="map.defaults" center="map.center" markers="map.markers" tiles="tiles" ng-if="map"></leaflet>
   </ion-content>
