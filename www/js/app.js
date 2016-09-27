@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapControllers', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapControllers', 'wikiControllers', 'starter.controllers', 'starter.services'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
@@ -50,12 +50,12 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
     }
   })
 
-  .state('tab.chats', {
-      url: '/chats',
+  .state('tab.wiki', {
+      url: '/wiki',
       views: {
-        'tab-chats': {
-          templateUrl: 'templates/tab-chats.html',
-          controller: 'ChatsCtrl'
+        'tab-wiki': {
+          templateUrl: 'templates/tab-wiki.html',
+          controller: 'WikiCtrl'
         }
       }
     })
