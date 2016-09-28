@@ -32,7 +32,7 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
   $stateProvider
 
   // setup an abstract state for the tabs directive
-    .state('tab', {
+  .state('tab', {
     url: '/tab',
     abstract: true,
     templateUrl: 'templates/tabs.html'
@@ -76,6 +76,16 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
       'tab-account': {
         templateUrl: 'templates/tab-account.html',
         controller: 'AccountCtrl'
+      }
+    }
+  })
+
+  .state('tab.info', {
+    url: '/info',
+    views: {
+      'tab-info': {
+        templateUrl: 'templates/tab-info.html',
+        controller: 'InfoCtrl'
       }
     }
   });

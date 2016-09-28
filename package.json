@@ -24,7 +24,14 @@
     "cordova-plugin-geolocation",
     "cordova-plugin-camera",
     "cordova-plugin-file",
-    "cordova-plugin-file-transfer"
+    "cordova-plugin-file-transfer",
+    "cordova-plugin-inappbrowser"
   ],
-  "cordovaPlatforms": []
+  "cordovaPlatforms": [
+    {
+      "platform": "android",
+      "version": "",
+      "locator": "android"
+    }
+  ]
 }
