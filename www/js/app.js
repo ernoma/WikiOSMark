@@ -59,12 +59,13 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
         }
       }
     })
-    .state('tab.chat-detail', {
-      url: '/chats/:chatId',
+
+    .state('tab.wiki-detail', {
+      url: '/wiki/:wikiId',
       views: {
-        'tab-chats': {
-          templateUrl: 'templates/chat-detail.html',
-          controller: 'ChatDetailCtrl'
+        'tab-wiki': {
+          templateUrl: 'templates/tab-wiki-detail.html',
+          controller: 'WikiDetailCtrl'
         }
       }
     })
