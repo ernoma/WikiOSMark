@@ -88,6 +88,9 @@ var wikiControllers = angular.module('wikiControllers', [])
 .controller('WikiDetailCtrl', function($scope, $stateParams, $http) {
 		console.log($stateParams.wikiId);
 
+		var IMAGE_COUNT_LIMIT = 10;
+		var IMAGE_THUMB_WIDTH = 80;
+
 		$scope.title = "";
 		$scope.siteURL = "";
 
@@ -141,15 +144,103 @@ var wikiControllers = angular.module('wikiControllers', [])
 			//TODO show page link and image thumbnails with links
 
 			$scope.title = id.replace(/_+/g, ' ');
-
+			$scope.imageCount = -1;
+			$scope.imageCountLimitReached = false;
 			$scope.siteURL = "https://commons.wikimedia.org/wiki/" + id;
+			$scope.thumbs = [];
 
-			var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&prop=images&imlimit=50&format=json&titles="
+			$scope.goTo = function(URL) {
+					//console.log("goTo: " + URL);
+					e.preventDefault();
+					window.open(URL, '_system', 'location=yes');
+			}
+
+			var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&prop=images&imlimit=" + IMAGE_COUNT_LIMIT + "&format=json&titles="
 			url += id;
 
 			$http.jsonp(url).
 				success(function(data) {
 					console.log(data);
+
+					for (var key in data.query.pages) { // there is just one key, so for runs only once
+						var imagesNames = data.query.pages[key].images;
+
+						if (data.continue != undefined) {
+							// TODO there exists more than IMAGE_COUNT_LIMIT images, note in the UI, otherwise maybe show number of images
+							$scope.imageCountLimitReached = true;
+							$scope.imageCount = imagesNames.length;
+						}
+
+						var titles = "";
+
+						for (var i = 0; i < imagesNames.length; i++) {
+							titles += imagesNames[i].title + "|";
+						}
+						titles = titles.slice(0, titles.length - 1);
+						var thumbsUrl = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
+							+ titles + "&format=json&prop=imageinfo&iiprop=url|comment|extmetadata|user&iiurlwidth="
+							+ IMAGE_THUMB_WIDTH;
+
+						$http.jsonp(thumbsUrl).
+							success(function(thumbsData) {
+								console.log(thumbsData);
+
+								for (var thumbsPageKey in thumbsData.query.pages) {
+									var imageinfo = thumbsData.query.pages[thumbsPageKey].imageinfo[0];
+									var div = document.createElement("div");
+									div.innerHTML = imageinfo.extmetadata.ImageDescription.value;
+									var description = div.textContent || div.innerText || "";
+									//var description = imageinfo.extmetadata.ImageDescription.value;
+									div.innerHTML = imageinfo.extmetadata.Credit.value;
+									var source = div.textContent || div.innerText || "";
+									var date = imageinfo.extmetadata.DateTimeOriginal.value;
+									var author = "";
+									var permission = imageinfo.extmetadata.LicenseShortName.value;
+									var commentParts = imageinfo.comment.split("|");
+									for (var j = 1; j < commentParts.length; j++) {
+										var temp = commentParts[j].split("=");
+										switch (temp[0]) {
+											// case "Description ":
+											// case "Description":
+											// 		description = temp[1].substring(1);
+											// 	break;
+											case "Source ":
+											case "Source":
+													source = temp[1].substring(1);
+												break;
+											// case "Date ":
+											// case "Date":
+											// 		date = temp[1].substring(1);
+											// 	break;
+											case "Author ":
+											case "Author":
+													author = imageinfo.user;
+												break;
+											// case "Permission ":
+											// case "Permission":
+											// 		permission = temp[1].substring(1);
+												break;
+										}
+									}
+
+									$scope.thumbs.push({
+										image: imageinfo.thumburl,
+										title: thumbsData.query.pages[thumbsPageKey].title.split(":")[1],
+										date: date,
+										description: description,
+										source: source,
+										author: author,
+										permission: permission,
+										comment: imageinfo.comment,
+										descrUrl: imageinfo.descriptionurl
+									});
+								}
+							})
+							.error(function (thumbsData) {
+								console.log('data error');
+								console.log(thumbsData);
+							});
+					}
 
 				})
 				.error(function (data) {
