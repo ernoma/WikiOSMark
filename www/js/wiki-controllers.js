@@ -91,36 +91,63 @@ var wikiControllers = angular.module('wikiControllers', [])
 		var IMAGE_COUNT_LIMIT = 10;
 		var IMAGE_THUMB_WIDTH = 80;
 
-		$scope.title = "";
-		$scope.siteURL = "";
-
 		var parts = $stateParams.wikiId.split("+");
 		var lang = parts[0].substring(0, 2);
 		var site = parts[0].substring(2);
 		var id = parts[1];
+		$scope.data = {
+			site: site,
+			title: id.replace(/_+/g, ' '),
+			siteURL: ""
+		};
 
 		console.log(lang);
 		console.log(site);
 		console.log(id);
 
+		$scope.goTo = function(URL) {
+				//console.log("goTo: " + URL);
+				//e.preventDefault();
+				window.open(URL, '_system', 'location=yes');
+		}
+
 		if (site == "wikipedia") {
-			// TODO there are many ways to go to retrieve and present (and edit) the data
-			// var url = "https://";
-			// url += lang;
-			// url += ".wikipedia.org/w/api.php?action=query";
-			// url += "&titles=" + id;
-			// url += "&prop=revisions&rvprop=content";
-			// url += "&callback=JSON_CALLBACK&format=json";
-			//
-			// $http.jsonp(url).
-			//   success(function(data) {
-			//     console.log(data);
-			//
-			//   })
-			//   .error(function (data) {
-			//   	console.log('data error');
-			//     console.log(data);
-			//   });
+
+			$scope.articleImage = "";
+			$scope.introText = "";
+			$scope.data.siteURL = "https://" + lang + ".wikipedia.org/wiki/" + id;
+
+			var url = "https://";
+			url += lang;
+			url += ".wikipedia.org/w/api.php?action=query";
+			url += "&titles=" + id;
+			url += "&prop=revisions&rvprop=content";
+			url += "&callback=JSON_CALLBACK&format=json";
+
+			$http.jsonp(url).
+			  success(function(data) {
+			    console.log(data);
+					for (var key in data.query.pages) { // there is just one key, so for runs only once
+						var content = data.query.pages[key].revisions[0]['*'];
+						var parsedContent = wtf_wikipedia.parse(content);
+						console.log(parsedContent);
+
+						if (parsedContent.images.length > 0) {
+							$scope.articleImage = parsedContent.images[0].thumb;
+						}
+
+						var textEntries = parsedContent.text.get("Intro");
+						console.log(textEntries);
+
+						for (var i = 0; i < textEntries.length; i++) {
+							$scope.introText += textEntries[i].text + " ";
+						}
+					}
+			  })
+			  .error(function (data) {
+			  	console.log('data error');
+			    console.log(data);
+			  });
 		}
 		else if (site == "wikidata") {
 			//TODO
@@ -142,18 +169,10 @@ var wikiControllers = angular.module('wikiControllers', [])
 		}
 		else { // site == commons
 			//TODO show page link and image thumbnails with links
-
-			$scope.title = id.replace(/_+/g, ' ');
 			$scope.imageCount = -1;
 			$scope.imageCountLimitReached = false;
-			$scope.siteURL = "https://commons.wikimedia.org/wiki/" + id;
+			$scope.data.siteURL = "https://commons.wikimedia.org/wiki/" + id;
 			$scope.thumbs = [];
-
-			$scope.goTo = function(URL) {
-					//console.log("goTo: " + URL);
-					e.preventDefault();
-					window.open(URL, '_system', 'location=yes');
-			}
 
 			var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&prop=images&imlimit=" + IMAGE_COUNT_LIMIT + "&format=json&titles="
 			url += id;

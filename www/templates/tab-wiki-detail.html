@@ -6,27 +6,35 @@
 -->
 <ion-view view-title="WikiOSMark">
   <ion-content class="padding">
-    <h2>{{title}}</h2>
 
-    <p ng-if="imageCountLimitReached">There are more than {{imageCount}} images. Showing the first {{imageCount}}.</p>
+    <div ng-if="data.site == 'commons'">
+      <h2>{{data.title}}</h2>
 
-    <div class="list">
-      <a ng-repeat="thumb in thumbs"
-           class="item item-thumbnail-left" ng-click="goTo(thumb.descrUrl)">
+      <p ng-if="imageCountLimitReached">There are more than {{imageCount}} images. Showing the first {{imageCount}}.</p>
 
-           <img ng-src="{{ thumb.image }}">
-           <h2>{{ thumb.title }}</h2>
-           <!-- <h4>Date: {{ thumb.date }}</h4> -->
-           <h4>Description: {{ thumb.description }}</h4>
-           <!--<h4>{{ thumb.source }}</h4>-->
-           <h4>Author: {{ thumb.author }}</h4>
-           <h4>License: {{ thumb.permission }}</h4>
-        </a>
+      <div class="list">
+        <a ng-repeat="thumb in thumbs"
+             class="item item-thumbnail-left" ng-click="goTo(thumb.descrUrl)">
+
+             <img ng-src="{{ thumb.image }}">
+             <h2>{{ thumb.title }}</h2>
+             <!-- <h4>Date: {{ thumb.date }}</h4> -->
+             <h4>Description: {{ thumb.description }}</h4>
+             <!--<h4>{{ thumb.source }}</h4>-->
+             <h4>Author: {{ thumb.author }}</h4>
+             <h4>License: {{ thumb.permission }}</h4>
+          </a>
+      </div>
+
+      <!-- <a href="#" onclick="window.open('{{data.siteURL}}', '_system', 'location=yes'); return false;">
+        {{data.siteURL}}</a> -->
     </div>
-
-    <!-- <a href="#" onclick="window.open('{{siteURL}}', '_system', 'location=yes'); return false;">
-      {{siteURL}}</a> -->
-
-
+    <!------------------------------------------------------------------------------------------->
+    <div ng-if="data.site == 'wikipedia'">
+      <h2>{{data.title}}</h2>
+      <p><a href="" ng-click="goTo(data.siteURL)">View the original article</a></p>
+      <img ng-src="{{articleImage}}" ng-if="articleImage != ''">
+      <p>{{introText}}</p>
+    </div>
   </ion-content>
 </ion-view>
