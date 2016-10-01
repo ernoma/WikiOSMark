@@ -85,7 +85,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 	}
 })
 
-.controller('WikiDetailCtrl', function($scope, $stateParams, $http) {
+.controller('WikiDetailCtrl', function($scope, $stateParams, $http, Wiki) {
 		console.log($stateParams.wikiId);
 
 		var IMAGE_COUNT_LIMIT = 10;
@@ -150,8 +150,6 @@ var wikiControllers = angular.module('wikiControllers', [])
 			  });
 		}
 		else if (site == "wikidata") {
-			//TODO
-
 			var url = wdk.getEntities(id);
 
 			url += "&callback=JSON_CALLBACK";
@@ -159,13 +157,79 @@ var wikiControllers = angular.module('wikiControllers', [])
 			$http.jsonp(url).
 				success(function(data) {
 					console.log(data);
+
+					$scope.data.title = "";
+					if (data.entities[id].labels[lang] != undefined) {
+						$scope.data.title = data.entities[id].labels[lang].value + ' ';
+					}
+					else if (data.entities[id].labels['en'] != undefined) {
+						$scope.data.title = data.entities[id].labels['en'].value + ' ';
+					}
+					$scope.data.title += "(" + id + ")";
+
+					$scope.data.siteURL = "https://www.wikidata.org/wiki/" + id;
+
 					var simplifiedClaims = wdk.simplifyClaims(data.entities[id].claims);
 					console.log(simplifiedClaims);
+
+					Wiki.getWikidataProperties('en').then(function(wikidataProperties) {
+						console.log(wikidataProperties.data);
+						if (lang != 'en') {
+							Wiki.getWikidataProperties(lang).then(function(langWikidataProperties) {
+								console.log(langWikidataProperties.data);
+								createWikidataClaims(simplifiedClaims, wikidataProperties.data, langWikidataProperties.data);
+							});
+						}
+						else {
+							createWikidataClaims(simplifiedClaims, wikidataProperties.data, null);
+						}
+					});
 				})
 				.error(function (data) {
 					console.log('data error');
 					console.log(data);
 				});
+
+				var createWikidataClaims = function(simplifiedClaims, wikidataProperties, langWikidataProperties) {
+					// TODO show somewhat similar but more compact table than in the Wikidata site
+					$scope.claims = [];
+					for (var key in simplifiedClaims) {
+						var propertyName = key;
+						if (langWikidataProperties != null) {
+							for (var i = 0; i < langWikidataProperties.rows.length; i++) {
+								if (langWikidataProperties.rows[i][0] == key) {
+									propertyName = langWikidataProperties.rows[i][1] + " (" + key + ")";
+									break;
+								}
+							}
+						}
+						if (propertyName == key) {
+							for (var i = 0; i < wikidataProperties.rows.length; i++) {
+								if (wikidataProperties.rows[i][0] == key) {
+									propertyName = wikidataProperties.rows[i][1] + " (" + key + ")";
+									break;
+								}
+							}
+						}
+						var values = [];
+						var areLinks = false;
+						for (var i = 0; i < simplifiedClaims[key].length; i++) {
+							value = simplifiedClaims[key][i];
+							if (typeof simplifiedClaims[key][i] === 'string' && simplifiedClaims[key][i].startsWith('Q') && !isNaN(parseInt(simplifiedClaims[key][i].substring(1)))) {
+								value = 'https://www.wikidata.org/wiki/' + simplifiedClaims[key][i];
+								areLinks = true;
+							}
+							values.push(value);
+						}
+
+						$scope.claims.push({
+							property: propertyName,
+							values: values,
+							areLinks: areLinks
+						});
+					}
+					console.log($scope.claims);
+				}
 		}
 		else { // site == commons
 			//TODO show page link and image thumbnails with links

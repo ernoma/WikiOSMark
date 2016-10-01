@@ -1,5 +1,20 @@
 angular.module('starter.services', [])
 
+.factory('Wiki', function($http) {
+  var wikiService = {
+    getWikidataProperties: function(lang) {
+
+      var promise = $http.get('data/wikidata_properties/' + lang + '.json').success(function(response){
+        //console.log(response);
+        return response.data;
+      });
+
+      return promise;
+    }
+  };
+  return wikiService;
+})
+
 .factory('Chats', function() {
   // Might use a resource here that returns a JSON array
 

@@ -36,5 +36,25 @@
       <img ng-src="{{articleImage}}" ng-if="articleImage != ''">
       <p>{{introText}}</p>
     </div>
+    <!------------------------------------------------------------------------------------------->
+    <div ng-if="data.site == 'wikidata'">
+      <h2>{{data.title}}</h2>
+      <p><a href="" ng-click="goTo(data.siteURL)">View at the Wikidata site</a></p>
+
+      <div class="list">
+        <div class="item" ng-repeat="claim in claims">
+          <div class="row responsive-sm">
+            <div class="col col-50">{{claim.property}}</div>
+              <div class="col col-50">
+                <div class="row padding-bottom" ng-repeat="value in claim.values">
+                  <span ng-if="claim.areLinks == true"><a href="" ng-click="goTo(value)">{{value}}</a></span>
+                  <span ng-if="claim.areLinks == false">{{value}}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </ion-content>
 </ion-view>
