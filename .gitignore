@@ -4,3 +4,4 @@
 node_modules/
 platforms/
 plugins/
+www/data/oauth_prototype_data.js

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="lib/osmauth.js"></script>
+        <script src="data/oauth_prototype_data.js"></script>
+        <script>
+            function stringQs(str) {
+                return str.split('&').filter(function (pair) {
+                    return pair !== '';
+                }).reduce(function(obj, pair){
+                    var parts = pair.split('=');
+                    obj[decodeURIComponent(parts[0])] = (null === parts[1]) ?
+                        '' : decodeURIComponent(parts[1]);
+                    return obj;
+                }, {});
+            }
+
+            var authCallback = function(err, details) {
+              console.log("authCallback");
+              console.log("err: " + err);
+              console.log(details);
+              window.location.href = "/#/tab/account";
+            }
+
+            var auth = osmAuth({
+                oauth_consumer_key: osm_oauth_data.oauth_consumer_key,
+                oauth_secret: osm_oauth_data.oauth_secret,
+                url: osm_oauth_data.url,
+                landing: osm_oauth_data.landing,
+                authCallback: authCallback,
+                singlepage: true,
+                auto: true // show a login form if the user is not authenticated and
+                           // you try to do a call
+            });
+
+            auth.authComplete(window.location.href);
+            //var oauth_token = stringQs(window.location.href.split('?')[1]).oauth_token;
+            //auth.get_access_token(oauth_token);
+            //window.location.href = "/";
+        </script>
+    </head>
+    <body>Redirecting...</body>
+</html>

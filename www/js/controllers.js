@@ -21,10 +21,29 @@ angular.module('starter.controllers', [])
   $scope.chat = Chats.get($stateParams.chatId);
 })
 
-.controller('AccountCtrl', function($scope) {
+.controller('AccountCtrl', function($scope, $state, $location, OpenStreetMap) {
   $scope.settings = {
     enableFriends: true
   };
+
+  $scope.authorizeWiki = function() {
+    // TODO
+  }
+
+  $scope.authorizeOSM = function() {
+    OpenStreetMap.getUserDetails();
+  }
+
+  $scope.logoutOSM = function() {
+    OpenStreetMap.logout();
+  }
+
+
+  $scope.authComplete = function() {
+    console.log($location.url());
+    OpenStreetMap.authComplete($location.url());
+    $state.go("tab.account");
+  }
 })
 
 .controller('InfoCtrl', function($scope) {

@@ -1,5 +1,38 @@
 angular.module('starter.services', [])
 
+.factory('OpenStreetMap', function() {
+
+  var auth = osmAuth({
+    oauth_consumer_key: osm_oauth_data.oauth_consumer_key,
+    oauth_secret: osm_oauth_data.oauth_secret,
+    url: osm_oauth_data.url,
+    landing: osm_oauth_data.landing,
+    singlepage: true,
+    auto: true // show a login form if the user is not authenticated and
+              // you try to do a call
+  });
+
+  var OpenStreetMapService = {
+    getUserDetails: function () {
+      //auth.authenticate(authCallback);
+      auth.xhr({
+        method: 'GET',
+        path: '/api/0.6/user/details'
+      }, function(err, details) {
+        console.log("done");
+          // details is an XML DOM of user details
+          console.log(details);
+      });
+    },
+    logout: function () {
+      auth.logout();
+    }
+  }
+
+  return OpenStreetMapService;
+
+})
+
 .factory('Wiki', function($http) {
   var wikiService = {
     getWikidataProperties: function(lang) {

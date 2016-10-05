@@ -6,12 +6,17 @@
     </ion-toggle>
 
     <div class="list list-inset">
-    	<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="#/tab/account/osm_oauth">
+    	<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeOSM()">
     		<img src="img/osm.png">
     		<h2>OpenStreetMap</h2>
         	<p>Click to connect...</p>
     	</ion-item>
-    	<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="#/tab/account/wiki_oauth">
+      <ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="logoutOSM()">
+    		<img src="img/osm.png">
+    		<h2>OpenStreetMap</h2>
+        	<p>Click to disconnect...</p>
+    	</ion-item>
+    	<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeWiki()">
     		<img src="img/wiki.png">
     		<h2>Wikimedia</h2>
         	<p>Click to connect...</p>

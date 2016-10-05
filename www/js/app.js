@@ -79,6 +79,13 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
       }
     }
   })
+  .state('osmlanding', {
+    url: '/osmlanding?oauth_token={oauthToken}',
+    template: '',
+    controller: function($stateParams) {
+      console.log($stateParams.oauthToken);
+    }
+  })
 
   .state('tab.info', {
     url: '/info',
