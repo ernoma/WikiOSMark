@@ -1,7 +1,7 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $cordovaGeolocation, $http, leafletData) {
+.controller('MapCtrl', function($scope, $cordovaGeolocation, $http, leafletData, $ionicPopover) {
 
 	var tilesDict = {
 		openstreetmap: {
@@ -11,7 +11,7 @@ var mapControllers = angular.module('mapControllers', [])
 			}
 		}
 	};
-	
+
 	$scope.map = {
           defaults: {
             zoomControlPosition: 'bottomleft'
@@ -24,11 +24,11 @@ var mapControllers = angular.module('mapControllers', [])
             }
           }
         };
-	
+
 	angular.extend($scope, {
 			tiles: tilesDict.openstreetmap
 	});
-	
+
 	$scope.goTo = function() {
 		$scope.map.center  = {
 			  lat : 61.5,
@@ -36,9 +36,9 @@ var mapControllers = angular.module('mapControllers', [])
 			  zoom : 12
 			};
 	}
-	
+
 	$scope.goTo();
-	
+
 	$scope.locateMe = function() {
 		//$scope.tiles = tilesDict.openstreetmap;
 		$scope.locate();
@@ -81,8 +81,11 @@ var mapControllers = angular.module('mapControllers', [])
 			if (feature.properties.tags != undefined) {
 				content += "<h4>Tags:</h4>";
 				for (var key in feature.properties.tags) {
-						content += key + "=" + feature.properties.tags[key] + "<br>";					
+						content += key + "=" + feature.properties.tags[key] + "<br>";
 				}
+			}
+			if (feature.properties.tags["wikipedia"] == undefined) {
+					content += "<p><button class='button button-small button-positive' ng-click='openPopover($event)'>Search Wiki</button></p>";
 			}
 			if (feature.properties.tainted) {
 				content += "<p><b>Note:</b> incomplete geometry</p>";
@@ -177,4 +180,30 @@ var mapControllers = angular.module('mapControllers', [])
 		// (node(around:100.0,61.496507,23.781377);<;);out meta; // sorsapuisto
 		// (node(around:100.0,61.5,23.766667);<;);out meta; // koskipuisto
 	}
+
+	// .fromTemplate() method
+	var template = '<ion-popover-view><ion-header-bar> <h1 class="title">My Popover Title</h1> </ion-header-bar> <ion-content> Hello! </ion-content></ion-popover-view>';
+
+	$scope.popover = $ionicPopover.fromTemplate(template, {
+    scope: $scope
+  });
+
+	$scope.openPopover = function($event) {
+	 $scope.popover.show($event);
+	};
+	$scope.closePopover = function() {
+	 $scope.popover.hide();
+	};
+	//Cleanup the popover when we're done with it!
+	$scope.$on('$destroy', function() {
+	 $scope.popover.remove();
+	});
+	// Execute action on hide popover
+	$scope.$on('popover.hidden', function() {
+	 // Execute action
+	});
+	// Execute action on remove popover
+	$scope.$on('popover.removed', function() {
+	 // Execute action
+	});
 });
