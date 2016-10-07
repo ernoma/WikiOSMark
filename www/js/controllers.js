@@ -26,23 +26,36 @@ angular.module('starter.controllers', [])
     enableFriends: true
   };
 
+  $scope.userDetails = {
+    OSM: null,
+    Wiki: null
+  }
+
+  var x2js = new X2JS();
+
   $scope.authorizeWiki = function() {
     // TODO
   }
 
   $scope.authorizeOSM = function() {
-    OpenStreetMap.getUserDetails();
+    OpenStreetMap.getUserDetails(function(details) {});
   }
 
   $scope.logoutOSM = function() {
     OpenStreetMap.logout();
   }
 
+  $scope.authenticatedOSM = function() {
+    return OpenStreetMap.authenticated();
+  }
 
-  $scope.authComplete = function() {
-    console.log($location.url());
-    OpenStreetMap.authComplete($location.url());
-    $state.go("tab.account");
+  $scope.getOSMUserDetails = function() {
+    OpenStreetMap.getUserDetails(function(details) {
+      //console.log(details.getElementsByTagName("osm")[0].innerHTML);
+      var jsonObj = x2js.xml_str2json( details.getElementsByTagName("osm")[0].innerHTML );
+      console.log(jsonObj);
+      $scope.userDetails.OSM = jsonObj;
+    });
   }
 })
 

@@ -6,14 +6,16 @@
     </ion-toggle>
 
     <div class="list list-inset">
-    	<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeOSM()">
+    	<ion-item ng-if="authenticatedOSM() == false" class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeOSM()">
     		<img src="img/osm.png">
     		<h2>OpenStreetMap</h2>
-        	<p>Click to connect...</p>
+        	<p>Authenticate...</p>
     	</ion-item>
-      <ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="logoutOSM()">
+      <ion-item ng-if="authenticatedOSM() == true" class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="logoutOSM()">
     		<img src="img/osm.png">
-    		<h2>OpenStreetMap</h2>
+    		<h2 ng-init="getOSMUserDetails()">OpenStreetMap</h2>
+          <p ng-if="userDetails.OSM.user._display_name == null">Logged in</p>
+          <p ng-if="userDetails.OSM.user._display_name != null">Logged in as {{userDetails.OSM.user._display_name}}</p>
         	<p>Click to disconnect...</p>
     	</ion-item>
     	<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeWiki()">

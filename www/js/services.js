@@ -12,20 +12,32 @@ angular.module('starter.services', [])
               // you try to do a call
   });
 
+  var userDetails = null;
+
   var OpenStreetMapService = {
-    getUserDetails: function () {
+    getUserDetails: function (callback) {
       //auth.authenticate(authCallback);
-      auth.xhr({
-        method: 'GET',
-        path: '/api/0.6/user/details'
-      }, function(err, details) {
-        console.log("done");
-          // details is an XML DOM of user details
-          console.log(details);
-      });
+      if (userDetails == null) {
+        auth.xhr({
+          method: 'GET',
+          path: '/api/0.6/user/details'
+        }, function(err, details) {
+          //console.log("done");
+            // details is an XML DOM of user details
+            //console.log(details);
+            userDetails = details;
+            callback(userDetails);
+        });
+      }
+      else {
+        callback(userDetails);
+      }
     },
     logout: function () {
       auth.logout();
+    },
+    authenticated: function() {
+      return auth.authenticated();
     }
   }
 
