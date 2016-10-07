@@ -1,7 +1,47 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $cordovaGeolocation, $http, leafletData, $ionicPopover) {
+.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $http, leafletData, leafletEvents, $ionicSideMenuDelegate) {
+
+	//
+	// Variables
+	//
+
+	$scope.overpassResult = "";
+
+	var mapFeatures = [];
+
+	var mapEvents = leafletEvents.getAvailableMapEvents();
+	//console.log(mapEvents);
+	for (var k in mapEvents){
+      var eventName = 'leafletDirectiveMap.' + mapEvents[k];
+      $scope.$on(eventName, function(event){
+          //console.log(event.name);
+					if (event.name == "leafletDirectiveMap.popupopen") {
+						console.log(event);
+						for (var i = 0; i < mapFeatures.length; i++) {
+							if (mapFeatures[i].popup._isOpen) {
+								console.log(mapFeatures[i].feature);
+								$ionicSideMenuDelegate.toggleRight(true);
+								break;
+							}
+						}
+					}
+      });
+  }
+
+	$scope.map = {
+	        defaults: {
+	          zoomControlPosition: 'bottomleft'
+	        },
+	        markers : {},
+	        events: {
+	          map: {
+	            enable: ['context'],
+	            logic: 'emit'
+	          }
+	        }
+	      };
 
 	var tilesDict = {
 		openstreetmap: {
@@ -12,22 +52,25 @@ var mapControllers = angular.module('mapControllers', [])
 		}
 	};
 
-	$scope.map = {
-          defaults: {
-            zoomControlPosition: 'bottomleft'
-          },
-          markers : {},
-          events: {
-            map: {
-              enable: ['context'],
-              logic: 'emit'
-            }
-          }
-        };
-
 	angular.extend($scope, {
 			tiles: tilesDict.openstreetmap
 	});
+
+	//
+	// Event handlers
+	//
+
+	$rootScope.$on( "locateMe", function( event ) {
+		$scope.locateMe();
+	});
+
+	$rootScope.$on( "findOSMObjects", function( event ) {
+		$scope.findOSMObjects();
+	});
+
+	//
+	// Methods
+	//
 
 	$scope.goTo = function() {
 		$scope.map.center  = {
@@ -68,8 +111,6 @@ var mapControllers = angular.module('mapControllers', [])
 		  });
 	};
 
-	$scope.overpassResult = "";
-
 	$scope.findOSMObjects = function() {
 
 		var onEachFeature = function (feature, layer) {
@@ -84,14 +125,21 @@ var mapControllers = angular.module('mapControllers', [])
 						content += key + "=" + feature.properties.tags[key] + "<br>";
 				}
 			}
-			if (feature.properties.tags["wikipedia"] == undefined) {
-					content += "<p><button class='button button-small button-positive' ng-click='openPopover($event)'>Search Wiki</button></p>";
-			}
+			// if (feature.properties.tags["wikipedia"] == undefined) {
+			// 		content += "<p><button class='button button-small button-positive' ng-click='searchWiki()'>Search Wiki</button></p>";
+			// }
 			if (feature.properties.tainted) {
 				content += "<p><b>Note:</b> incomplete geometry</p>";
 			}
 
 			layer.bindPopup(content);
+			//console.log(layer);
+			//var popup = layer.getPopup();
+			var mapFeature = {
+				popup: layer._popup,
+				feature: feature
+			}
+			mapFeatures.push(mapFeature);
 		}
 
 		var styleFeature = function (feature) {
@@ -181,29 +229,4 @@ var mapControllers = angular.module('mapControllers', [])
 		// (node(around:100.0,61.5,23.766667);<;);out meta; // koskipuisto
 	}
 
-	// .fromTemplate() method
-	var template = '<ion-popover-view><ion-header-bar> <h1 class="title">My Popover Title</h1> </ion-header-bar> <ion-content> Hello! </ion-content></ion-popover-view>';
-
-	$scope.popover = $ionicPopover.fromTemplate(template, {
-    scope: $scope
-  });
-
-	$scope.openPopover = function($event) {
-	 $scope.popover.show($event);
-	};
-	$scope.closePopover = function() {
-	 $scope.popover.hide();
-	};
-	//Cleanup the popover when we're done with it!
-	$scope.$on('$destroy', function() {
-	 $scope.popover.remove();
-	});
-	// Execute action on hide popover
-	$scope.$on('popover.hidden', function() {
-	 // Execute action
-	});
-	// Execute action on remove popover
-	$scope.$on('popover.removed', function() {
-	 // Execute action
-	});
 });

@@ -1,28 +1,90 @@
+<ion-side-menus enable-menu-with-back-views="false">
+  <ion-side-menu-content>
+    <ion-nav-bar class="bar-stable">
+      <ion-nav-back-button>
+      </ion-nav-back-button>
+
+      <ion-nav-buttons side="right">
+        <button ng-if="currentState == 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="right"></button>
+        <button ng-if="currentState != 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="right" ng-hide="true"></button>
+      </ion-nav-buttons>
+      <ion-nav-buttons side="left">
+        <button ng-if="currentState == 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+        <button ng-if="currentState != 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="left" ng-hide="true"></button>
+      </ion-nav-buttons>
+    </ion-nav-bar>
+
+    <!-- TABS -->
+    <!--
+    Create tabs with an icon and label, using the tabs-positive style.
+    Each tab's child <ion-nav-view> directive will have its own
+    navigation history that also transitions its views in and out.
+    -->
+    <ion-tabs class="tabs-icon-top tabs-color-active-positive">
+
+      <!-- Map Tab -->
+      <ion-tab title="Map" icon-off="ion-map" icon-on="ion-map" href="#/tab/map">
+        <ion-nav-view name="tab-map"></ion-nav-view>
+      </ion-tab>
+
+      <!-- Wiki Tab -->
+      <ion-tab title="Wiki" icon-off="ion-ios-barcode" icon-on="ion-ios-barcode" href="#/tab/wiki">
+        <ion-nav-view name="tab-wiki"></ion-nav-view>
+      </ion-tab>
+
+      <!-- Account Tab -->
+      <ion-tab title="Account" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/account">
+        <ion-nav-view name="tab-account"></ion-nav-view>
+      </ion-tab>
+
+      <!-- Info Tab -->
+      <ion-tab title="Info" icon-off="ion-information" icon-on="ion-information" href="#/tab/info">
+        <ion-nav-view name="tab-info"></ion-nav-view>
+      </ion-tab>
+
+    </ion-tabs>
+
+  </ion-side-menu-content>
+
 <!--
-Create tabs with an icon and label, using the tabs-positive style.
-Each tab's child <ion-nav-view> directive will have its own
-navigation history that also transitions its views in and out.
+<ion-nav-buttons side="primary">
+  <button ng-click="locateMe();" class="button">Locate me</button>
+</ion-nav-buttons>
+  <ion-nav-buttons side="secondary">
+  <button ng-click="findOSMObjects();" class="button">List OSM objects</button>
+</ion-nav-buttons>
 -->
-<ion-tabs class="tabs-icon-top tabs-color-active-positive">
 
-  <!-- Map Tab -->
-  <ion-tab title="Map" icon-off="ion-map" icon-on="ion-map" href="#/tab/dash">
-    <ion-nav-view name="tab-dash"></ion-nav-view>
-  </ion-tab>
+   <!-- Side Menu (left) -->
+  <ion-side-menu side="left">
+    <ion-header-bar class="bar-stable">
+      <h1 class="title">{{mainMenuTitle}}</h1>
+    </ion-header-bar>
+    <ion-content>
+      <ion-list ng-show="currentState == 'tab.map'">
+        <ion-item menu-close ng-click="locateMe()">
+          Locate me
+        </ion-item>
+        <ion-item menu-close ng-click="findOSMObjects()">
+          Show OSM objects
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-side-menu>
 
-  <!-- Wiki Tab -->
-  <ion-tab title="Wiki" icon-off="ion-ios-barcode" icon-on="ion-ios-barcode" href="#/tab/wiki">
-    <ion-nav-view name="tab-wiki"></ion-nav-view>
-  </ion-tab>
-
-  <!-- Account Tab -->
-  <ion-tab title="Account" icon-off="ion-ios-gear-outline" icon-on="ion-ios-gear" href="#/tab/account">
-    <ion-nav-view name="tab-account"></ion-nav-view>
-  </ion-tab>
-
-  <!-- Info Tab -->
-  <ion-tab title="Info" icon-off="ion-information" icon-on="ion-information" href="#/tab/info">
-    <ion-nav-view name="tab-info"></ion-nav-view>
-  </ion-tab>
-
-</ion-tabs>
+  <ion-side-menu side="right">
+    <ion-header-bar class="bar-stable">
+      <h1 class="title">{{sideMenuTitle}}</h1>
+    </ion-header-bar>
+    <ion-content>
+      <ion-list ng-show="currentState == 'tab.map'">
+        <ion-item menu-close ng-click="">
+          Wiki
+        </ion-item>
+        <ion-item menu-close ng-click="">
+          Wiki more
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-side-menu>
+</ion-side-menus>

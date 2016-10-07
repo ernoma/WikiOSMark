@@ -1,6 +1,43 @@
 angular.module('starter.controllers', [])
 
-.controller('DashCtrl', function($scope) {})
+.controller('AppCtrl', function($scope, $state, $rootScope) {
+  $scope.mainMenuTitle = "Map";
+  $scope.sideMenuTitle = "Wiki";
+
+  $scope.$on('$stateChangeSuccess',
+    function(evt, toState, toParams, fromState, fromParams) {
+      $rootScope.currentState = toState.name;
+      switch ($rootScope.currentState) {
+        case "tab.map":
+          $scope.mainMenuTitle = "Map";
+          $scope.sideMenuTitle = "Wiki";
+          break;
+        case "tab.wiki":
+          $scope.mainMenuTitle = "Wiki";
+          $scope.sideMenuTitle = "";
+          break;
+        case "tab.account":
+          $scope.mainMenuTitle = "Account";
+          $scope.sideMenuTitle = "";
+          break;
+        case "tab.info":
+          $scope.mainMenuTitle = "Info";
+          $scope.sideMenuTitle = "";
+          break;
+      }
+  });
+})
+
+.controller('TabCtrl', function($scope, $rootScope) {
+  $scope.findOSMObjects = function() {
+    console.log("in TabCtrl");
+    $rootScope.$broadcast('findOSMObjects');
+  }
+  $scope.locateMe = function() {
+    console.log("in TabCtrl");
+    $rootScope.$broadcast('locateMe');
+  }
+})
 
 .controller('ChatsCtrl', function($scope, Chats) {
   // With the new view caching in Ionic, Controllers are only called
@@ -25,6 +62,9 @@ angular.module('starter.controllers', [])
   $scope.settings = {
     enableFriends: true
   };
+
+  console.log($scope.$parent);
+  //$scope.$parent.title = "Account";
 
   $scope.userDetails = {
     OSM: null,

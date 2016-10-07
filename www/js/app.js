@@ -35,15 +35,16 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
   .state('tab', {
     url: '/tab',
     abstract: true,
-    templateUrl: 'templates/tabs.html'
+    templateUrl: 'templates/tabs.html',
+    controller: 'TabCtrl'
   })
 
   // Each tab has its own nav history stack:
 
-  .state('tab.dash', {
-    url: '/dash',
+  .state('tab.map', {
+    url: '/map',
     views: {
-      'tab-dash': {
+      'tab-map': {
         templateUrl: 'templates/tab-dash.html',
         controller: 'MapCtrl'
       }
@@ -98,6 +99,6 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/dash');
+  $urlRouterProvider.otherwise('/tab/map');
 
 });
