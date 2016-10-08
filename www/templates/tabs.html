@@ -78,12 +78,18 @@
     </ion-header-bar>
     <ion-content>
       <ion-list ng-if="currentState == 'tab.map'" ng-controller="MapCtrl">
+        <ion-item class="item-osm-object">
+          <button class="button button-positive" ng-click="saveWikiTagChanges()" ng-disabled="changesToSave == false">
+            Save changes
+          </button>
+        </ion-item>
         <div class="list list-inset">
           <div class="item item-divider">
-            Object id
+            Object ID
           </div>
-          <ion-item ng-click="showOSMPage()">
+          <ion-item ng-click="">
             <h2>{{osmObjectInfo.id}}</h2>
+            <a ref="" ng-click="showOSMObjectPage()">View on openstreetmap.org</a>
           </ion-item>
           <div class="item item-divider">
             Type
@@ -97,31 +103,31 @@
           <ion-item class="item-osm-object">
             <label class="item item-input item-stacked-label">
               <span class="input-label">Wikidata
-                <button class="button button-positive button-small wiki-map-button" ng-click="showWikidataPage()" ng-disabled="osmObjectInfo.wikidataTag == null">Show</button>
               </span>
               <input type="text" placeholder="Give label or Qxxxx ..." ng-model="osmObjectInfo.wikidataTag" ng-change="inputWikidataChange()">
             </label>
           </ion-item>
           <ion-item class="item-osm-object">
+            <button class="button button-positive button-small wiki-map-button" ng-click="showWikidataPage()" ng-disabled="osmObjectInfo.wikidataTag == ''">View on wikidata.org</button>
+          </ion-item>
+          <ion-item class="item-osm-object">
             <label class="item item-input item-stacked-label">
               <span class="input-label">Wikipedia
-                <button class="button button-positive button-small wiki-map-button" ng-click="showWikipediaPage()" ng-disabled="osmObjectInfo.wikipediaTag == null">Show</button>
               </span>
               <input type="text" placeholder="Give article or fi:article or ..." ng-model="osmObjectInfo.wikipediaTag" ng-change="inputWikipediaChange()">
             </label>
           </ion-item>
           <ion-item class="item-osm-object">
+                <button class="button button-positive button-small wiki-map-button" ng-click="showWikipediaPage()" ng-disabled="osmObjectInfo.wikipediaTag == ''">View on wikipedia.org</button>          </ion-item>
+          <ion-item class="item-osm-object">
             <label class="item item-input item-stacked-label">
               <span class="input-label">Wikimedia Commons
-                <button class="button button-positive button-small wiki-map-button" ng-click="showCommonsPage()" ng-disabled="osmObjectInfo.wikimediaCommonsTag == null">Show</button>
               </span>
               <input type="text" placeholder="Give Category:xyz or File:xyz ..." ng-model="osmObjectInfo.wikimediaCommonsTag" ng-change="inputCommonsChange()">
             </label>
           </ion-item>
           <ion-item class="item-osm-object">
-            <button class="button button-positive button-small" ng-click="saveWikiTagChanges()">
-              Save changes
-            </button>
+            <button class="button button-positive button-small wiki-map-button" ng-click="showCommonsPage()" ng-disabled="osmObjectInfo.wikimediaCommonsTag == ''">View on commons.wikimedia.org</button>
           </ion-item>
           <div class="item item-divider">
             Other Tags

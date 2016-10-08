@@ -9,6 +9,8 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.overpassResult = "";
 
+	$scope.changesToSave = false;
+
 	//var mapFeatures = [];
 
 	$scope.map = {
@@ -134,6 +136,13 @@ var mapControllers = angular.module('mapControllers', [])
 		  });
 	};
 
+	$scope.showOSMObjectPage = function() {
+		window.open("https://www.openstreetmap.org/" +
+			$scope.osmObjectInfo.type + "/" +
+			$scope.osmObjectInfo.id,
+			'_system', 'location=yes');
+	}
+
 	$scope.searchWiki = function() {
 		console.log("in searchWiki");
 	}
@@ -153,6 +162,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.inputWikidataChange = function() {
 		// TODO search and suggest options when 2 or more characters in the input field
+		$scope.changesToSave = true;
 		if ($scope.osmObjectInfo.wikidataTag.length >= 2) {
 			Wiki.queryMediaWiki("wikidata", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikidataTag, function(data) {
 					console.log(data);
@@ -161,6 +171,7 @@ var mapControllers = angular.module('mapControllers', [])
 	}
 	$scope.inputWikipediaChange = function() {
 		// TODO search and suggest options when enought characters in the input field
+		$scope.changesToSave = true;
 		if ($scope.osmObjectInfo.wikipediaTag.includes(":")) {
 			if ($scope.osmObjectInfo.wikipediaTag.length >= 6) {
 				var parts = $scope.osmObjectInfo.wikipediaTag.split(":");
@@ -181,6 +192,7 @@ var mapControllers = angular.module('mapControllers', [])
 	}
 	$scope.inputCommonsChange = function() {
 		// TODO search and suggest options when 3 or more characters in the input field
+		$scope.changesToSave = true;
 	}
 
 	$scope.saveWikiTagChanges = function() {
@@ -188,6 +200,7 @@ var mapControllers = angular.module('mapControllers', [])
 		// 1. what changes there are
 		// 2. if there exists the wiki item(s) and if there does
 		// 3. call OpenStreetMapService save accordingly
+		$scope.changesToSave = false;
 	}
 
 	$scope.findOSMObjects = function() {
@@ -203,9 +216,9 @@ var mapControllers = angular.module('mapControllers', [])
 					$scope.osmObjectInfo.id = feature.properties.id;
 					$scope.osmObjectInfo.type = feature.properties.type;
 					$scope.osmObjectInfo.tags = {};
-					$scope.osmObjectInfo.wikidataTag = null;
-					$scope.osmObjectInfo.wikipediaTag = null;
-					$scope.osmObjectInfo.wikimediaCommonsTag = null;
+					$scope.osmObjectInfo.wikidataTag = "";
+					$scope.osmObjectInfo.wikipediaTag = "";
+					$scope.osmObjectInfo.wikimediaCommonsTag = "";
 					for (var key in feature.properties.tags) {
 						if (key == "wikipedia") {
 							$scope.osmObjectInfo.wikipediaTag = feature.properties.tags[key];
@@ -223,6 +236,7 @@ var mapControllers = angular.module('mapControllers', [])
 					//$scope.osmObjectInfo.tags = feature.properties.tags;
 					$scope.osmObjectInfo.incompleteGeometry = feature.properties.tainted;
 
+					$scope.changesToSave = false; // TODO not working this way, save is enabled when a feature is selected, also could ask saving previous changes...
 					// TODO populate Wiki search form with the data
 					$ionicSideMenuDelegate.toggleRight(true);
 				}
