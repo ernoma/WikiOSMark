@@ -2,7 +2,17 @@ angular.module('starter.controllers', [])
 
 .controller('AppCtrl', function($scope, $state, $rootScope) {
   $scope.mainMenuTitle = "Map";
-  $scope.sideMenuTitle = "Wiki";
+  $scope.sideMenuTitle = "Info";
+
+  $scope.osmObjectInfo = {
+    type: "",
+    id: "",
+    tags: null,
+    wikidataTag: null,
+    wikipediaTag: null,
+    wikimediaCommonsTag: null,
+    incompleteGeometry: false,
+  }
 
   $scope.$on('$stateChangeSuccess',
     function(evt, toState, toParams, fromState, fromParams) {
@@ -10,7 +20,7 @@ angular.module('starter.controllers', [])
       switch ($rootScope.currentState) {
         case "tab.map":
           $scope.mainMenuTitle = "Map";
-          $scope.sideMenuTitle = "Wiki";
+          $scope.sideMenuTitle = "OSM Object Info";
           break;
         case "tab.wiki":
           $scope.mainMenuTitle = "Wiki";
@@ -29,38 +39,20 @@ angular.module('starter.controllers', [])
 })
 
 .controller('TabCtrl', function($scope, $rootScope) {
-  $scope.findOSMObjects = function() {
-    console.log("in TabCtrl");
-    $rootScope.$broadcast('findOSMObjects');
-  }
+  // $scope.findOSMObjects = function() {
+  //   console.log("in TabCtrl");
+  //   $rootScope.$broadcast('findOSMObjects');
+  // }
   $scope.locateMe = function() {
     console.log("in TabCtrl");
     $rootScope.$broadcast('locateMe');
   }
 })
 
-.controller('ChatsCtrl', function($scope, Chats) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  };
-})
-
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
-})
-
-.controller('AccountCtrl', function($scope, $state, $location, OpenStreetMap) {
+.controller('AccountCtrl', function($scope, $state, $location, OpenStreetMap, AppSettings) {
   $scope.settings = {
-    enableFriends: true
+    enableFriends: true,
+    defaultLanguage: AppSettings.getDefaultLanguage()
   };
 
   console.log($scope.$parent);
@@ -69,6 +61,11 @@ angular.module('starter.controllers', [])
   $scope.userDetails = {
     OSM: null,
     Wiki: null
+  }
+
+  $scope.changeDefaultLanguage = function() {
+    //console.log($scope.settings.defaultLanguage);
+    AppSettings.setDefaultLanguage($scope.settings.defaultLanguage);
   }
 
   var x2js = new X2JS();

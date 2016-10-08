@@ -1,5 +1,92 @@
 angular.module('starter.services', [])
 
+.factory('AppSettings', function($window) {
+  var settingsService = {
+    getDefaultLanguage: function() {
+      return $window.localStorage["defaultLanguage"] || "en";
+    },
+    setDefaultLanguage: function(language) {
+      $window.localStorage["defaultLanguage"] = language;
+    }
+    // set: function(key, value) {
+		//   $window.localStorage[key] = value;
+		// },
+		// get: function(key, defaultValue) {
+		//   return $window.localStorage[key] || defaultValue;
+		// },
+		// setObject: function(key, value) {
+		//   $window.localStorage[key] = JSON.stringify(value);
+		// },
+		// getObject: function(key) {
+		//   return JSON.parse($window.localStorage[key] || '{}');
+		// }
+  }
+  return settingsService;
+})
+
+.factory('Wiki', function($http) {
+  var wikiService = {
+    getWikidataProperties: function(lang) {
+
+      var promise = $http.get('data/wikidata_properties/' + lang + '.json').success(function(response){
+        //console.log(response);
+        return response.data;
+      });
+
+      return promise;
+    },
+    showWikidataPage: function(identifier) {
+      var URL = "https://www.wikidata.org/wiki/" + identifier;
+      window.open(URL, '_system', 'location=yes');
+    },
+    showWikipediaPage: function(identifier) {
+      var URL = "https://";
+      var parts =  identifier.split(":");
+      URL += parts[0] + ".wikipedia.org/wiki/" + parts[1];
+      window.open(URL, '_system', 'location=yes');
+    },
+    showWikimediaCommonsPage: function(identifier) {
+      var URL = "https://commons.wikimedia.org/wiki/" + identifier;
+      window.open(URL, '_system', 'location=yes');
+    },
+    queryMediaWiki: function(site, language, searchText, callback) {
+      console.log(searchText);
+
+  		var url = "https://";
+
+  		if (site == "wikipedia") {
+  			url += language;
+  			url += ".wikipedia.org/w/api.php?action=opensearch";
+  			url += "&limit=" + 50;
+  			url += "&search=" + searchText;
+
+  		}
+  		else if (site == "wikidata") {
+  			url = wdk.searchEntities({
+  				search: searchText,
+  				language: language,
+  				limit: 50
+  				});
+  		}
+  		else { // site == commons
+  			url += "commons.wikimedia.org/w/api.php?action=opensearch";
+  			url += "&limit=" + 50;
+  			url += "&search=" + searchText;
+  		}
+
+  		url += "&callback=JSON_CALLBACK";
+
+  		$http.jsonp(url).
+  		  success(callback)
+  		  .error(function (data) {
+  		  	console.log('data error');
+  		    console.log(data);
+  		  });
+    },
+  };
+  return wikiService;
+})
+
 .factory('OpenStreetMap', function() {
 
   var auth = osmAuth({
@@ -43,68 +130,4 @@ angular.module('starter.services', [])
 
   return OpenStreetMapService;
 
-})
-
-.factory('Wiki', function($http) {
-  var wikiService = {
-    getWikidataProperties: function(lang) {
-
-      var promise = $http.get('data/wikidata_properties/' + lang + '.json').success(function(response){
-        //console.log(response);
-        return response.data;
-      });
-
-      return promise;
-    }
-  };
-  return wikiService;
-})
-
-.factory('Chats', function() {
-  // Might use a resource here that returns a JSON array
-
-  // Some fake testing data
-  var chats = [{
-    id: 0,
-    name: 'Ben Sparrow',
-    lastText: 'You on your way?',
-    face: 'img/ben.png'
-  }, {
-    id: 1,
-    name: 'Max Lynx',
-    lastText: 'Hey, it\'s me',
-    face: 'img/max.png'
-  }, {
-    id: 2,
-    name: 'Adam Bradleyson',
-    lastText: 'I should buy a boat',
-    face: 'img/adam.jpg'
-  }, {
-    id: 3,
-    name: 'Perry Governor',
-    lastText: 'Look at my mukluks!',
-    face: 'img/perry.png'
-  }, {
-    id: 4,
-    name: 'Mike Harrington',
-    lastText: 'This is wicked good ice cream.',
-    face: 'img/mike.png'
-  }];
-
-  return {
-    all: function() {
-      return chats;
-    },
-    remove: function(chat) {
-      chats.splice(chats.indexOf(chat), 1);
-    },
-    get: function(chatId) {
-      for (var i = 0; i < chats.length; i++) {
-        if (chats[i].id === parseInt(chatId)) {
-          return chats[i];
-        }
-      }
-      return null;
-    }
-  };
 });

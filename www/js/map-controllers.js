@@ -1,7 +1,7 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $http, leafletData, leafletEvents, $ionicSideMenuDelegate) {
+.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $http, leafletData, leafletEvents, $ionicSideMenuDelegate, Wiki, AppSettings) {
 
 	//
 	// Variables
@@ -9,26 +9,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.overpassResult = "";
 
-	var mapFeatures = [];
-
-	var mapEvents = leafletEvents.getAvailableMapEvents();
-	//console.log(mapEvents);
-	for (var k in mapEvents){
-      var eventName = 'leafletDirectiveMap.' + mapEvents[k];
-      $scope.$on(eventName, function(event){
-          //console.log(event.name);
-					if (event.name == "leafletDirectiveMap.popupopen") {
-						console.log(event);
-						for (var i = 0; i < mapFeatures.length; i++) {
-							if (mapFeatures[i].popup._isOpen) {
-								console.log(mapFeatures[i].feature);
-								$ionicSideMenuDelegate.toggleRight(true);
-								break;
-							}
-						}
-					}
-      });
-  }
+	//var mapFeatures = [];
 
 	$scope.map = {
 	        defaults: {
@@ -63,10 +44,51 @@ var mapControllers = angular.module('mapControllers', [])
 	$rootScope.$on( "locateMe", function( event ) {
 		$scope.locateMe();
 	});
+	//
+	// $rootScope.$on( "findOSMObjects", function( event ) {
+	// 	$scope.findOSMObjects();
+	// });
 
-	$rootScope.$on( "findOSMObjects", function( event ) {
-		$scope.findOSMObjects();
-	});
+	//console.log(leafletEvents);
+	//var markerEvents = leafletEvents.getAvailableMarkerEvents();
+	//console.log(markerEvents);
+	// var mapEvents = leafletEvents.getAvailableMapEvents();
+	// //console.log(mapEvents);
+	// for (var k in mapEvents){
+  //     var eventName = 'leafletDirectiveMap.' + mapEvents[k];
+  //     $scope.$on(eventName, function(event){
+  //         //console.log(event.name);
+	// 				if (event.name == "leafletDirectiveMap.popupopen") {
+	// 					console.log(event);
+	// 					for (var i = 0; i < mapFeatures.length; i++) {
+	// 						if (mapFeatures[i].popup._isOpen) {
+	//
+	// 							leafletData.getMap().then(function(map) {
+	// 								console.log(mapFeatures[i].popup);
+	// 								map.closePopup(mapFeatures[i].popup);
+	// 								console.log(mapFeatures[i].feature);
+	// 								// TODO populate info form with the data
+	// 								var title = mapFeatures[i].feature.properties.type.charAt(0).toUpperCase() +
+	// 									mapFeatures[i].feature.properties.type.slice(1) + " " +
+	// 									mapFeatures[i].feature.properties.id;
+	// 								console.log(title);
+	// 								$scope.osmObjectInfo.title = title;
+	// 								//tags: mapFeatures[i].feature.properties.tags,
+	// 								//incompleteGeometry: mapFeatures[i].feature.properties.tainted
+	//
+	// 								// TODO populate Wiki search form with the data
+	// 								$ionicSideMenuDelegate.toggleRight(true);
+	// 							});
+	// 							break;
+	// 						}
+	// 					}
+	// 				}
+  //     });
+  // }
+	// $scope.$on('leafletDirectiveMarker.click', function(event, locationEvent) {
+	// 	console.log(event);
+	// 	console.log(locationEvent);
+	// });
 
 	//
 	// Methods
@@ -83,6 +105,7 @@ var mapControllers = angular.module('mapControllers', [])
 	$scope.goTo();
 
 	$scope.locateMe = function() {
+		console.log("in locateMe");
 		//$scope.tiles = tilesDict.openstreetmap;
 		$scope.locate();
 	}
@@ -111,35 +134,132 @@ var mapControllers = angular.module('mapControllers', [])
 		  });
 	};
 
-	$scope.findOSMObjects = function() {
+	$scope.searchWiki = function() {
+		console.log("in searchWiki");
+	}
 
-		var onEachFeature = function (feature, layer) {
-			var content = "";
+	$scope.showWikidataPage = function() {
+		console.log("in showWikidataPage");
+		Wiki.showWikidataPage($scope.osmObjectInfo.wikidataTag);
+	}
+	$scope.showWikipediaPage = function() {
+		console.log("in showWikipediaPage");
+		Wiki.showWikipediaPage($scope.osmObjectInfo.wikipediaTag);
+	}
+	$scope.showCommonsPage = function() {
+		console.log("in showCommonsPage");
+		Wiki.showWikimediaCommonsPage($scope.osmObjectInfo.wikimediaCommonsTag);
+	}
 
-			content += "<h3>" + feature.properties.type.charAt(0).toUpperCase() + feature.properties.type.slice(1);
-			content += " " + feature.properties.id + "</h3>";
-
-			if (feature.properties.tags != undefined) {
-				content += "<h4>Tags:</h4>";
-				for (var key in feature.properties.tags) {
-						content += key + "=" + feature.properties.tags[key] + "<br>";
+	$scope.inputWikidataChange = function() {
+		// TODO search and suggest options when 2 or more characters in the input field
+		if ($scope.osmObjectInfo.wikidataTag.length >= 2) {
+			Wiki.queryMediaWiki("wikidata", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikidataTag, function(data) {
+					console.log(data);
+			});
+		}
+	}
+	$scope.inputWikipediaChange = function() {
+		// TODO search and suggest options when enought characters in the input field
+		if ($scope.osmObjectInfo.wikipediaTag.includes(":")) {
+			if ($scope.osmObjectInfo.wikipediaTag.length >= 6) {
+				var parts = $scope.osmObjectInfo.wikipediaTag.split(":");
+				if (parts.length > 1) {
+					Wiki.queryMediaWiki("wikipedia", parts[0], parts[1], function(data) {
+							console.log(data);
+					});
 				}
 			}
-			// if (feature.properties.tags["wikipedia"] == undefined) {
-			// 		content += "<p><button class='button button-small button-positive' ng-click='searchWiki()'>Search Wiki</button></p>";
-			// }
-			if (feature.properties.tainted) {
-				content += "<p><b>Note:</b> incomplete geometry</p>";
+		}
+		else {
+			if ($scope.osmObjectInfo.wikipediaTag.length >= 3) {
+				Wiki.queryMediaWiki("wikipedia", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikipediaTag, function(data) {
+						console.log(data);
+				});
 			}
+		}
+	}
+	$scope.inputCommonsChange = function() {
+		// TODO search and suggest options when 3 or more characters in the input field
+	}
 
-			layer.bindPopup(content);
+	$scope.saveWikiTagChanges = function() {
+		// TODO Check
+		// 1. what changes there are
+		// 2. if there exists the wiki item(s) and if there does
+		// 3. call OpenStreetMapService save accordingly
+	}
+
+	$scope.findOSMObjects = function() {
+		console.log("in findOSMObjects");
+		var onEachFeature = function (feature, layer) {
+			layer.on({
+        click: function() {
+          console.log("geojson feature clicked");
+					// var title = feature.properties.type.charAt(0).toUpperCase() +
+					// 	feature.properties.type.slice(1) + " " +
+					// 	feature.properties.id;
+					console.log(feature);
+					$scope.osmObjectInfo.id = feature.properties.id;
+					$scope.osmObjectInfo.type = feature.properties.type;
+					$scope.osmObjectInfo.tags = {};
+					$scope.osmObjectInfo.wikidataTag = null;
+					$scope.osmObjectInfo.wikipediaTag = null;
+					$scope.osmObjectInfo.wikimediaCommonsTag = null;
+					for (var key in feature.properties.tags) {
+						if (key == "wikipedia") {
+							$scope.osmObjectInfo.wikipediaTag = feature.properties.tags[key];
+						}
+						else if (key == "wikidata") {
+							$scope.osmObjectInfo.wikidataTag = feature.properties.tags[key];
+						}
+						else if (key == "wikimedia_commons") {
+							$scope.osmObjectInfo.wikimediaCommonsTag = feature.properties.tags[key];
+						}
+						else {
+							$scope.osmObjectInfo.tags[key] = feature.properties.tags[key];
+						}
+					}
+					//$scope.osmObjectInfo.tags = feature.properties.tags;
+					$scope.osmObjectInfo.incompleteGeometry = feature.properties.tainted;
+
+					// TODO populate Wiki search form with the data
+					$ionicSideMenuDelegate.toggleRight(true);
+				}
+			});
+
+			// var content = "";
+			//
+			// content += "<h3>" + feature.properties.type.charAt(0).toUpperCase() + feature.properties.type.slice(1);
+			// content += " " + feature.properties.id + "</h3>";
+			//
+			// if (feature.properties.tags != undefined) {
+			// 	content += "<h4>Tags:</h4>";
+			// 	for (var key in feature.properties.tags) {
+			// 			content += key + "=" + feature.properties.tags[key] + "<br>";
+			// 	}
+			// }
+			// if (feature.properties.tags["wikipedia"] == undefined) {
+			//  		content += "<p><button class='button button-small button-positive' ng-click='searchWiki()'>Search Wiki</button></p>";
+			// }
+			// if (feature.properties.tainted) {
+			// 	content += "<p><b>Note:</b> incomplete geometry</p>";
+			// }
+			//
+			// //var element = $compile(content);
+			// //console.log(element);
+			// //var html = element($scope);
+			// //console.log(html);
+			// layer.bindPopup(content);
+
+
 			//console.log(layer);
 			//var popup = layer.getPopup();
-			var mapFeature = {
-				popup: layer._popup,
-				feature: feature
-			}
-			mapFeatures.push(mapFeature);
+			// var mapFeature = {
+			// 	popup: layer._popup,
+			// 	feature: feature
+			// }
+			// mapFeatures.push(mapFeature);
 		}
 
 		var styleFeature = function (feature) {
@@ -200,30 +320,36 @@ var mapControllers = angular.module('mapControllers', [])
 		}
 
 
-		data = "[out:json];(node(around:100.0," + $scope.map.center.lat + "," + $scope.map.center.lng + ");<;);out meta;";
-		$http.get('http://www.overpass-api.de/api/interpreter?data=' + data)
-			.success(function(data, status, headers,config){
-		      console.log('data success');
-		      //console.log(data); // for browser console
-		      //$scope.overpassResult = data; // for UI
+		var addOverpassDataToMap = function(data) {
+			var geoJson = osmtogeojson(data);
+			console.log(geoJson);
 
-		      var geoJson = osmtogeojson(data);
-		      console.log(geoJson);
+			leafletData.getMap().then(function(map) {
+				L.geoJson(geoJson, {
+					style: styleFeature,
+					pointToLayer: pointToLayer,
+					onEachFeature: onEachFeature
+				}).addTo(map);
+			});
+		}
 
-		      leafletData.getMap().then(function(map) {
-		      	L.geoJson(geoJson, {
-		      		style: styleFeature,
-		      		pointToLayer: pointToLayer,
-		      		onEachFeature: onEachFeature
-		      	}).addTo(map);
-		      });
-		    })
-		    .error(function(data, status, headers,config){
-		      console.log('data error');
-		    })
-		    .then(function(result){
-		      //things = result.data;
-		    });
+		addOverpassDataToMap(overpass_test_data);
+
+		// data = "[out:json];(node(around:100.0," + $scope.map.center.lat + "," + $scope.map.center.lng + ");<;);out meta;";
+		// $http.get('http://www.overpass-api.de/api/interpreter?data=' + data)
+		// 	.success(function(data, status, headers,config){
+		//       console.log('data success');
+		//       //console.log(data); // for browser console
+		//       //$scope.overpassResult = data; // for UI
+		//
+		//       addOverpassDataToMap(data);
+		//     })
+		//     .error(function(data, status, headers,config){
+		//       console.log('data error');
+		//     })
+		//     .then(function(result){
+		//       //things = result.data;
+		//     });
 
 		// (node(around:100.0,61.496507,23.781377);<;);out meta; // sorsapuisto
 		// (node(around:100.0,61.5,23.766667);<;);out meta; // koskipuisto

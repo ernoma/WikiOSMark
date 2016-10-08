@@ -61,29 +61,88 @@
       <h1 class="title">{{mainMenuTitle}}</h1>
     </ion-header-bar>
     <ion-content>
-      <ion-list ng-show="currentState == 'tab.map'">
+      <ion-list ng-if="currentState == 'tab.map'">
         <ion-item menu-close ng-click="locateMe()">
           Locate me
         </ion-item>
-        <ion-item menu-close ng-click="findOSMObjects()">
+        <ion-item menu-close ng-click="findOSMObjects()" ng-controller="MapCtrl">
           Show OSM objects
         </ion-item>
       </ion-list>
     </ion-content>
   </ion-side-menu>
 
-  <ion-side-menu side="right">
+  <ion-side-menu side="right" width="275">
     <ion-header-bar class="bar-stable">
       <h1 class="title">{{sideMenuTitle}}</h1>
     </ion-header-bar>
     <ion-content>
-      <ion-list ng-show="currentState == 'tab.map'">
-        <ion-item menu-close ng-click="">
-          Wiki
-        </ion-item>
-        <ion-item menu-close ng-click="">
-          Wiki more
-        </ion-item>
+      <ion-list ng-if="currentState == 'tab.map'" ng-controller="MapCtrl">
+        <div class="list list-inset">
+          <div class="item item-divider">
+            Object id
+          </div>
+          <ion-item ng-click="showOSMPage()">
+            <h2>{{osmObjectInfo.id}}</h2>
+          </ion-item>
+          <div class="item item-divider">
+            Type
+          </div>
+          <ion-item>
+            <h2>{{osmObjectInfo.type}}</h2>
+          </ion-item>
+          <div class="item item-divider">
+            Wiki Tags
+          </div>
+          <ion-item class="item-osm-object">
+            <label class="item item-input item-stacked-label">
+              <span class="input-label">Wikidata
+                <button class="button button-positive button-small wiki-map-button" ng-click="showWikidataPage()" ng-disabled="osmObjectInfo.wikidataTag == null">Show</button>
+              </span>
+              <input type="text" placeholder="Give label or Qxxxx ..." ng-model="osmObjectInfo.wikidataTag" ng-change="inputWikidataChange()">
+            </label>
+          </ion-item>
+          <ion-item class="item-osm-object">
+            <label class="item item-input item-stacked-label">
+              <span class="input-label">Wikipedia
+                <button class="button button-positive button-small wiki-map-button" ng-click="showWikipediaPage()" ng-disabled="osmObjectInfo.wikipediaTag == null">Show</button>
+              </span>
+              <input type="text" placeholder="Give article or fi:article or ..." ng-model="osmObjectInfo.wikipediaTag" ng-change="inputWikipediaChange()">
+            </label>
+          </ion-item>
+          <ion-item class="item-osm-object">
+            <label class="item item-input item-stacked-label">
+              <span class="input-label">Wikimedia Commons
+                <button class="button button-positive button-small wiki-map-button" ng-click="showCommonsPage()" ng-disabled="osmObjectInfo.wikimediaCommonsTag == null">Show</button>
+              </span>
+              <input type="text" placeholder="Give Category:xyz or File:xyz ..." ng-model="osmObjectInfo.wikimediaCommonsTag" ng-change="inputCommonsChange()">
+            </label>
+          </ion-item>
+          <ion-item class="item-osm-object">
+            <button class="button button-positive button-small" ng-click="saveWikiTagChanges()">
+              Save changes
+            </button>
+          </ion-item>
+          <div class="item item-divider">
+            Other Tags
+          </div>
+          <div class="item row row-osm-object-header">
+            <div class="col col-50 col-osm-object col-osm-object-left">Key</div>
+            <div class="col col-50 col-osm-object">Value</div>
+          </div>
+            <ion-item class="item-osm-object" ng-click="" ng-repeat="(key, value) in osmObjectInfo.tags">
+              <div class="row row-osm-object">
+                <div class="col col-50 col-osm-object col-osm-object-left">{{key}}</div>
+                <div class="col col-50 col-osm-object">{{value}}</div>
+              </div>
+            </ion-item>
+          <div class="item item-divider" ng-if="osmObjectInfo.incompleteGeometry">
+            Note
+          </div>
+          <ion-item ng-if="osmObjectInfo.incompleteGeometry">
+            Incomplete geometry shown
+          </ion-item>
+        </div>
       </ion-list>
     </ion-content>
   </ion-side-menu>

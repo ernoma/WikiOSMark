@@ -9840,3 +9840,24 @@ body {
   max-height: 150px;
   width: 100%;
   /* height: 100%; */ }
+
+.row-osm-object-header {
+  padding: 0px;
+  border-bottom: 2px solid #ddd;
+  background: #f7f7f7; }
+
+.item-osm-object {
+  padding: 0px; }
+
+.row-osm-object {
+  padding: 0px; }
+
+.col-osm-object {
+  width: 100%; }
+
+.col-osm-object-left {
+  border-right: 1px solid #ddd; }
+
+.wiki-map-button {
+  position: absolute;
+  right: 10px; }

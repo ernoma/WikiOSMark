@@ -24,6 +24,24 @@
         	<p>Click to connect...</p>
     	</ion-item>
     </div>
+
+    <div class="list list-inset">
+      <label class="item item-input item-select">
+        <div class="input-label">
+          Default search language
+        </div>
+        <select ng-model="settings.defaultLanguage" ng-change="changeDefaultLanguage()">
+          <option value="en">English (en)</option>
+          <option value="da">Danish (da)</option>
+          <option value="et">Estonian (et)</option>
+          <option value="fi">Finnish (fi)</option>
+          <option value="is">Icelandic (is)</option>
+          <option value="no">Norwegian (no)</option>
+          <option value="se">Swedish (se)</option>
+          <!--<option>Wikivoyage</option>-->
+        </select>
+      </label>
+    </div>
     </ion-list>
   </ion-content>
 </ion-view>
