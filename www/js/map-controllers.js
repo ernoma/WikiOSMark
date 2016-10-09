@@ -11,6 +11,13 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.changesToSave = false;
 
+	//$scope.wikidataResults = [{"id":"Q5408372","concepturi":"http://www.wikidata.org/entity/Q5408372","url":"//www.wikidata.org/wiki/Q5408372","title":"Q5408372","pageid":5172585,"label":"Joutsenkaula","description":"Wikimedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsenkaula"}},
+	//  {"id":"Q2736937","concepturi":"http://www.wikidata.org/entity/Q2736937","url":"//www.wikidata.org/wiki/Q2736937","title":"Q2736937","pageid":2628927,"label":"Joutsen","description":"Wikipedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsen"}
+	//}];
+	$scope.wikidataResults = null;
+	$scope.wikipediaResults = null;
+	$scope.commonsResults = null;
+
 	//var mapFeatures = [];
 
 	$scope.map = {
@@ -46,51 +53,6 @@ var mapControllers = angular.module('mapControllers', [])
 	$rootScope.$on( "locateMe", function( event ) {
 		$scope.locateMe();
 	});
-	//
-	// $rootScope.$on( "findOSMObjects", function( event ) {
-	// 	$scope.findOSMObjects();
-	// });
-
-	//console.log(leafletEvents);
-	//var markerEvents = leafletEvents.getAvailableMarkerEvents();
-	//console.log(markerEvents);
-	// var mapEvents = leafletEvents.getAvailableMapEvents();
-	// //console.log(mapEvents);
-	// for (var k in mapEvents){
-  //     var eventName = 'leafletDirectiveMap.' + mapEvents[k];
-  //     $scope.$on(eventName, function(event){
-  //         //console.log(event.name);
-	// 				if (event.name == "leafletDirectiveMap.popupopen") {
-	// 					console.log(event);
-	// 					for (var i = 0; i < mapFeatures.length; i++) {
-	// 						if (mapFeatures[i].popup._isOpen) {
-	//
-	// 							leafletData.getMap().then(function(map) {
-	// 								console.log(mapFeatures[i].popup);
-	// 								map.closePopup(mapFeatures[i].popup);
-	// 								console.log(mapFeatures[i].feature);
-	// 								// TODO populate info form with the data
-	// 								var title = mapFeatures[i].feature.properties.type.charAt(0).toUpperCase() +
-	// 									mapFeatures[i].feature.properties.type.slice(1) + " " +
-	// 									mapFeatures[i].feature.properties.id;
-	// 								console.log(title);
-	// 								$scope.osmObjectInfo.title = title;
-	// 								//tags: mapFeatures[i].feature.properties.tags,
-	// 								//incompleteGeometry: mapFeatures[i].feature.properties.tainted
-	//
-	// 								// TODO populate Wiki search form with the data
-	// 								$ionicSideMenuDelegate.toggleRight(true);
-	// 							});
-	// 							break;
-	// 						}
-	// 					}
-	// 				}
-  //     });
-  // }
-	// $scope.$on('leafletDirectiveMarker.click', function(event, locationEvent) {
-	// 	console.log(event);
-	// 	console.log(locationEvent);
-	// });
 
 	//
 	// Methods
@@ -149,11 +111,20 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.showWikidataPage = function() {
 		console.log("in showWikidataPage");
-		Wiki.showWikidataPage($scope.osmObjectInfo.wikidataTag);
+		var item = $scope.osmObjectInfo.wikidataTag;
+		if ($scope.osmObjectInfo.wikidataTag.includes("(")) {
+			var temp = $scope.osmObjectInfo.wikidataTag.split("(")[1];
+			item = temp.split(")")[0];
+		}
+		Wiki.showWikidataPage(item);
 	}
 	$scope.showWikipediaPage = function() {
 		console.log("in showWikipediaPage");
-		Wiki.showWikipediaPage($scope.osmObjectInfo.wikipediaTag);
+		var item = $scope.osmObjectInfo.wikipediaTag;
+		if (!item.includes(":")) {
+			item = AppSettings.getDefaultLanguage() + ":" + $scope.osmObjectInfo.wikipediaTag;
+		}
+		Wiki.showWikipediaPage(item);
 	}
 	$scope.showCommonsPage = function() {
 		console.log("in showCommonsPage");
@@ -166,9 +137,14 @@ var mapControllers = angular.module('mapControllers', [])
 		if ($scope.osmObjectInfo.wikidataTag.length >= 2) {
 			Wiki.queryMediaWiki("wikidata", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikidataTag, function(data) {
 					console.log(data);
+					$scope.wikidataResults = data.search;
 			});
 		}
+		else if ($scope.osmObjectInfo.wikidataTag.length == 0) {
+			$scope.wikidataResults = "";
+		}
 	}
+
 	$scope.inputWikipediaChange = function() {
 		// TODO search and suggest options when enought characters in the input field
 		$scope.changesToSave = true;
@@ -178,28 +154,57 @@ var mapControllers = angular.module('mapControllers', [])
 				if (parts.length > 1) {
 					Wiki.queryMediaWiki("wikipedia", parts[0], parts[1], function(data) {
 							console.log(data);
+							$scope.wikipediaResults = data[1];
 					});
 				}
 			}
 		}
-		else {
-			if ($scope.osmObjectInfo.wikipediaTag.length >= 3) {
-				Wiki.queryMediaWiki("wikipedia", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikipediaTag, function(data) {
-						console.log(data);
-				});
-			}
+		else if ($scope.osmObjectInfo.wikipediaTag.length >= 3) {
+			Wiki.queryMediaWiki("wikipedia", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikipediaTag, function(data) {
+					console.log(data);
+					$scope.wikipediaResults = data[1];
+			});
+		}
+		else if ($scope.osmObjectInfo.wikipediaTag.length == 0) {
+			$scope.wikipediaResults = "";
 		}
 	}
+
 	$scope.inputCommonsChange = function() {
 		// TODO search and suggest options when 3 or more characters in the input field
 		$scope.changesToSave = true;
+		$scope.commonsResults = null;
+		if ($scope.osmObjectInfo.wikimediaCommonsTag.length >= 3) {
+			Wiki.queryMediaWiki("commons", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikimediaCommonsTag, function(data) {
+					console.log(data);
+					$scope.commonsResults = data[1];
+			});
+		}
+		else if ($scope.osmObjectInfo.wikimediaCommonsTag.length == 0) {
+			$scope.commonsResults = "";
+		}
+	}
+
+	$scope.selectWikidataSearchResult = function(item) {
+		$scope.osmObjectInfo.wikidataTag = item.label + " (" + item.id + ")";
+		$scope.wikidataResults = null;
+	}
+
+	$scope.selectWikipediaSearchResult = function(item) {
+		$scope.osmObjectInfo.wikipediaTag = item;
+		$scope.wikipediaResults = null;
+	}
+
+	$scope.selectCommonsSearchResult = function(item) {
+		$scope.osmObjectInfo.wikimediaCommonsTag = item;
+		$scope.commonsResults = null;
 	}
 
 	$scope.saveWikiTagChanges = function() {
 		// TODO Check
 		// 1. what changes there are
 		// 2. if there exists the wiki item(s) and if there does
-		// 3. call OpenStreetMapService save accordingly
+		// 3. call OpenStreetMapService save accordingly (trim the UI input values)
 		$scope.changesToSave = false;
 	}
 

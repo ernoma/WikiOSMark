@@ -89,7 +89,9 @@
           </div>
           <ion-item ng-click="">
             <h2>{{osmObjectInfo.id}}</h2>
-            <a ref="" ng-click="showOSMObjectPage()">View on openstreetmap.org</a>
+          </ion-item>
+          <ion-item class="item-osm-object">
+            <button class="button button-positive button-small wiki-map-button" ng-click="showOSMObjectPage()">View on openstreetmap.org</button>
           </ion-item>
           <div class="item item-divider">
             Type
@@ -107,6 +109,11 @@
               <input type="text" placeholder="Give label or Qxxxx ..." ng-model="osmObjectInfo.wikidataTag" ng-change="inputWikidataChange()">
             </label>
           </ion-item>
+          <ion-list>
+            <ion-item class="item" ng-repeat="item in wikidataResults" ng-click="selectWikidataSearchResult(item)">
+              <p>{{item.label}} ({{item.id}})</p>
+            </ion-item>
+          </ion-list>
           <ion-item class="item-osm-object">
             <button class="button button-positive button-small wiki-map-button" ng-click="showWikidataPage()" ng-disabled="osmObjectInfo.wikidataTag == ''">View on wikidata.org</button>
           </ion-item>
@@ -117,6 +124,11 @@
               <input type="text" placeholder="Give article or fi:article or ..." ng-model="osmObjectInfo.wikipediaTag" ng-change="inputWikipediaChange()">
             </label>
           </ion-item>
+          <ion-list>
+            <ion-item class="item" ng-repeat="item in wikipediaResults" ng-click="selectWikipediaSearchResult(item)">
+              <p>{{item}}</p>
+            </ion-item>
+          </ion-list>
           <ion-item class="item-osm-object">
                 <button class="button button-positive button-small wiki-map-button" ng-click="showWikipediaPage()" ng-disabled="osmObjectInfo.wikipediaTag == ''">View on wikipedia.org</button>          </ion-item>
           <ion-item class="item-osm-object">
@@ -126,6 +138,11 @@
               <input type="text" placeholder="Give Category:xyz or File:xyz ..." ng-model="osmObjectInfo.wikimediaCommonsTag" ng-change="inputCommonsChange()">
             </label>
           </ion-item>
+          <ion-list>
+            <ion-item class="item" ng-repeat="item in commonsResults" ng-click="selectCommonsSearchResult(item)">
+              <p>{{item}}</p>
+            </ion-item>
+          </ion-list>
           <ion-item class="item-osm-object">
             <button class="button button-positive button-small wiki-map-button" ng-click="showCommonsPage()" ng-disabled="osmObjectInfo.wikimediaCommonsTag == ''">View on commons.wikimedia.org</button>
           </ion-item>
