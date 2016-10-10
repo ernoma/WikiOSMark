@@ -50,7 +50,7 @@ angular.module('starter.services', [])
       window.open(URL, '_system', 'location=yes');
     },
     queryMediaWiki: function(site, language, searchText, callback) {
-      console.log(searchText);
+      //console.log(searchText);
 
   		var url = "https://";
 
@@ -87,7 +87,7 @@ angular.module('starter.services', [])
   return wikiService;
 })
 
-.factory('OpenStreetMap', function() {
+.factory('OpenStreetMap', function($http) {
 
   var auth = osmAuth({
     oauth_consumer_key: osm_oauth_data.oauth_consumer_key,
@@ -98,6 +98,8 @@ angular.module('starter.services', [])
     auto: true // show a login form if the user is not authenticated and
               // you try to do a call
   });
+
+  var serializer = new XMLSerializer();
 
   var userDetails = null;
 
@@ -125,6 +127,66 @@ angular.module('starter.services', [])
     },
     authenticated: function() {
       return auth.authenticated();
+    },
+    getPermissions: function() {
+      auth.xhr({
+        method: 'GET',
+        path: '/api/0.6/permissions'
+      }, function(err, response) {
+        console.log(err);
+        console.log(response);
+      });
+    },
+    updateElementTags: function(osmObject, changesetComment, tags) {
+      // TODO: create xml, open changeset, update data, close changeset
+      // TODO: also check if a wiki tag should be deleted
+      console.log(osmObject);
+      console.log(changesetComment);
+      console.log(tags);
+
+      var changesetXMLString = '';//'<?xml version="1.0" encoding="UTF-8"?>';
+      changesetXMLString += '<osm><changeset><tag k="created_by" v="WikiOSMark 0.1"/>';
+      changesetXMLString += '<tag k="comment" v="' + changesetComment + '"/>';
+      changesetXMLString += '</changeset></osm>';
+
+      console.log("creating changeset");
+      auth.xhr({
+        method: 'PUT',
+        path: '/api/0.6/changeset/create',
+        content: changesetXMLString,
+        options: {
+          header: {
+            //"Content-Type": 'application/x-www-form-urlencoded'
+          }
+        }
+      }, function (err, response) {
+          console.log(response);
+          if (err != null) {
+            console.log("error creating changeset");
+            console.log(err);
+          }
+          else {
+            var changesetID = response;
+
+            // TODO make the actual change
+
+            console.log("closing changeset");
+            auth.xhr({
+              method: 'PUT',
+              path: '/api/0.6/changeset/' + changesetID + '/close',
+              options: {
+                header: {
+                  //"Content-Type": 'application/x-www-form-urlencoded'
+                }
+              }
+            }, function (err, response) {
+              if (err != null) {
+                console.log("error creating changeset");
+                console.log(err);
+              }
+          });
+        }
+      });
     }
   }
 

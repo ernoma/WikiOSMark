@@ -14,6 +14,13 @@ angular.module('starter.controllers', [])
     incompleteGeometry: false,
   }
 
+  $scope.mapControllerData = {
+  	selectedFeature: null,
+    overpassResult: "",
+    changesToSave: false,
+    changesetComment: ""
+  }
+
   $scope.$on('$stateChangeSuccess',
     function(evt, toState, toParams, fromState, fromParams) {
       $rootScope.currentState = toState.name;

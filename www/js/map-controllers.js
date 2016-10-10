@@ -1,15 +1,11 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $http, leafletData, leafletEvents, $ionicSideMenuDelegate, Wiki, AppSettings) {
+.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $ionicPopup, $http, leafletData, leafletEvents, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings) {
 
 	//
 	// Variables
 	//
-
-	$scope.overpassResult = "";
-
-	$scope.changesToSave = false;
 
 	//$scope.wikidataResults = [{"id":"Q5408372","concepturi":"http://www.wikidata.org/entity/Q5408372","url":"//www.wikidata.org/wiki/Q5408372","title":"Q5408372","pageid":5172585,"label":"Joutsenkaula","description":"Wikimedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsenkaula"}},
 	//  {"id":"Q2736937","concepturi":"http://www.wikidata.org/entity/Q2736937","url":"//www.wikidata.org/wiki/Q2736937","title":"Q2736937","pageid":2628927,"label":"Joutsen","description":"Wikipedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsen"}
@@ -17,8 +13,6 @@ var mapControllers = angular.module('mapControllers', [])
 	$scope.wikidataResults = null;
 	$scope.wikipediaResults = null;
 	$scope.commonsResults = null;
-
-	//var mapFeatures = [];
 
 	$scope.map = {
 	        defaults: {
@@ -133,10 +127,10 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.inputWikidataChange = function() {
 		// TODO search and suggest options when 2 or more characters in the input field
-		$scope.changesToSave = true;
+		$scope.mapControllerData.changesToSave = true;
 		if ($scope.osmObjectInfo.wikidataTag.length >= 2) {
 			Wiki.queryMediaWiki("wikidata", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikidataTag, function(data) {
-					console.log(data);
+					//console.log(data);
 					$scope.wikidataResults = data.search;
 			});
 		}
@@ -147,13 +141,13 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.inputWikipediaChange = function() {
 		// TODO search and suggest options when enought characters in the input field
-		$scope.changesToSave = true;
+		$scope.mapControllerData.changesToSave = true;
 		if ($scope.osmObjectInfo.wikipediaTag.includes(":")) {
 			if ($scope.osmObjectInfo.wikipediaTag.length >= 6) {
 				var parts = $scope.osmObjectInfo.wikipediaTag.split(":");
 				if (parts.length > 1) {
 					Wiki.queryMediaWiki("wikipedia", parts[0], parts[1], function(data) {
-							console.log(data);
+							//console.log(data);
 							$scope.wikipediaResults = data[1];
 					});
 				}
@@ -161,7 +155,7 @@ var mapControllers = angular.module('mapControllers', [])
 		}
 		else if ($scope.osmObjectInfo.wikipediaTag.length >= 3) {
 			Wiki.queryMediaWiki("wikipedia", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikipediaTag, function(data) {
-					console.log(data);
+					//console.log(data);
 					$scope.wikipediaResults = data[1];
 			});
 		}
@@ -172,11 +166,11 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.inputCommonsChange = function() {
 		// TODO search and suggest options when 3 or more characters in the input field
-		$scope.changesToSave = true;
+		$scope.mapControllerData.changesToSave = true;
 		$scope.commonsResults = null;
 		if ($scope.osmObjectInfo.wikimediaCommonsTag.length >= 3) {
 			Wiki.queryMediaWiki("commons", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikimediaCommonsTag, function(data) {
-					console.log(data);
+					//console.log(data);
 					$scope.commonsResults = data[1];
 			});
 		}
@@ -188,11 +182,13 @@ var mapControllers = angular.module('mapControllers', [])
 	$scope.selectWikidataSearchResult = function(item) {
 		$scope.osmObjectInfo.wikidataTag = item.label + " (" + item.id + ")";
 		$scope.wikidataResults = null;
+		// TODO: update wikipedia and commons tags if they can be found via Wiki search
 	}
 
 	$scope.selectWikipediaSearchResult = function(item) {
 		$scope.osmObjectInfo.wikipediaTag = item;
 		$scope.wikipediaResults = null;
+		// TODO: update wikidata tag if it can be found via Wiki search
 	}
 
 	$scope.selectCommonsSearchResult = function(item) {
@@ -201,11 +197,93 @@ var mapControllers = angular.module('mapControllers', [])
 	}
 
 	$scope.saveWikiTagChanges = function() {
-		// TODO Check
-		// 1. what changes there are
-		// 2. if there exists the wiki item(s) and if there does
-		// 3. call OpenStreetMapService save accordingly (trim the UI input values)
-		$scope.changesToSave = false;
+		// TODO somehow ensure that user is logged in before trying to save changes
+		// Check
+		// 1. if there are changes to the wiki item(s) and if there are
+		// 2. verify the changeset comment from the user,
+		// 3. call OpenStreetMapService save accordingly ("trim" the UI input values)
+
+		//console.log($scope);
+		//console.log($scope.mapControllerData.selectedFeature);
+		//console.log($scope.osmObjectInfo.wikidataTag);
+		//console.log($scope.osmObjectInfo.wikipediaTag);
+		//console.log($scope.osmObjectInfo.wikimediaCommonsTag);
+
+		var changesetCommentPopup = $ionicPopup.show({
+	    template: '<input type="text" ng-model="mapControllerData.changesetComment">',
+	    title: 'Changeset comment',
+	    scope: $scope,
+	    buttons: [
+	      { text: 'Cancel',
+					onTap: function(e) {
+						return false;
+					}
+				},
+	      {
+	        text: '<b>Save</b>',
+	        type: 'button-positive',
+	        onTap: function(e) {
+	            return true;
+	          }
+	      }
+	    ]
+	  });
+
+		var feature = $scope.mapControllerData.selectedFeature;
+
+		var tags = {
+			wikidata: null,
+			wikipedia: null,
+			commons: null,
+		};
+
+		$scope.mapControllerData.changesetComment = "Modified ";
+		var changeCount = 0;
+
+		var item = $scope.osmObjectInfo.wikidataTag;
+		if ($scope.osmObjectInfo.wikidataTag.includes("(")) {
+			var temp = $scope.osmObjectInfo.wikidataTag.split("(")[1];
+			item = temp.split(")")[0];
+		}
+		if (feature.properties.tags.wikidata == undefined || item != feature.properties.tags.wikidata) {
+			tags.wikidata = item;
+			$scope.mapControllerData.changesetComment += "wikidata";
+			changeCount++;
+		}
+
+		var item = $scope.osmObjectInfo.wikipediaTag;
+		if (item != "" && !item.includes(":")) {
+			item = AppSettings.getDefaultLanguage() + ":" + $scope.osmObjectInfo.wikipediaTag;
+		}
+		if (feature.properties.tags.wikipedia == undefined || item != feature.properties.tags.wikipedia) {
+			tags.wikipedia = item;
+			if (changeCount > 0) {
+				$scope.mapControllerData.changesetComment += ", ";
+			}
+			$scope.mapControllerData.changesetComment += "wikipedia";
+			changeCount++;
+		}
+
+		var item = $scope.osmObjectInfo.wikimediaCommonsTag;
+		if (feature.properties.tags.wikimedia_commons == undefined || item != feature.properties.tags.wikimediaCommonsTag) {
+			tags.commons = $scope.osmObjectInfo.wikimediaCommonsTag;
+			if (changeCount > 0) {
+				$scope.mapControllerData.changesetComment += " and ";
+			}
+			$scope.mapControllerData.changesetComment += "wikimedia_commons ";
+			changeCount++;
+		}
+
+		$scope.mapControllerData.changesetComment += (changeCount > 1  ? " tags." : "tag.");
+
+		changesetCommentPopup.then(function(res) {
+			console.log(res);
+			if (res == true) {
+				//OpenStreetMap.getPermissions();
+				OpenStreetMap.updateElementTags($scope.mapControllerData.selectedFeature, $scope.mapControllerData.changesetComment, tags);
+		 	 	$scope.mapControllerData.changesToSave = false;
+			}
+	  });
 	}
 
 	$scope.findOSMObjects = function() {
@@ -218,6 +296,11 @@ var mapControllers = angular.module('mapControllers', [])
 					// 	feature.properties.type.slice(1) + " " +
 					// 	feature.properties.id;
 					console.log(feature);
+					console.log($scope);
+					$scope.$apply(function() {
+						$scope.mapControllerData.selectedFeature = feature;
+					});
+					console.log($scope);
 					$scope.osmObjectInfo.id = feature.properties.id;
 					$scope.osmObjectInfo.type = feature.properties.type;
 					$scope.osmObjectInfo.tags = {};
@@ -241,44 +324,12 @@ var mapControllers = angular.module('mapControllers', [])
 					//$scope.osmObjectInfo.tags = feature.properties.tags;
 					$scope.osmObjectInfo.incompleteGeometry = feature.properties.tainted;
 
-					$scope.changesToSave = false; // TODO not working this way, save is enabled when a feature is selected, also could ask saving previous changes...
+					$scope.mapControllerData.changesToSave = false; // TODO could ask saving previous changes before selecting this new feature...
+					$scope.$apply();
 					// TODO populate Wiki search form with the data
 					$ionicSideMenuDelegate.toggleRight(true);
 				}
 			});
-
-			// var content = "";
-			//
-			// content += "<h3>" + feature.properties.type.charAt(0).toUpperCase() + feature.properties.type.slice(1);
-			// content += " " + feature.properties.id + "</h3>";
-			//
-			// if (feature.properties.tags != undefined) {
-			// 	content += "<h4>Tags:</h4>";
-			// 	for (var key in feature.properties.tags) {
-			// 			content += key + "=" + feature.properties.tags[key] + "<br>";
-			// 	}
-			// }
-			// if (feature.properties.tags["wikipedia"] == undefined) {
-			//  		content += "<p><button class='button button-small button-positive' ng-click='searchWiki()'>Search Wiki</button></p>";
-			// }
-			// if (feature.properties.tainted) {
-			// 	content += "<p><b>Note:</b> incomplete geometry</p>";
-			// }
-			//
-			// //var element = $compile(content);
-			// //console.log(element);
-			// //var html = element($scope);
-			// //console.log(html);
-			// layer.bindPopup(content);
-
-
-			//console.log(layer);
-			//var popup = layer.getPopup();
-			// var mapFeature = {
-			// 	popup: layer._popup,
-			// 	feature: feature
-			// }
-			// mapFeatures.push(mapFeature);
 		}
 
 		var styleFeature = function (feature) {
@@ -359,7 +410,7 @@ var mapControllers = angular.module('mapControllers', [])
 		// 	.success(function(data, status, headers,config){
 		//       console.log('data success');
 		//       //console.log(data); // for browser console
-		//       //$scope.overpassResult = data; // for UI
+		//       //$scope.mapControllerData.overpassResult = data; // for UI
 		//
 		//       addOverpassDataToMap(data);
 		//     })

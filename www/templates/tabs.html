@@ -79,7 +79,7 @@
     <ion-content>
       <ion-list ng-if="currentState == 'tab.map'" ng-controller="MapCtrl">
         <ion-item class="item-osm-object">
-          <button class="button button-positive" ng-click="saveWikiTagChanges()" ng-disabled="changesToSave == false">
+          <button class="button button-positive" ng-click="saveWikiTagChanges()" ng-disabled="mapControllerData.changesToSave == false">
             Save changes
           </button>
         </ion-item>
