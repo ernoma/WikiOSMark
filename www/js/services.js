@@ -205,7 +205,7 @@ angular.module('starter.services', [])
           console.log("getting the OSM element");
           auth.xhr({
             method: 'GET',
-            path: '/api/0.6/' + osmObject.properties.type + "/" + 4305115206//osmObject.properties.id
+            path: '/api/0.6/' + osmObject.properties.type + "/" + osmObject.properties.id // node/4305115206
           }, function(err, response) {
             if (err != null) {
               console.log("error getting OSM element");
