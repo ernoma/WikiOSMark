@@ -99,9 +99,43 @@ angular.module('starter.services', [])
               // you try to do a call
   });
 
-  var serializer = new XMLSerializer();
+  var x2js = new X2JS();
+  //var serializer = new XMLSerializer();
 
   var userDetails = null;
+
+  // var createNodeElement = function() {
+  //   var elementXMLString = '';//'<?xml version="1.0" encoding="UTF-8"?>';
+  //   elementXMLString += '<osm><' + osmObject.properties.type + ' changeset="' + changesetID + '" visible="true" lon="' + osmObject.geometry.coordinates[0] + '" lat="' + osmObject.geometry.coordinates[1] + '">';
+  //   elementXMLString += '<tag k="name" v="Joutsenet"/><tag k="name:en" v="Swans"/><tag k="name:fi" v="Joutsenet"/><tag k="tourism" v="artwork"/>';
+  //   for (var key in tags) {
+  //     if (tags[key] != null && tags[key] != "") {
+  //       elementXMLString += '<tag k="' + key + '"' + ' v="' + tags[key] + '"/>';
+  //     }
+  //   }
+  //   elementXMLString += '</' + osmObject.properties.type + '></osm>';
+  //   console.log(elementXMLString);
+  //
+  //   auth.xhr({
+  //     method: 'PUT',
+  //     path: '/api/0.6/' + osmObject.properties.type + "/create",
+  //     content: elementXMLString,
+  //     options: {
+  //       header: {
+  //         //"Content-Type": 'application/x-www-form-urlencoded'
+  //       }
+  //     }
+  //   }, function(err, response) {
+  //     if (err != null) {
+  //       console.log("error creating element");
+  //       console.log(err);
+  //     }
+  //     else {
+  //       // TODO
+  //       var elementID = 4305115206;//response;
+  //     }
+  //   });
+  // }
 
   var OpenStreetMapService = {
     getUserDetails: function (callback) {
@@ -138,8 +172,8 @@ angular.module('starter.services', [])
       });
     },
     updateElementTags: function(osmObject, changesetComment, tags) {
-      // TODO: create xml, open changeset, update data, close changeset
-      // TODO: also check if a wiki tag should be deleted
+      // Open changeset, create xml, update data, close changeset
+
       console.log(osmObject);
       console.log(changesetComment);
       console.log(tags);
@@ -156,34 +190,146 @@ angular.module('starter.services', [])
         content: changesetXMLString,
         options: {
           header: {
-            //"Content-Type": 'application/x-www-form-urlencoded'
           }
         }
-      }, function (err, response) {
-          console.log(response);
-          if (err != null) {
-            console.log("error creating changeset");
-            console.log(err);
-          }
-          else {
-            var changesetID = response;
+      }, function(err, response) {
+        console.log(response);
+        if (err != null) {
+          console.log("error creating changeset");
+          console.log(err);
+        }
+        else {
+          var changesetID = response;
 
-            // TODO make the actual change
+          // TODO get the element to update
+          console.log("getting the OSM element");
+          auth.xhr({
+            method: 'GET',
+            path: '/api/0.6/' + osmObject.properties.type + "/" + 4305115206//osmObject.properties.id
+          }, function(err, response) {
+            if (err != null) {
+              console.log("error getting OSM element");
+              console.log(err);
+            }
+            else {
+              console.log(response);
+              // TODO: make the actual update
 
-            console.log("closing changeset");
-            auth.xhr({
-              method: 'PUT',
-              path: '/api/0.6/changeset/' + changesetID + '/close',
-              options: {
-                header: {
-                  //"Content-Type": 'application/x-www-form-urlencoded'
+              var jsonObj = x2js.xml_str2json( response.getElementsByTagName("osm")[0].innerHTML );
+              console.log(jsonObj);
+
+              var elementXMLString = '';//'<?xml version="1.0" encoding="UTF-8"?>';
+              if (osmObject.properties.type == 'node') {
+                elementXMLString += '<osm><' +
+                  osmObject.properties.type +
+                  ' changeset="' + changesetID +
+                  '" id="' + jsonObj.node._id +
+                  '" visible="' + jsonObj.node._visible +
+                  '" lon="' + jsonObj.node._lon +
+                  '" lat="' + jsonObj.node._lat +
+                  '" version="' + jsonObj.node._version +
+                  '">';
+              }
+              else { // way or relation
+                elementXMLString += '<osm><' +
+                  osmObject.properties.type +
+                  ' changeset="' + changesetID +
+                  '" id="' + jsonObj[osmObject.properties.type]._id +
+                  '" visible="' + jsonObj[osmObject.properties.type]._visible +
+                  '" version="' + jsonObj[osmObject.properties.type]._version +
+                  '">';
+              }
+
+              if (jsonObj[osmObject.properties.type].tag != undefined) { // TODO: element does not have any tags yet, add wiki keys
+                for (var i = 0; i < jsonObj[osmObject.properties.type].tag.length; i++) {
+                  if (jsonObj[osmObject.properties.type].tag[i]._k == "wikipedia") {
+                    if (tags.wikipedia == null) { // no changes, keep original
+                      elementXMLString += '<tag k="' + jsonObj[osmObject.properties.type].tag[i]._k + '"' +
+                        ' v="' + jsonObj[osmObject.properties.type].tag[i]._v + '"/>';
+                    }
+                    else {
+                      elementXMLString += '<tag k="' + jsonObj[osmObject.properties.type].tag[i]._k + '"' +
+                        ' v="' + tags.wikipedia + '"/>';
+                    }
+                  }
+                  else if (jsonObj[osmObject.properties.type].tag[i]._k == "wikidata") {
+                    if (tags.wikidata == null) { // no changes, keep original
+                      elementXMLString += '<tag k="' + jsonObj[osmObject.properties.type].tag[i]._k + '"' +
+                        ' v="' + jsonObj[osmObject.properties.type].tag[i]._v + '"/>';
+                    }
+                    else {
+                      elementXMLString += '<tag k="' + jsonObj[osmObject.properties.type].tag[i]._k + '"' +
+                        ' v="' + tags.wikidata + '"/>';
+                    }
+                  }
+                  else if(jsonObj[osmObject.properties.type].tag[i]._k == "wikimedia_commons") {
+                    if (tags.wikimedia_commons == null) { // no changes, keep original
+                      elementXMLString += '<tag k="' + jsonObj[osmObject.properties.type].tag[i]._k + '"' +
+                        ' v="' + jsonObj[osmObject.properties.type].tag[i]._v + '"/>';
+                    }
+                    else {
+                      elementXMLString += '<tag k="' + jsonObj[osmObject.properties.type].tag[i]._k + '"' +
+                        ' v="' + tags.wikimedia_commons + '"/>';
+                    }
+                  }
+                  else {
+                    elementXMLString += '<tag k="' + jsonObj[osmObject.properties.type].tag[i]._k + '"' +
+                      ' v="' + jsonObj[osmObject.properties.type].tag[i]._v + '"/>';
+                  }
                 }
               }
-            }, function (err, response) {
-              if (err != null) {
-                console.log("error creating changeset");
-                console.log(err);
+
+              if (osmObject.properties.type == "way" && jsonObj[osmObject.properties.type].nd != undefined) {
+                for (var i = 0; i < jsonObj[osmObject.properties.type].nd.length; i++) {
+                  elementXMLString += '<nd ref="' + jsonObj[osmObject.properties.type].nd[i]._ref +
+                    '"/>';
+                }
               }
+              else if (osmObject.properties.type == "relation" && jsonObj[osmObject.properties.type].member != undefined) {
+                for (var i = 0; i < jsonObj[osmObject.properties.type].member.length; i++) {
+                  elementXMLString += '<member ref="' + jsonObj[osmObject.properties.type].member[i]._ref +
+                    '"/>';
+                }
+              }
+
+              elementXMLString += '</' + osmObject.properties.type + '></osm>';
+              console.log(elementXMLString);
+
+              console.log("updating OSM element");
+              auth.xhr({
+                method: 'PUT',
+                path: '/api/0.6/' + osmObject.properties.type + "/" + jsonObj.node._id,
+                content: elementXMLString,
+                options: {
+                  header: {
+                  }
+                }
+              }, function(err, response) {
+                if (err != null) {
+                  console.log("error updating OSM element");
+                  console.log(err);
+                }
+                else {
+                  var version = response;
+                  console.log(version);
+                }
+
+                console.log("closing changeset");
+                auth.xhr({
+                  method: 'PUT',
+                  path: '/api/0.6/changeset/' + changesetID + '/close',
+                  options: {
+                    header: {
+                    }
+                  }
+                }, function(err, response) {
+                  if (err != null) {
+                    console.log("error closing changeset");
+                    console.log(err);
+                  }
+                });
+              });
+            }
           });
         }
       });

@@ -186,7 +186,12 @@ var mapControllers = angular.module('mapControllers', [])
 	}
 
 	$scope.selectWikipediaSearchResult = function(item) {
-		$scope.osmObjectInfo.wikipediaTag = item;
+		if ($scope.osmObjectInfo.wikipediaTag.includes(":") && !item.includes(":")) {
+			$scope.osmObjectInfo.wikipediaTag = $scope.osmObjectInfo.wikipediaTag.split(":")[0] + ":" + item;
+		}
+		else {
+			$scope.osmObjectInfo.wikipediaTag = item;
+		}
 		$scope.wikipediaResults = null;
 		// TODO: update wikidata tag if it can be found via Wiki search
 	}
@@ -198,6 +203,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.saveWikiTagChanges = function() {
 		// TODO somehow ensure that user is logged in before trying to save changes
+
 		// Check
 		// 1. if there are changes to the wiki item(s) and if there are
 		// 2. verify the changeset comment from the user,
@@ -234,28 +240,38 @@ var mapControllers = angular.module('mapControllers', [])
 		var tags = {
 			wikidata: null,
 			wikipedia: null,
-			commons: null,
+			wikimedia_commons: null,
 		};
 
 		$scope.mapControllerData.changesetComment = "Modified ";
 		var changeCount = 0;
 
+		if (feature.properties.tags.wikidata != undefined) {
+			tags.wikidata = feature.properties.tags.wikidata;
+		}
+		if (feature.properties.tags.wikipedia != undefined) {
+			tags.wikipedia = feature.properties.tags.wikipedia;
+		}
+		if (feature.properties.tags.wikimediaCommonsTag != undefined) {
+			tags.wikimediaCommonsTag = feature.properties.tags.wikimediaCommonsTag;
+		}
+
 		var item = $scope.osmObjectInfo.wikidataTag;
-		if ($scope.osmObjectInfo.wikidataTag.includes("(")) {
+		if (item != null && item.includes("(")) {
 			var temp = $scope.osmObjectInfo.wikidataTag.split("(")[1];
 			item = temp.split(")")[0];
 		}
-		if (feature.properties.tags.wikidata == undefined || item != feature.properties.tags.wikidata) {
+		if (item != feature.properties.tags.wikidata) {
 			tags.wikidata = item;
 			$scope.mapControllerData.changesetComment += "wikidata";
 			changeCount++;
 		}
 
 		var item = $scope.osmObjectInfo.wikipediaTag;
-		if (item != "" && !item.includes(":")) {
+		if (item != null && item != "" && !item.includes(":")) {
 			item = AppSettings.getDefaultLanguage() + ":" + $scope.osmObjectInfo.wikipediaTag;
 		}
-		if (feature.properties.tags.wikipedia == undefined || item != feature.properties.tags.wikipedia) {
+		if (item != feature.properties.tags.wikipedia) {
 			tags.wikipedia = item;
 			if (changeCount > 0) {
 				$scope.mapControllerData.changesetComment += ", ";
@@ -265,16 +281,16 @@ var mapControllers = angular.module('mapControllers', [])
 		}
 
 		var item = $scope.osmObjectInfo.wikimediaCommonsTag;
-		if (feature.properties.tags.wikimedia_commons == undefined || item != feature.properties.tags.wikimediaCommonsTag) {
-			tags.commons = $scope.osmObjectInfo.wikimediaCommonsTag;
+		if (item != feature.properties.tags.wikimediaCommonsTag) {
+			tags.wikimedia_commons = $scope.osmObjectInfo.wikimediaCommonsTag;
 			if (changeCount > 0) {
 				$scope.mapControllerData.changesetComment += " and ";
 			}
-			$scope.mapControllerData.changesetComment += "wikimedia_commons ";
+			$scope.mapControllerData.changesetComment += "wikimedia_commons";
 			changeCount++;
 		}
 
-		$scope.mapControllerData.changesetComment += (changeCount > 1  ? " tags." : "tag.");
+		$scope.mapControllerData.changesetComment += (changeCount > 1  ? " tags." : " tag.");
 
 		changesetCommentPopup.then(function(res) {
 			console.log(res);
@@ -291,22 +307,20 @@ var mapControllers = angular.module('mapControllers', [])
 		var onEachFeature = function (feature, layer) {
 			layer.on({
         click: function() {
-          console.log("geojson feature clicked");
+          //console.log("geojson feature clicked");
 					// var title = feature.properties.type.charAt(0).toUpperCase() +
 					// 	feature.properties.type.slice(1) + " " +
 					// 	feature.properties.id;
-					console.log(feature);
-					console.log($scope);
-					$scope.$apply(function() {
-						$scope.mapControllerData.selectedFeature = feature;
-					});
-					console.log($scope);
+					//console.log(feature);
+					//console.log($scope);
+					$scope.mapControllerData.selectedFeature = feature;
+					//console.log($scope);
 					$scope.osmObjectInfo.id = feature.properties.id;
 					$scope.osmObjectInfo.type = feature.properties.type;
 					$scope.osmObjectInfo.tags = {};
-					$scope.osmObjectInfo.wikidataTag = "";
-					$scope.osmObjectInfo.wikipediaTag = "";
-					$scope.osmObjectInfo.wikimediaCommonsTag = "";
+					$scope.osmObjectInfo.wikidataTag = null;
+					$scope.osmObjectInfo.wikipediaTag = null;
+					$scope.osmObjectInfo.wikimediaCommonsTag = null;
 					for (var key in feature.properties.tags) {
 						if (key == "wikipedia") {
 							$scope.osmObjectInfo.wikipediaTag = feature.properties.tags[key];

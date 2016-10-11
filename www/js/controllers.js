@@ -8,9 +8,9 @@ angular.module('starter.controllers', [])
     type: "",
     id: "",
     tags: null,
-    wikidataTag: "",
-    wikipediaTag: "",
-    wikimediaCommonsTag: "",
+    wikidataTag: null,
+    wikipediaTag: null,
+    wikimediaCommonsTag: null,
     incompleteGeometry: false,
   }
 
