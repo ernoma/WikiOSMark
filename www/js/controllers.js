@@ -33,8 +33,8 @@ angular.module('starter.controllers', [])
           $scope.mainMenuTitle = "Wiki";
           $scope.sideMenuTitle = "";
           break;
-        case "tab.account":
-          $scope.mainMenuTitle = "Account";
+        case "tab.settings":
+          $scope.mainMenuTitle = "Settings";
           $scope.sideMenuTitle = "";
           break;
         case "tab.info":
@@ -46,17 +46,17 @@ angular.module('starter.controllers', [])
 })
 
 .controller('TabCtrl', function($scope, $rootScope) {
-  // $scope.findOSMObjects = function() {
-  //   console.log("in TabCtrl");
-  //   $rootScope.$broadcast('findOSMObjects');
-  // }
+  $scope.findOSMObjects = function() {
+    console.log("in TabCtrl");
+    $scope.$broadcast('findOSMObjects');
+  }
   $scope.locateMe = function() {
     console.log("in TabCtrl");
-    $rootScope.$broadcast('locateMe');
+    $scope.$broadcast('locateMe');
   }
 })
 
-.controller('AccountCtrl', function($scope, $state, $location, OpenStreetMap, AppSettings) {
+.controller('SettingsCtrl', function($scope, $state, $location, OpenStreetMap, AppSettings) {
   $scope.settings = {
     enableFriends: true,
     defaultLanguage: AppSettings.getDefaultLanguage()

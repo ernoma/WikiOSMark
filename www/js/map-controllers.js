@@ -44,9 +44,14 @@ var mapControllers = angular.module('mapControllers', [])
 	// Event handlers
 	//
 
-	$rootScope.$on( "locateMe", function( event ) {
+	$scope.$on( "locateMe", function( event ) {
 		$scope.locateMe();
 	});
+
+	$scope.$on( "findOSMObjects", function( event ) {
+		$scope.findOSMObjects();
+	});
+
 
 	//
 	// Methods
@@ -69,11 +74,13 @@ var mapControllers = angular.module('mapControllers', [])
 	}
 
 	$scope.locate = function(){
-
+		console.log("in locate");
 		$cordovaGeolocation
 		  .getCurrentPosition()
 		  .then(function (position) {
-		    $scope.map.center.lat  = position.coords.latitude;
+				//console.log(position);
+				//console.log($scope);
+		    $scope.map.center.lat = position.coords.latitude;
 		    $scope.map.center.lng = position.coords.longitude;
 		    $scope.map.center.zoom = 18;
 

@@ -71,12 +71,12 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
       }
     })
 
-  .state('tab.account', {
-    url: '/account',
+  .state('tab.settings', {
+    url: '/settings',
     views: {
-      'tab-account': {
+      'tab-settings': {
         templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
+        controller: 'SettingsCtrl'
       }
     }
   })
