@@ -45,14 +45,32 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller('TabCtrl', function($scope, $rootScope) {
+.controller('TabCtrl', function($scope, $rootScope, $cordovaCamera) {
   $scope.findOSMObjects = function() {
-    console.log("in TabCtrl");
+    //console.log("in TabCtrl");
     $scope.$broadcast('findOSMObjects');
   }
   $scope.locateMe = function() {
-    console.log("in TabCtrl");
+    //console.log("in TabCtrl");
     $scope.$broadcast('locateMe');
+  }
+  $scope.takePhoto = function() {
+    var options = {
+      quality: 75,
+      destinationType: Camera.DestinationType.FILE_URI,
+      sourceType: Camera.PictureSourceType.CAMERA,
+      allowEdit: true,
+      correctOrientation: true,
+      saveToPhotoAlbum: true
+    }
+
+    $cordovaCamera.getPicture(options).then(function(imageData) {
+      console.log(imageData); //file:///storage/emulated/0/Android/data/com.ionicframework.wikiosmark921578/cache/1476208863949.jpg
+      //var image = document.getElementById('myImage');
+      //image.src = "data:image/jpeg;base64," + imageData;
+    }, function(err) {
+      console.log(err);
+    });
   }
 })
 
