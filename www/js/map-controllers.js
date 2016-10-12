@@ -1,10 +1,10 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $ionicPopup, $http, leafletData, leafletEvents, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings) {
+.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $ionicPopup, $http, leafletData, leafletMapEvents, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings) {
 
 	//
-	// Variables
+	// Variables & initialization
 	//
 
 	//$scope.wikidataResults = [{"id":"Q5408372","concepturi":"http://www.wikidata.org/entity/Q5408372","url":"//www.wikidata.org/wiki/Q5408372","title":"Q5408372","pageid":5172585,"label":"Joutsenkaula","description":"Wikimedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsenkaula"}},
@@ -29,15 +29,71 @@ var mapControllers = angular.module('mapControllers', [])
 
 	var tilesDict = {
 		openstreetmap: {
+			name: "OpenStreetMap",
 			url: "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+			type: 'xyz',
 			options: {
 				attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}
+		},
+		osmCycleLayer: {
+			name: "OpenCycleMap",
+			url: 'http://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png',
+			type: 'xyz',
+			options: {
+    		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Maps &copy; <a href="http://thunderforest.com/">Thunderforest</a>',
+    		maxZoom: 18
+			}
+		},
+		mapBoxLayer: {
+			name: "MapBox",
+			url: 'http://{s}.tiles.mapbox.com/v3/' + 'ernoma.i04d787e' + '/{z}/{x}/{y}.png',
+			type: 'xyz',
+			options: {
+    		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    		maxZoom: 20
+			}
 		}
-	};
+	}
 
 	angular.extend($scope, {
-			tiles: tilesDict.openstreetmap
+		tiles: tilesDict.openstreetmap,
+		layers: {
+			baselayers: {} //tilesDict
+		}
+	});
+
+	var osmLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+	    maxZoom: 20
+	});
+	var osmCycleLayer = L.tileLayer('http://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, , Maps &copy; <a href="http://thunderforest.com/">Thunderforest</a>',
+	    maxZoom: 18
+	});
+	var mapBoxLayer = L.tileLayer('http://{s}.tiles.mapbox.com/v3/' + 'ernoma.i04d787e' + '/{z}/{x}/{y}.png', {
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+	    maxZoom: 20
+	});
+	var bingLayer = new L.BingLayer('Agf7Ot_un-nQxTrh4Vg6bqThCzQ5KH6kF2oLndffl3LlclN5dY3ELe80I6Kkj5Qd', {type: 'AerialWithLabels'});
+
+	var baseMaps = {
+			"OpenStreetMap": osmLayer,
+			"OpenCycleMap": osmCycleLayer,
+			"Bing aerial": bingLayer,
+			"MapBox": mapBoxLayer
+	}
+
+	angular.element(document).ready(function () {
+		leafletData.getMap().then(function(map) {
+			//console.log(map);
+			L.control.layers(baseMaps).addTo(map);
+			map.eachLayer(function (layer) {
+				//console.log(layer);
+				map.removeLayer(layer);
+			});
+			map.addLayer(osmLayer);
+		});
 	});
 
 	//
@@ -409,7 +465,6 @@ var mapControllers = angular.module('mapControllers', [])
 
 			return L.circleMarker(latlng, geojsonMarkerOptions);
 		}
-
 
 		var addOverpassDataToMap = function(data) {
 			var geoJson = osmtogeojson(data);
