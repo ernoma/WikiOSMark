@@ -1,0 +1,2 @@
+MIT
+https://www.npmjs.com/package/wtf_wikipedia
