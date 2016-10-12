@@ -41,6 +41,9 @@
           <!--<option>Wikivoyage</option>-->
         </select>
       </label>
+      <ion-toggle ng-model="settings.showUserPhotos" ng-change="switchShowUserPhotos()">
+          Show my photos on the map
+      </ion-toggle>
     </div>
     </ion-list>
   </ion-content>

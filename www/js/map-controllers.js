@@ -1,7 +1,7 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $rootScope, $cordovaGeolocation, $ionicPopup, $http, leafletData, leafletMapEvents, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings) {
+.controller('MapCtrl', function($scope, $rootScope, $state, $timeout, $cordovaGeolocation, $ionicPopup, $http, leafletData, leafletMapEvents, leafletMarkerEvents, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings, GeoLocation, PhotoGallery) {
 
 	//
 	// Variables & initialization
@@ -15,17 +15,23 @@ var mapControllers = angular.module('mapControllers', [])
 	$scope.commonsResults = null;
 
 	$scope.map = {
-	        defaults: {
-	          zoomControlPosition: 'bottomleft'
-	        },
-	        markers : {},
-	        events: {
-	          map: {
-	            enable: ['context'],
-	            logic: 'emit'
-	          }
-	        }
-	      };
+    defaults: {
+      zoomControlPosition: 'topleft'
+    },
+    markers : {},
+    events: {
+      map: {
+        enable: ['context'],
+        logic: 'emit'
+      }
+    }
+  };
+
+	$scope.events = {
+		markers: {
+		   enable: leafletMarkerEvents.getAvailableEvents(),
+		}
+  };
 
 	var tilesDict = {
 		openstreetmap: {
@@ -60,7 +66,8 @@ var mapControllers = angular.module('mapControllers', [])
 		tiles: tilesDict.openstreetmap,
 		layers: {
 			baselayers: {} //tilesDict
-		}
+		},
+		markers: {}
 	});
 
 	var osmLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -85,6 +92,7 @@ var mapControllers = angular.module('mapControllers', [])
 	}
 
 	angular.element(document).ready(function () {
+		// Adding Bing layer is maybe easiest this way
 		leafletData.getMap().then(function(map) {
 			//console.log(map);
 			L.control.layers(baseMaps).addTo(map);
@@ -94,6 +102,8 @@ var mapControllers = angular.module('mapControllers', [])
 			});
 			map.addLayer(osmLayer);
 		});
+
+		//console.log("in ready");
 	});
 
 	//
@@ -108,10 +118,70 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.findOSMObjects();
 	});
 
+	$scope.$on( "photoAdded", function ( event ) {
+		$scope.updatePhotoMapLayer();
+	});
+
+	$scope.$on("$ionicView.enter", function(event, data){
+   	// handle event
+   	//console.log(event);
+		//console.log(data);
+
+		$scope.updatePhotoMapLayer();
+	});
+
+	// var markerEvents = leafletMarkerEvents.getAvailableEvents();
+  // for (var k in markerEvents){
+  //   var eventName = 'leafletDirectiveMarker.wikiosmmap.' + markerEvents[k];
+	// 	console.log(eventName);
+  //   //$scope.$on(eventName, function(event, args) {
+  //   //    console.log(event.name);
+  //   //});
+  // }
+
+	$scope.$on('leafletDirectiveMarker.wikiosmmap.click', function(event, args) {
+			console.log(event.name);
+			console.log(args);
+			$state.go("tab.photo-detail", { photoID: args.model.photoID });
+	});
 
 	//
 	// Methods
 	//
+
+	var photoIcon = {
+		iconUrl: 'img/icons/camera.png',
+		iconSize:     [32, 32],
+		iconAnchor: [16, 16]
+	};
+
+	$scope.updatePhotoMapLayer = function() {
+		if (AppSettings.shouldShowUserPhotos()) {
+			var gallery = PhotoGallery.getGallery();
+			console.log(gallery);
+
+			var markers = {};
+
+			// TODO show photos on the map if in view
+			for (var i = 0; i < gallery.photos.length; i++) {
+				markers["m" + i] = {
+					lat: gallery.photos[i].location.coords.latitude,
+					lng: gallery.photos[i].location.coords.longitude,
+					icon: photoIcon,
+					photoID: gallery.photos[i].photoID
+				}
+			}
+			console.log(markers);
+			angular.extend($scope, {
+				markers: markers
+			});
+		}
+		else {
+			angular.extend($scope, {
+				markers: {}
+			});
+		}
+	}
 
 	$scope.goTo = function() {
 		$scope.map.center  = {

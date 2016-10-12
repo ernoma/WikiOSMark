@@ -45,7 +45,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller('TabCtrl', function($scope, $rootScope, $cordovaCamera) {
+.controller('TabCtrl', function($scope, $rootScope, $cordovaCamera, GeoLocation, PhotoGallery) {
   $scope.findOSMObjects = function() {
     //console.log("in TabCtrl");
     $scope.$broadcast('findOSMObjects');
@@ -57,26 +57,34 @@ angular.module('starter.controllers', [])
   $scope.takePhoto = function() {
     var options = {
       quality: 75,
-      destinationType: Camera.DestinationType.FILE_URI,
-      sourceType: Camera.PictureSourceType.CAMERA,
       allowEdit: true,
       correctOrientation: true,
       saveToPhotoAlbum: true
     }
 
-    $cordovaCamera.getPicture(options).then(function(imageData) {
-      console.log(imageData); //file:///storage/emulated/0/Android/data/com.ionicframework.wikiosmark921578/cache/1476208863949.jpg
-      //var image = document.getElementById('myImage');
-      //image.src = "data:image/jpeg;base64," + imageData;
-    }, function(err) {
-      console.log(err);
-    });
+    storePhoto("https://upload.wikimedia.org/wikipedia/commons/8/85/Tesoman_palloiluhalli.jpg");
+    //$cordovaCamera.getPicture(options).then(storePhoto, function(err) {
+    //  console.log(err);
+    //});
+  }
+
+  var storePhoto = function(imageURL) {
+    // Get location, store photo and location to the localStorage, and view to user (on map, etc.)
+
+    console.log(imageURL); //file:///storage/emulated/0/Android/data/com.ionicframework.wikiosmark921578/cache/1476208863949.jpg
+    var position = GeoLocation.getCurrentPosition();
+    console.log(position);
+
+    PhotoGallery.addPhoto(imageURL, position);
+
+    $scope.$broadcast('photoAdded');
   }
 })
 
-.controller('SettingsCtrl', function($scope, $state, $location, OpenStreetMap, AppSettings) {
+.controller('SettingsCtrl', function($scope, $rootScope, $state, $location, OpenStreetMap, AppSettings) {
   $scope.settings = {
     enableFriends: true,
+    showUserPhotos: AppSettings.shouldShowUserPhotos(),
     defaultLanguage: AppSettings.getDefaultLanguage()
   };
 
@@ -86,6 +94,13 @@ angular.module('starter.controllers', [])
   $scope.userDetails = {
     OSM: null,
     Wiki: null
+  }
+
+  $scope.switchShowUserPhotos = function() {
+    console.log("in switchShowUserPhotos");
+    //console.log($scope.settings.showUserPhotos);
+    AppSettings.setShowUserPhotos($scope.settings.showUserPhotos);
+    //console.log(AppSettings.shouldShowUserPhotos());
   }
 
   $scope.changeDefaultLanguage = function() {

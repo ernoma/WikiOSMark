@@ -7,6 +7,17 @@ angular.module('starter.services', [])
     },
     setDefaultLanguage: function(language) {
       $window.localStorage["defaultLanguage"] = language;
+    },
+    shouldShowUserPhotos: function() {
+      if ($window.localStorage["showUserPhotos"] != undefined) {
+        return JSON.parse($window.localStorage["showUserPhotos"]);
+      }
+      else {
+        return true;
+      }
+    },
+    setShowUserPhotos: function(value) {
+      $window.localStorage["showUserPhotos"] = JSON.stringify(value);
     }
     // set: function(key, value) {
 		//   $window.localStorage[key] = value;
@@ -22,6 +33,62 @@ angular.module('starter.services', [])
 		// }
   }
   return settingsService;
+})
+
+.factory('GeoLocation', function() {
+  navigator.geolocation.watchPosition(onLocationWatchSuccess, onLocationWatchError, { maximumAge: 10000, enableHighAccuracy: true });
+
+  var currentPosition = null;
+
+  function onLocationWatchSuccess(position) {
+		var latitude = position.coords.latitude;
+		var longitude = position.coords.longitude;
+    currentPosition = position;
+
+		console.log("Latitude : " + latitude + " Longitude: " + longitude);
+
+	}
+	function onLocationWatchError(err) {
+		if (err.code == 1) {
+			console.log("Error: Access is denied!");
+		}
+		else if ( err.code == 2) {
+			console.log("Error: Position is unavailable!");
+		}
+	}
+
+  var locationService = {
+    getCurrentPosition: function() {
+      return currentPosition;
+    }
+  }
+  return locationService;
+})
+
+.factory('PhotoGallery', function($window) {
+    var photoGalleryService = {
+      addPhoto: function(imageURL, location) {
+        var photoGallery = null;
+        if ($window.localStorage["photoGallery"] != undefined) {
+           photoGallery = JSON.parse($window.localStorage["photoGallery"]);
+        }
+        else {
+          photoGallery = {
+            photos: []
+          }
+        }
+        photoGallery.photos.push({
+          photoID: photoGallery.photos.length,
+          photoURL: imageURL,
+          location: location
+        });
+        $window.localStorage["photoGallery"] = JSON.stringify(photoGallery);
+      },
+      getGallery: function() {
+        return photoGallery = JSON.parse($window.localStorage["photoGallery"]);
+      }
+    }
+    return photoGalleryService;
 })
 
 .factory('Wiki', function($http) {
