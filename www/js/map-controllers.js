@@ -33,6 +33,8 @@ var mapControllers = angular.module('mapControllers', [])
 		}
   };
 
+	var photoLayer = null;
+
 	var tilesDict = {
 		openstreetmap: {
 			name: "OpenStreetMap",
@@ -149,36 +151,74 @@ var mapControllers = angular.module('mapControllers', [])
 	// Methods
 	//
 
-	var photoIcon = {
-		iconUrl: 'img/icons/camera.png',
-		iconSize:     [32, 32],
-		iconAnchor: [16, 16]
-	};
+	// var photoIcon = {
+  // 	iconUrl: 'img/icons/camera.png',
+  //   iconSize: [32, 32],
+  //   iconAnchor: [16, 16]
+  // };
 
 	$scope.updatePhotoMapLayer = function() {
 		if (AppSettings.shouldShowUserPhotos()) {
-			var gallery = PhotoGallery.getGallery();
-			console.log(gallery);
 
-			var markers = {};
+			leafletData.getMap().then(function(map) {
+				var gallery = PhotoGallery.getGallery();
+       	console.log(gallery);
 
-			// TODO show photos on the map if in view
-			for (var i = 0; i < gallery.photos.length; i++) {
-				markers["m" + i] = {
-					lat: gallery.photos[i].location.coords.latitude,
-					lng: gallery.photos[i].location.coords.longitude,
-					icon: photoIcon,
-					photoID: gallery.photos[i].photoID
+       // 	var markers = {};
+				//
+       // 	// TODO show photos on the map if in view
+       // 	for (var i = 0; i < gallery.photos.length; i++) {
+        //  	markers["m" + i] = {
+				// 		lat: gallery.photos[i].location.coords.latitude,
+        //     lng: gallery.photos[i].location.coords.longitude,
+        //     icon: photoIcon,
+        //     photoID: gallery.photos[i].photoID
+				// 	}
+				// }
+				//
+				// angular.extend($scope, {
+				// 	markers: markers
+				// });
+
+				photoLayer = L.photo.cluster().on('click', function (evt) {
+					// var photo = evt.layer.photo,
+					// 	template = '<img src="{url}"/></a><p>{caption}</p>';
+					//
+					// 	console.log(evt);
+					// 	evt.layer.bindPopup(L.Util.template(template, photo), {
+					// 		className: 'leaflet-popup-photo',
+					// 		minWidth: 400
+					// 	}).openPopup();
+
+						$state.go("tab.photo-detail", { photoID: evt.layer.photo.photoID });
+				});
+
+				//console.log(map);
+				var gallery = PhotoGallery.getGallery();
+				var photos = [];
+
+				// TODO show photos on the map if in view
+				for (var i = 0; i < gallery.photos.length; i++) {
+					var urlParts = gallery.photos[i].photoURL.split("/");
+					photos.push({
+								lat: gallery.photos[i].location.coords.latitude,
+								lng: gallery.photos[i].location.coords.longitude,
+								url: gallery.photos[i].photoURL,
+								caption: urlParts[urlParts.length-1],
+								thumbnail: gallery.photos[i].photoURL,
+								photoID: gallery.photos[i].photoID
+					});
 				}
-			}
-			console.log(markers);
-			angular.extend($scope, {
-				markers: markers
+				photoLayer.add(photos).addTo(map);
 			});
 		}
 		else {
-			angular.extend($scope, {
-				markers: {}
+			// angular.extend($scope, {
+			// 	markers: {}
+			// });
+
+			leafletData.getMap().then(function(map) {
+				map.removeLayer(photoLayer);
 			});
 		}
 	}

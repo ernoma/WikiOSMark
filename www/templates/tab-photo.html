@@ -1,5 +1,45 @@
-<ion-view view-title="Photo">
-  <ion-content>
-    <!-- TODO At minimum show the photo -->
-  </ion-content>
-</ion-view>
+<!-- <ion-nav-bar>
+	<ion-nav-back-button class="button-clear"
+    ng-click="console.log('moi');goBack()">
+    <i class="ion-arrow-left-c"></i> Back
+	</ion-nav-back-button>
+</ion-nav-bar> -->
+  <ion-view view-title="Photo">
+    <ion-content ng-model="photo">
+      <!-- <div class="item">
+        <button class="button icon-left ion-chevron-left button-clear button-dark">Back</button>
+      </div> -->
+      <!-- TODO At minimum show the photo -->
+      <div class="list card text-center">
+        <div class="item item-image">
+            <img ng-src="{{photo.url}}" alt="{{photo.caption}}">
+        </div>
+        <div class="item">
+          <h2>{{photo.caption}}</h2>
+        </div>
+        <div class="item text-left">
+          <!--<div class="row">
+            <div class="col col-100">
+              Location
+            </div>
+          </div>-->
+          <div class="row">
+            <div class="col col-50">
+              <p>Latitude</p>
+            </div>
+            <div class="col col-50">
+              <p>Longitude</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-50">
+              <p>{{photo.lat}}</p>
+            </div>
+            <div class="col col-50">
+              <p>{{photo.lng}}</p>
+            </div>
+          </div>
+        </div>
+      </diV>
+    </ion-content>
+  </ion-view>
