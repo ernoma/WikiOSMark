@@ -21,6 +21,15 @@ angular.module('starter.controllers', [])
     changesetComment: ""
   }
 
+  $scope.searchResults = {
+    //wikidataResults = [{"id":"Q5408372","concepturi":"http://www.wikidata.org/entity/Q5408372","url":"//www.wikidata.org/wiki/Q5408372","title":"Q5408372","pageid":5172585,"label":"Joutsenkaula","description":"Wikimedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsenkaula"}},
+    //  {"id":"Q2736937","concepturi":"http://www.wikidata.org/entity/Q2736937","url":"//www.wikidata.org/wiki/Q2736937","title":"Q2736937","pageid":2628927,"label":"Joutsen","description":"Wikipedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsen"}
+    //}],
+    wikidataResults: null,
+    wikipediaResults: null,
+    commonsResults: null
+  }
+
   $scope.$on('$stateChangeSuccess',
     function(evt, toState, toParams, fromState, fromParams) {
       $rootScope.currentState = toState.name;
@@ -54,6 +63,26 @@ angular.module('starter.controllers', [])
     //console.log("in TabCtrl");
     $scope.$broadcast('locateMe');
   }
+
+  $scope.inputWikidataChange = function() {
+    $scope.$broadcast('inputWikidataChange');
+  }
+  $scope.selectWikidataSearchResult = function(item) {
+    $scope.$broadcast('selectWikidataSearchResult', item);
+  }
+  $scope.inputWikipediaChange = function() {
+    $scope.$broadcast('inputWikipediaChange');
+  }
+  $scope.selectWikipediaSearchResult = function(item) {
+    $scope.$broadcast('selectWikipediaSearchResult', item);
+  }
+  $scope.inputCommonsChange = function() {
+    $scope.$broadcast('inputCommonsChange');
+  }
+  $scope.selectCommonsSearchResult = function(item) {
+    $scope.$broadcast('selectCommonsSearchResult', item);
+  }
+
   $scope.takePhoto = function() {
     var options = {
       quality: 75,

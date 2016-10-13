@@ -116,7 +116,7 @@
             </label>
           </ion-item>
           <ion-list>
-            <ion-item class="item" ng-repeat="item in wikidataResults" ng-click="selectWikidataSearchResult(item)">
+            <ion-item class="item" ng-repeat="item in searchResults.wikidataResults" ng-click="selectWikidataSearchResult(item)">
               <p>{{item.label}} ({{item.id}})</p>
             </ion-item>
           </ion-list>
@@ -131,7 +131,7 @@
             </label>
           </ion-item>
           <ion-list>
-            <ion-item class="item" ng-repeat="item in wikipediaResults" ng-click="selectWikipediaSearchResult(item)">
+            <ion-item class="item" ng-repeat="item in searchResults.wikipediaResults" ng-click="selectWikipediaSearchResult(item)">
               <p>{{item}}</p>
             </ion-item>
           </ion-list>
@@ -145,7 +145,7 @@
             </label>
           </ion-item>
           <ion-list>
-            <ion-item class="item" ng-repeat="item in commonsResults" ng-click="selectCommonsSearchResult(item)">
+            <ion-item class="item" ng-repeat="item in searchResults.commonsResults" ng-click="selectCommonsSearchResult(item)">
               <p>{{item}}</p>
             </ion-item>
           </ion-list>

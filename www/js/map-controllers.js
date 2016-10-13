@@ -7,13 +7,6 @@ var mapControllers = angular.module('mapControllers', [])
 	// Variables & initialization
 	//
 
-	//$scope.wikidataResults = [{"id":"Q5408372","concepturi":"http://www.wikidata.org/entity/Q5408372","url":"//www.wikidata.org/wiki/Q5408372","title":"Q5408372","pageid":5172585,"label":"Joutsenkaula","description":"Wikimedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsenkaula"}},
-	//  {"id":"Q2736937","concepturi":"http://www.wikidata.org/entity/Q2736937","url":"//www.wikidata.org/wiki/Q2736937","title":"Q2736937","pageid":2628927,"label":"Joutsen","description":"Wikipedia disambiguation page","match":{"type":"label","language":"en","text":"Joutsen"}
-	//}];
-	$scope.wikidataResults = null;
-	$scope.wikipediaResults = null;
-	$scope.commonsResults = null;
-
 	$scope.map = {
     defaults: {
       zoomControlPosition: 'topleft'
@@ -120,6 +113,25 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.findOSMObjects();
 	});
 
+	$scope.$on( "inputWikidataChange", function( event ) {
+		$scope.inputWikidataChange();
+	});
+	$scope.$on( "selectWikidataSearchResult", function( event, item ) {
+		$scope.selectWikidataSearchResult(item);
+	});
+	$scope.$on( "inputWikipediaChange", function( event ) {
+		$scope.inputWikipediaChange();
+	});
+	$scope.$on( "selectWikipediaSearchResult", function( event, item ) {
+		$scope.selectWikipediaSearchResult(item);
+	});
+	$scope.$on( "inputCommonsChange", function( event ) {
+		$scope.inputCommonsChange();
+	});
+	$scope.$on( "selectCommonsSearchResult", function( event, item ) {
+		$scope.selectCommonsSearchResult(item);
+	});
+
 	$scope.$on( "photoAdded", function ( event ) {
 		$scope.updatePhotoMapLayer();
 	});
@@ -162,7 +174,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 			leafletData.getMap().then(function(map) {
 				var gallery = PhotoGallery.getGallery();
-       	console.log(gallery);
+       	//console.log(gallery);
 
        // 	var markers = {};
 				//
@@ -244,19 +256,24 @@ var mapControllers = angular.module('mapControllers', [])
 		$cordovaGeolocation
 		  .getCurrentPosition()
 		  .then(function (position) {
-				//console.log(position);
-				//console.log($scope);
+				console.log(position);
+				console.log($scope);
 		    $scope.map.center.lat = position.coords.latitude;
 		    $scope.map.center.lng = position.coords.longitude;
 		    $scope.map.center.zoom = 18;
 
-		    $scope.map.markers.now = {
+				var markers = {};
+		    markers.now = {
 		      lat:position.coords.latitude,
 		      lng:position.coords.longitude,
 		      message: "You Are Here",
 		      focus: true,
 		      draggable: false
 		    };
+
+				angular.extend($scope, {
+				 	markers: markers
+				});
 
 		  }, function(err) {
 		    // error
@@ -304,11 +321,11 @@ var mapControllers = angular.module('mapControllers', [])
 		if ($scope.osmObjectInfo.wikidataTag.length >= 2) {
 			Wiki.queryMediaWiki("wikidata", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikidataTag, function(data) {
 					//console.log(data);
-					$scope.wikidataResults = data.search;
+					$scope.searchResults.wikidataResults = data.search;
 			});
 		}
 		else if ($scope.osmObjectInfo.wikidataTag.length == 0) {
-			$scope.wikidataResults = "";
+			$scope.searchResults.wikidataResults = "";
 		}
 	}
 
@@ -321,7 +338,7 @@ var mapControllers = angular.module('mapControllers', [])
 				if (parts.length > 1) {
 					Wiki.queryMediaWiki("wikipedia", parts[0], parts[1], function(data) {
 							//console.log(data);
-							$scope.wikipediaResults = data[1];
+							$scope.searchResults.wikipediaResults = data[1];
 					});
 				}
 			}
@@ -329,11 +346,11 @@ var mapControllers = angular.module('mapControllers', [])
 		else if ($scope.osmObjectInfo.wikipediaTag.length >= 3) {
 			Wiki.queryMediaWiki("wikipedia", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikipediaTag, function(data) {
 					//console.log(data);
-					$scope.wikipediaResults = data[1];
+					$scope.searchResults.wikipediaResults = data[1];
 			});
 		}
 		else if ($scope.osmObjectInfo.wikipediaTag.length == 0) {
-			$scope.wikipediaResults = "";
+			$scope.searchResults.wikipediaResults = "";
 		}
 	}
 
@@ -343,18 +360,18 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.commonsResults = null;
 		if ($scope.osmObjectInfo.wikimediaCommonsTag.length >= 3) {
 			Wiki.queryMediaWiki("commons", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikimediaCommonsTag, function(data) {
-					//console.log(data);
-					$scope.commonsResults = data[1];
+					console.log(data);
+					$scope.searchResults.commonsResults = data[1];
 			});
 		}
 		else if ($scope.osmObjectInfo.wikimediaCommonsTag.length == 0) {
-			$scope.commonsResults = "";
+			$scope.searchResults.commonsResults = "";
 		}
 	}
 
 	$scope.selectWikidataSearchResult = function(item) {
 		$scope.osmObjectInfo.wikidataTag = item.label + " (" + item.id + ")";
-		$scope.wikidataResults = null;
+		$scope.searchResults.wikidataResults = null;
 		// TODO: update wikipedia and commons tags if they can be found via Wiki search
 	}
 
@@ -365,13 +382,13 @@ var mapControllers = angular.module('mapControllers', [])
 		else {
 			$scope.osmObjectInfo.wikipediaTag = item;
 		}
-		$scope.wikipediaResults = null;
+		$scope.searchResults.wikipediaResults = null;
 		// TODO: update wikidata tag if it can be found via Wiki search
 	}
 
 	$scope.selectCommonsSearchResult = function(item) {
 		$scope.osmObjectInfo.wikimediaCommonsTag = item;
-		$scope.commonsResults = null;
+		$scope.searchResults.commonsResults = null;
 	}
 
 	$scope.saveWikiTagChanges = function() {

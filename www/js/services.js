@@ -45,7 +45,7 @@ angular.module('starter.services', [])
 		var longitude = position.coords.longitude;
     currentPosition = position;
 
-		console.log("Latitude : " + latitude + " Longitude: " + longitude);
+		//console.log("Latitude : " + latitude + " Longitude: " + longitude);
 
 	}
 	function onLocationWatchError(err) {
