@@ -31,8 +31,11 @@ var photoGalleryControllers = angular.module('photoGalleryControllers', [])
     }
   });
 
-  // $scope.goBack = function() {
-  //   console.log("goBack");
-  //   $ionicHistory.goBack();
-  // }
+  $scope.uploadPhotoViaWikiShootMe = function() {
+    window.open("https://tools.wmflabs.org/wikishootme/" +
+      "#lat=" + $scope.photo.lat +
+      "&lng=" + $scope.photo.lng +
+      "&zoom=17",
+      '_system', 'location=yes');
+  }
 });

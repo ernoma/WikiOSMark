@@ -4,6 +4,9 @@ angular.module('starter.controllers', [])
   $scope.mainMenuTitle = "Map";
   $scope.sideMenuTitle = "Info";
 
+
+  //$scope.selectedMapMarker = null;
+
   $scope.osmObjectInfo = {
     type: "",
     id: "",
@@ -18,7 +21,9 @@ angular.module('starter.controllers', [])
   	selectedFeature: null,
     overpassResult: "",
     changesToSave: false,
-    changesetComment: ""
+    changesetComment: "",
+    OSMElementsShown: false,
+    WikiItemsShown: false
   }
 
   $scope.searchResults = {
@@ -36,7 +41,7 @@ angular.module('starter.controllers', [])
       switch ($rootScope.currentState) {
         case "tab.map":
           $scope.mainMenuTitle = "Map";
-          $scope.sideMenuTitle = "OSM Object Info";
+          $scope.sideMenuTitle = "OSM Element Info";
           break;
         case "tab.wiki":
           $scope.mainMenuTitle = "Wiki";
@@ -55,9 +60,12 @@ angular.module('starter.controllers', [])
 })
 
 .controller('TabCtrl', function($scope, $rootScope, $ionicPopup, $cordovaCamera, GeoLocation, PhotoGallery, Wiki, OpenStreetMap, AppSettings) {
-  $scope.findOSMObjects = function() {
+  $scope.showOSMObjects = function() {
     //console.log("in TabCtrl");
-    $scope.$broadcast('findOSMObjects');
+    $scope.$broadcast('showOSMObjects');
+  }
+  $scope.updateWikiLayers = function() {
+    $scope.$broadcast('updateWikiLayers');
   }
   $scope.locateMe = function() {
     //console.log("in TabCtrl");
@@ -294,61 +302,6 @@ angular.module('starter.controllers', [])
     PhotoGallery.addPhoto(imageURL, position);
 
     $scope.$broadcast('photoAdded');
-  }
-})
-
-.controller('SettingsCtrl', function($scope, $rootScope, $state, $location, OpenStreetMap, AppSettings) {
-  $scope.settings = {
-    enableFriends: true,
-    showUserPhotos: AppSettings.shouldShowUserPhotos(),
-    defaultLanguage: AppSettings.getDefaultLanguage()
-  };
-
-  console.log($scope.$parent);
-  //$scope.$parent.title = "Account";
-
-  $scope.userDetails = {
-    OSM: null,
-    Wiki: null
-  }
-
-  $scope.switchShowUserPhotos = function() {
-    console.log("in switchShowUserPhotos");
-    //console.log($scope.settings.showUserPhotos);
-    AppSettings.setShowUserPhotos($scope.settings.showUserPhotos);
-    //console.log(AppSettings.shouldShowUserPhotos());
-  }
-
-  $scope.changeDefaultLanguage = function() {
-    //console.log($scope.settings.defaultLanguage);
-    AppSettings.setDefaultLanguage($scope.settings.defaultLanguage);
-  }
-
-  var x2js = new X2JS();
-
-  $scope.authorizeWiki = function() {
-    // TODO
-  }
-
-  $scope.authorizeOSM = function() {
-    OpenStreetMap.getUserDetails(function(details) {});
-  }
-
-  $scope.logoutOSM = function() {
-    OpenStreetMap.logout();
-  }
-
-  $scope.authenticatedOSM = function() {
-    return OpenStreetMap.authenticated();
-  }
-
-  $scope.getOSMUserDetails = function() {
-    OpenStreetMap.getUserDetails(function(details) {
-      //console.log(details.getElementsByTagName("osm")[0].innerHTML);
-      var jsonObj = x2js.xml_str2json( details.getElementsByTagName("osm")[0].innerHTML );
-      console.log(jsonObj);
-      $scope.userDetails.OSM = jsonObj;
-    });
   }
 })
 

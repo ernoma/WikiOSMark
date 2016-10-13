@@ -5,7 +5,7 @@
 // the 2nd parameter is an array of 'requires'
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
-angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapControllers', 'wikiControllers', 'photoGalleryControllers', 'starter.controllers', 'starter.services'])
+angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapControllers', 'wikiControllers', 'settingsControllers', 'photoGalleryControllers', 'starter.controllers', 'starter.services'])
 
 .run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {

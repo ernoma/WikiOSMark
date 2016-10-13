@@ -1,7 +1,7 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $rootScope, $state, $timeout, $cordovaGeolocation, $http, leafletData, leafletMapEvents, leafletMarkerEvents, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings, GeoLocation, PhotoGallery) {
+.controller('MapCtrl', function($scope, $rootScope, $state, $timeout, $cordovaGeolocation, $http, leafletData, leafletMapEvents, leafletMarkerEvents, leafletBoundsHelpers, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings, GeoLocation, PhotoGallery) {
 
 	//
 	// Variables & initialization
@@ -27,6 +27,7 @@ var mapControllers = angular.module('mapControllers', [])
   };
 
 	var photoLayer = null;
+	var osmGeoJsonLayer = null;
 
 	var tilesDict = {
 		openstreetmap: {
@@ -57,8 +58,15 @@ var mapControllers = angular.module('mapControllers', [])
 		}
 	}
 
+	var bounds = leafletBoundsHelpers.createBoundsFromArray([
+				[ 71.2, 32.8 ],
+        [ 53.9, -24.1 ]
+  ]);
+
 	angular.extend($scope, {
 		tiles: tilesDict.openstreetmap,
+		bounds: bounds,
+		center: {},
 		layers: {
 			baselayers: {} //tilesDict
 		},
@@ -67,17 +75,20 @@ var mapControllers = angular.module('mapControllers', [])
 
 	var osmLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
-	    maxZoom: 20
+			maxZoom: 20,
+			maxNativeZoom: 19
 	});
 	var osmCycleLayer = L.tileLayer('http://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, , Maps &copy; <a href="http://thunderforest.com/">Thunderforest</a>',
-	    maxZoom: 18
+			maxZoom: 20,
+			maxNativeZoom: 18
 	});
 	var mapBoxLayer = L.tileLayer('http://{s}.tiles.mapbox.com/v3/' + 'ernoma.i04d787e' + '/{z}/{x}/{y}.png', {
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
 	    maxZoom: 20
 	});
-	var bingLayer = new L.BingLayer('Agf7Ot_un-nQxTrh4Vg6bqThCzQ5KH6kF2oLndffl3LlclN5dY3ELe80I6Kkj5Qd', {type: 'AerialWithLabels'});
+	var bingLayer = new L.BingLayer('Agf7Ot_un-nQxTrh4Vg6bqThCzQ5KH6kF2oLndffl3LlclN5dY3ELe80I6Kkj5Qd', {type: 'AerialWithLabels', maxZoom: 20,
+	maxNativeZoom: 18});
 
 	var baseMaps = {
 			"OpenStreetMap": osmLayer,
@@ -95,7 +106,7 @@ var mapControllers = angular.module('mapControllers', [])
 				//console.log(layer);
 				map.removeLayer(layer);
 			});
-			map.addLayer(osmLayer);
+			map.addLayer(mapBoxLayer);
 		});
 
 		//console.log("in ready");
@@ -109,8 +120,13 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.locateMe();
 	});
 
-	$scope.$on( "findOSMObjects", function( event ) {
+	$scope.$on( "showOSMObjects", function( event ) {
+		console.log(event);
 		$scope.findOSMObjects();
+	});
+
+	$scope.$on( "updateWikiLayers", function( event ) {
+		$scope.updateWikiLayers();
 	});
 
 	$scope.$on( "photoAdded", function ( event ) {
@@ -123,6 +139,8 @@ var mapControllers = angular.module('mapControllers', [])
 		//console.log(data);
 
 		$scope.updatePhotoMapLayer();
+
+		//$scope.updateWikiLayers();
 	});
 
 	// var markerEvents = leafletMarkerEvents.getAvailableEvents();
@@ -134,10 +152,32 @@ var mapControllers = angular.module('mapControllers', [])
   //   //});
   // }
 
+	// var mapEvents = leafletMapEvents.getAvailableMapEvents();
+  // for (var k in mapEvents){
+  //     var eventName = 'leafletDirectiveMap.wikiosmmap.' + mapEvents[k];
+	// 		console.log(eventName);
+  //     $scope.$on(eventName, function(event, args) {
+  //         console.log(event.name);
+  //     });
+  // }
+
+	$scope.$on('leafletDirectiveMap.wikiosmmap.moveend', function(event, args) {
+		//console.log(event.name);
+		//console.log(args);
+		//$scope.updateWikiLayers();
+	});
+
 	$scope.$on('leafletDirectiveMarker.wikiosmmap.click', function(event, args) {
-			console.log(event.name);
+			//console.log(event.name);
 			console.log(args);
-			$state.go("tab.photo-detail", { photoID: args.model.photoID });
+			if (args.model != undefined) {
+				//console.log("evt.model != undefined");
+				//$scope.selectedMapMarker = args;
+
+				// TODO: Wiki.queryMediaWiki, populate WikiDetailCtrl $scope data and show wiki-detail page
+				//tab.wiki-detail
+			}
+			//$state.go("tab.photo-detail", { photoID: args.model.photoID });
 	});
 
 	//
@@ -149,6 +189,119 @@ var mapControllers = angular.module('mapControllers', [])
   //   iconSize: [32, 32],
   //   iconAnchor: [16, 16]
   // };
+
+	$scope.updateWikiLayers = function() {
+		if (!$scope.mapControllerData.WikiItemsShown) {
+			if (AppSettings.shouldShowWikidataOnMap()) {
+				leafletData.getMap().then(function(map) {
+					var bounds = map.getBounds();
+					Wiki.geoQueryWikidata(bounds.getSouthWest(), bounds.getNorthEast(), function(data) {
+						console.log(data);
+
+						var items = data.results.bindings;
+						var markers = {};
+
+						var wikidataIcon = {
+							iconUrl: 'img/wikidata_no_text.png',
+							iconSize: [32, 23],
+							iconAnchor: [16, 12]
+						}
+
+						for (var i = 0; i < items.length; i++) {
+							var locationParts = items[i].location.value.split("(")[1].split(")")[0].split(" ");
+
+					    markers["wikidata"+i] = {
+					      lat: parseFloat(locationParts[1]),
+					      lng: parseFloat(locationParts[0]),
+					      draggable: false,
+								icon: wikidataIcon,
+								wikidataItem: items[i]
+								//message: "<div ng-include src=\"'templates/wikidata-map-item-template.html'\"></div>",
+								//message: items[i].qLabel.value,
+					    };
+						}
+						console.log(markers);
+
+						Wiki.geoQueryWikipedia(bounds.getSouthWest(), bounds.getNorthEast(), function(data) {
+							console.log(data);
+
+							var items = data.query.geosearch;
+
+							var wikipediaIcon = {
+								iconUrl: 'img/wikipedia_no_text.png',
+								iconSize: [32, 27],
+								iconAnchor: [16, 14]
+							}
+
+							for (var i = 0; i < items.length; i++) {
+						    markers["wikipedia"+i] = {
+						      lat: parseFloat(items[i].lat),
+						      lng: parseFloat(items[i].lon),
+						      draggable: false,
+									icon: wikipediaIcon,
+									wikipediaItem: items[i]
+									//message: "<div ng-include src=\"'templates/wikidata-map-item-template.html'\"></div>",
+									//message: items[i].qLabel.value,
+						    };
+							}
+
+							Wiki.geoQueryCommons(bounds.getSouthWest(), bounds.getNorthEast(), function(data) {
+								console.log(data);
+
+								var items = data.query.geosearch;
+
+								var commonsIcon = {
+									iconUrl: 'img/commons.png',
+									iconSize: [25, 32],
+									iconAnchor: [12, 16]
+								}
+
+								for (var i = 0; i < items.length; i++) {
+							    markers["commons"+i] = {
+							      lat: parseFloat(items[i].lat),
+							      lng: parseFloat(items[i].lon),
+							      draggable: false,
+										icon: commonsIcon,
+										commonsItem: items[i]
+										//message: "<div ng-include src=\"'templates/wikidata-map-item-template.html'\"></div>",
+										//message: items[i].qLabel.value,
+							    };
+								}
+
+								angular.extend($scope, {
+									markers: markers
+								});
+
+								$scope.mapControllerData.WikiItemsShown = true;
+							});
+						});
+					});
+				});
+			}
+			else {
+				angular.extend($scope, {
+					markers: {}
+				});
+			}
+			// if (AppSettings.shouldShowWikipediaOnMap()) {
+			// }
+			// else {
+			// 	// TODO
+			// }
+			// if (AppSettings.shouldShowCommonsOnMap()) {
+			// 	// TODO
+			// }
+			// else {
+			// 	// TODO
+			// }
+		}
+		else {
+			angular.extend($scope, {
+				markers: {}
+			});
+			$scope.mapControllerData.WikiItemsShown = false;
+		}
+	}
 
 	$scope.updatePhotoMapLayer = function() {
 		if (AppSettings.shouldShowUserPhotos()) {
@@ -177,13 +330,15 @@ var mapControllers = angular.module('mapControllers', [])
 					// var photo = evt.layer.photo,
 					// 	template = '<img src="{url}"/></a><p>{caption}</p>';
 					//
-					// 	console.log(evt);
+					console.log(evt);
 					// 	evt.layer.bindPopup(L.Util.template(template, photo), {
 					// 		className: 'leaflet-popup-photo',
 					// 		minWidth: 400
 					// 	}).openPopup();
 
+					if (evt.layer != undefined) {
 						$state.go("tab.photo-detail", { photoID: evt.layer.photo.photoID });
+					}
 				});
 
 				//console.log(map);
@@ -205,7 +360,7 @@ var mapControllers = angular.module('mapControllers', [])
 				photoLayer.add(photos).addTo(map);
 			});
 		}
-		else {
+		else if (photoLayer != null){
 			// angular.extend($scope, {
 			// 	markers: {}
 			// });
@@ -217,14 +372,14 @@ var mapControllers = angular.module('mapControllers', [])
 	}
 
 	$scope.goTo = function() {
-		$scope.map.center  = {
+		$scope.center  = {
 			  lat : 61.5,
 			  lng : 23.766667,
 			  zoom : 12
 			};
 	}
 
-	$scope.goTo();
+	//$scope.goTo();
 
 	$scope.locateMe = function() {
 		console.log("in locateMe");
@@ -239,15 +394,15 @@ var mapControllers = angular.module('mapControllers', [])
 		  .then(function (position) {
 				console.log(position);
 				console.log($scope);
-		    $scope.map.center.lat = position.coords.latitude;
-		    $scope.map.center.lng = position.coords.longitude;
-		    $scope.map.center.zoom = 18;
+		    $scope.center.lat = position.coords.latitude;
+		    $scope.center.lng = position.coords.longitude;
+		    $scope.center.zoom = 18;
 
 				var markers = {};
 		    markers.now = {
 		      lat:position.coords.latitude,
 		      lng:position.coords.longitude,
-		      message: "You Are Here",
+		      //message: "You Are Here",
 		      focus: true,
 		      draggable: false
 		    };
@@ -365,11 +520,14 @@ var mapControllers = angular.module('mapControllers', [])
 		}
 
 		var addOverpassDataToMap = function(data) {
+
+			$scope.mapControllerData.OSMElementsShown = true;
+
 			var geoJson = osmtogeojson(data);
 			console.log(geoJson);
 
 			leafletData.getMap().then(function(map) {
-				L.geoJson(geoJson, {
+				osmGeoJsonLayer = L.geoJson(geoJson, {
 					style: styleFeature,
 					pointToLayer: pointToLayer,
 					onEachFeature: onEachFeature
@@ -377,9 +535,17 @@ var mapControllers = angular.module('mapControllers', [])
 			});
 		}
 
-		addOverpassDataToMap(overpass_test_data);
+		if (!$scope.mapControllerData.OSMElementsShown) {
+			addOverpassDataToMap(overpass_test_data);
+		}
+		else {
+			leafletData.getMap().then(function(map) {
+				map.removeLayer(osmGeoJsonLayer);
+				$scope.mapControllerData.OSMElementsShown = false;
+			});
+		}
 
-		// data = "[out:json];(node(around:100.0," + $scope.map.center.lat + "," + $scope.map.center.lng + ");<;);out meta;";
+		// data = "[out:json];(node(around:" + AppSettings.getOSMSearchRadius() + "," + $scope.center.lat + "," + $scope.center.lng + ");<;);out meta;";
 		// $http.get('http://www.overpass-api.de/api/interpreter?data=' + data)
 		// 	.success(function(data, status, headers,config){
 		//       console.log('data success');

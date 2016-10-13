@@ -8,6 +8,17 @@ angular.module('starter.services', [])
     setDefaultLanguage: function(language) {
       $window.localStorage["defaultLanguage"] = language;
     },
+    getOSMSearchRadius: function() {
+      if ($window.localStorage["OSMSearchRadius"] != undefined) {
+        return JSON.parse($window.localStorage["OSMSearchRadius"]);
+      }
+      else {
+        return 100;
+      }
+    },
+    setOSMSearchRadius: function(value) {
+      $window.localStorage["OSMSearchRadius"] = JSON.stringify(value);
+    },
     shouldShowUserPhotos: function() {
       if ($window.localStorage["showUserPhotos"] != undefined) {
         return JSON.parse($window.localStorage["showUserPhotos"]);
@@ -18,7 +29,40 @@ angular.module('starter.services', [])
     },
     setShowUserPhotos: function(value) {
       $window.localStorage["showUserPhotos"] = JSON.stringify(value);
-    }
+    },
+    shouldShowWikidataOnMap: function() {
+      if ($window.localStorage["showWikidataOnMap"] != undefined) {
+        return JSON.parse($window.localStorage["showWikidataOnMap"]);
+      }
+      else {
+        return true;
+      }
+    },
+    shouldShowWikipediaOnMap: function() {
+      if ($window.localStorage["showWikipediaOnMap"] != undefined) {
+        return JSON.parse($window.localStorage["showWikipediaOnMap"]);
+      }
+      else {
+        return true;
+      }
+    },
+    shouldShowCommonsOnMap: function() {
+      if ($window.localStorage["showCommonsOnMap"] != undefined) {
+        return JSON.parse($window.localStorage["showCommonsOnMap"]);
+      }
+      else {
+        return true;
+      }
+    },
+    setShowWikidataOnMap: function(value) {
+      $window.localStorage["showWikidataOnMap"] = JSON.stringify(value);
+    },
+    setShowWikipediaOnMap: function(value) {
+      $window.localStorage["showWikipediaOnMap"] = JSON.stringify(value);
+    },
+    setShowCommonsOnMap: function(value) {
+      $window.localStorage["showCommonsOnMap"] = JSON.stringify(value);
+    },
     // set: function(key, value) {
 		//   $window.localStorage[key] = value;
 		// },
@@ -150,6 +194,58 @@ angular.module('starter.services', [])
   		    console.log(data);
   		  });
     },
+    geoQueryWikidata: function(southWestPoint, northEastPoint, callback) {
+      //console.log(southWestPoint, northEastPoint);
+      var url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?query=";
+      var query = 'SELECT ?q ?qLabel ?location ?image ?desc ?osmId ' +
+        'WHERE { SERVICE wikibase:box { ' +
+        '?q wdt:P625 ?location . bd:serviceParam wikibase:cornerSouthWest "Point(' +
+        southWestPoint.lng + " " + southWestPoint.lat +
+        ')"^^geo:wktLiteral . bd:serviceParam wikibase:cornerNorthEast "Point(' +
+        northEastPoint.lng + " " + northEastPoint.lat +
+        ')"^^geo:wktLiteral } OPTIONAL { ?q wdt:P18 ?image } OPTIONAL { ?q wdt:P402 ?osmId }' +
+        ' SERVICE wikibase:label { bd:serviceParam wikibase:language "en,da,et,fi,is,no,se" . ?q schema:description ?desc . ?q rdfs:label ?qLabel } } LIMIT 200';
+
+      $http.get(url + encodeURIComponent(query))
+      .success(callback)
+		  .error(function (data) {
+		  	console.log('data error');
+		    console.log(data);
+		  });
+    },
+    geoQueryWikipedia: function(southWestPoint, northEastPoint, callback) {
+
+      var url = "https://en.wikipedia.org/w/api.php?action=query";
+      url += "&list=geosearch";
+      url += "&gsbbox=" + northEastPoint.lat + "|" + southWestPoint.lng + "|" + southWestPoint.lat + "|" + northEastPoint.lng;
+      url += "&gslimit=" + 200;
+      url += "&format=json"
+      url += "&callback=JSON_CALLBACK";
+
+      $http.jsonp(url).
+  		  success(callback)
+  		  .error(function (data) {
+  		  	console.log('data error');
+  		    console.log(data);
+  		  });
+    },
+    geoQueryCommons: function(southWestPoint, northEastPoint, callback) {
+
+      var url = "https://commons.wikimedia.org/w/api.php?action=query";
+      url += "&list=geosearch";
+      url += "&gsnamespace=6";
+      url += "&gsbbox=" + northEastPoint.lat + "|" + southWestPoint.lng + "|" + southWestPoint.lat + "|" + northEastPoint.lng;
+      url += "&gslimit=" + 200;
+      url += "&format=json"
+      url += "&callback=JSON_CALLBACK";
+
+      $http.jsonp(url).
+  		  success(callback)
+  		  .error(function (data) {
+  		  	console.log('data error');
+  		    console.log(data);
+  		  });
+    }
   };
   return wikiService;
 })

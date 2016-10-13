@@ -12,7 +12,7 @@
 
       <p ng-if="imageCountLimitReached">There are more than {{imageCount}} images. Showing the first {{imageCount}}.</p>
 
-      <div class="list">
+      <div class="list item-text-wrap">
         <a ng-repeat="thumb in thumbs"
              class="item item-thumbnail-left" ng-click="goTo(thumb.descrUrl)">
 

@@ -1,9 +1,9 @@
 <ion-view view-title="Settings">
   <ion-content>
     <ion-list>
-    <ion-toggle  ng-model="settings.enableFriends">
+    <!--<ion-toggle  ng-model="settings.enableFriends">
         Enable Friends
-    </ion-toggle>
+    </ion-toggle>-->
 
     <div class="list list-inset">
     	<ion-item ng-if="authenticatedOSM() == false" class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeOSM()">
@@ -16,16 +16,16 @@
     		<h2 ng-init="getOSMUserDetails()">OpenStreetMap</h2>
           <p ng-if="userDetails.OSM.user._display_name == null">Logged in</p>
           <p ng-if="userDetails.OSM.user._display_name != null">Logged in as {{userDetails.OSM.user._display_name}}</p>
-        	<p>Click to disconnect...</p>
+        	<p>Click to logout...</p>
     	</ion-item>
-    	<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeWiki()">
+    	<!--<ion-item class="item item-remove-animate item-thumbnail-left" type="item-text-wrap" href="" ng-click="authorizeWiki()">
     		<img src="img/wiki.png">
     		<h2>Wikimedia</h2>
         	<p>Click to connect...</p>
-    	</ion-item>
+    	</ion-item>-->
     </div>
 
-    <div class="list list-inset">
+    <div class="list list-inset item-text-wrap">
       <label class="item item-input item-select">
         <div class="input-label">
           Default search language
@@ -41,9 +41,37 @@
           <!--<option>Wikivoyage</option>-->
         </select>
       </label>
+
+      <div class="item" ng-model="settings.OSMSearchRadius">
+        OpenStreetMap elements search radius
+        <div class="row">
+        </div>
+        <div class="item range">
+          <i class="icon ion-minus-round"></i>
+            <input type="range" name="searchRadius" min="10" max="500" ng-model="settings.OSMSearchRadius"  ng-change="changeOSMSearchRadius()">
+          <i class="icon ion-plus-round"></i>
+        </div>
+        <div class="item item-input-inset">
+          <label class="item-input-wrapper">
+            <input type="text" ng-model="settings.OSMSearchRadius" ng-change="changeOSMSearchRadius()">
+          </label>
+          <span>
+            &nbsp;meters
+          </span>
+        </div>
+      </div>
       <ion-toggle ng-model="settings.showUserPhotos" ng-change="switchShowUserPhotos()">
           Show my photos on the map
       </ion-toggle>
+      <!--<ion-toggle ng-model="settings.showWikidataOnMap" ng-change="switchShowWikidataOnMap()">
+          Show Wikidata, Wikipedia and Wikimedia Commons items on the map
+      </ion-toggle>
+      <!--<ion-toggle ng-model="settings.showWikipediaOnMap" ng-change="switchShowWikipediaOnMap()">
+          Show Wikipedia items on the map
+      </ion-toggle>
+      <ion-toggle ng-model="settings.showCommonsOnMap" ng-change="switchShowCommonsOnMap()">
+          Show Wikimedia Commons items on the map
+      </ion-toggle>-->
     </div>
     </ion-list>
   </ion-content>

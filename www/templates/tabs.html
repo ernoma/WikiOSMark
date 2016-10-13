@@ -66,9 +66,15 @@
           <i class="icon ion-android-locate"></i>
           Locate me
         </ion-item>
-        <ion-item class="item item-icon-left" menu-close ng-click="findOSMObjects()">
+        <ion-item class="item item-icon-left" menu-close ng-click="updateWikiLayers()">
           <i class="icon ion-soup-can"></i>
-          Show OSM elements
+          <span ng-if="!mapControllerData.WikiItemsShown">Show Wiki items</span>
+          <span ng-if="mapControllerData.WikiItemsShown">Hide Wiki items</span>
+        </ion-item>
+        <ion-item class="item item-icon-left" menu-close ng-click="showOSMObjects()">
+          <i class="icon ion-soup-can"></i>
+          <span ng-if="!mapControllerData.OSMElementsShown">Show OSM elements</span>
+          <span ng-if="mapControllerData.OSMElementsShown">Hide OSM elements</span>
         </ion-item>
         <ion-item class="item item-icon-left" menu-close ng-click="takePhoto()">
           <i class="icon ion-camera"></i>
@@ -159,7 +165,7 @@
             <div class="col col-50 col-osm-object col-osm-object-left">Key</div>
             <div class="col col-50 col-osm-object">Value</div>
           </div>
-            <ion-item class="item-osm-object" ng-click="" ng-repeat="(key, value) in osmObjectInfo.tags">
+            <ion-item class="item-osm-object item-text-wrap" ng-click="" ng-repeat="(key, value) in osmObjectInfo.tags">
               <div class="row row-osm-object">
                 <div class="col col-50 col-osm-object col-osm-object-left">{{key}}</div>
                 <div class="col col-50 col-osm-object">{{value}}</div>

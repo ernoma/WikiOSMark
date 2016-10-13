@@ -6,11 +6,11 @@
 </ion-nav-bar> -->
   <ion-view view-title="Photo">
     <ion-content ng-model="photo">
-      <!-- <div class="item">
-        <button class="button icon-left ion-chevron-left button-clear button-dark">Back</button>
-      </div> -->
       <!-- TODO At minimum show the photo -->
       <div class="list card text-center">
+        <button class="button button-block button-positive" ng-click="uploadPhotoViaWikiShootMe()">
+          Upload via WikiShootMe!
+        </button>
         <div class="item item-image">
             <img ng-src="{{photo.url}}" alt="{{photo.caption}}">
         </div>
