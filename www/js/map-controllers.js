@@ -7,6 +7,16 @@ var mapControllers = angular.module('mapControllers', [])
 	// Variables & initialization
 	//
 
+	var osmColors = {
+		wiki: '#0f0',
+		building: '#800000',
+		leisure: '#196619',
+		highway: '#4d4d33',
+		nodes: '#ff7800',
+		unspecified_way: '#404040',
+		unspecified: '#00f'
+	}
+
 	$scope.map = {
     defaults: {
       zoomControlPosition: 'topleft'
@@ -70,7 +80,12 @@ var mapControllers = angular.module('mapControllers', [])
 		layers: {
 			baselayers: {} //tilesDict
 		},
-		markers: {}
+		markers: {},
+		legend: {
+			position: 'bottomleft',
+			colors: [ osmColors.wiki, osmColors.building, osmColors.leisure, osmColors.highway, osmColors.unspecified_way, osmColors.nodes, osmColors.unspecified ],
+			labels: [ 'Element with a Wiki tag', 'Buildings', 'Leisure', 'Highways', 'Other way elements', 'Node elements', 'Default OSM color' ]
+		}
 	});
 
 	var osmLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -469,25 +484,25 @@ var mapControllers = angular.module('mapControllers', [])
 			if (feature.properties.type == "way") {
 				if (feature.properties.tags != undefined) {
 					if (feature.properties.tags.wikipedia != undefined) {
-						style.color = '#0f0';
+						style.color = osmColors.wiki;
 						console.log(style);
 					}
 					else if (feature.properties.tags.building != undefined) {
-						style.color = '#800000';
+						style.color = osmColors.building;
 					}
 					else if ((feature.properties.tags.leisure != undefined && feature.properties.tags.leisure == "park") ||
 						(feature.properties.tags.leisure != undefined && feature.properties.tags.leisure == "playground") ||
 						(feature.properties.tags.landuse != undefined && feature.properties.tags.landuse == "grass")
 						) {
-						style.color = '#196619';
+						style.color = osmColors.leisure;
 					}
 					else if (feature.properties.tags.highway != undefined ||
 						(feature.properties.tags.amenity != undefined && feature.properties.tags.amenity == "parking")
 						) {
-						style.color = '#4d4d33';
+						style.color = osmColors.highway;
 					}
 					else {
-						style.color = '#404040';
+						style.color = osmColors.unspecified_way;
 					}
 				}
 				if (feature.properties.tainted) {
@@ -503,7 +518,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 			var geojsonMarkerOptions = {
 			    radius: 12,
-			    fillColor: "#ff7800",
+			    fillColor: osmColors.nodes,
 			    color: "#000",
 			    weight: 1,
 			    opacity: 1,
@@ -512,7 +527,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 			if (feature.properties.tags != undefined) {
 				if (feature.properties.tags.wikipedia != undefined) {
-					geojsonMarkerOptions.fillColor = "#0f0";
+					geojsonMarkerOptions.fillColor = osmColors.wiki;
 				}
 			}
 
