@@ -17,6 +17,12 @@ var mapControllers = angular.module('mapControllers', [])
 		unspecified: '#00f'
 	}
 
+	var legend = {
+		position: 'topleft',
+		colors: [ osmColors.wiki, osmColors.building, osmColors.leisure, osmColors.highway, osmColors.unspecified_way, osmColors.nodes, osmColors.unspecified ],
+		labels: [ 'Element with a Wiki tag', 'Buildings', 'Leisure', 'Highways', 'Other way elements', 'Node elements', 'Default OSM color' ]
+	}
+
 	$scope.map = {
     defaults: {
       zoomControlPosition: 'topleft'
@@ -81,11 +87,7 @@ var mapControllers = angular.module('mapControllers', [])
 			baselayers: {} //tilesDict
 		},
 		markers: {},
-		legend: {
-			position: 'bottomleft',
-			colors: [ osmColors.wiki, osmColors.building, osmColors.leisure, osmColors.highway, osmColors.unspecified_way, osmColors.nodes, osmColors.unspecified ],
-			labels: [ 'Element with a Wiki tag', 'Buildings', 'Leisure', 'Highways', 'Other way elements', 'Node elements', 'Default OSM color' ]
-		}
+		legend: null
 	});
 
 	var osmLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -138,6 +140,24 @@ var mapControllers = angular.module('mapControllers', [])
 	$scope.$on( "showOSMObjects", function( event ) {
 		console.log(event);
 		$scope.findOSMObjects();
+	});
+
+	$scope.$on( "showLegend", function( event ) {
+		console.log(event);
+		console.log($scope.legend);
+		if ($scope.mapControllerData.legendShown == false) {
+			angular.extend($scope, {
+				legend: legend
+			});
+			$scope.mapControllerData.legendShown = true;
+			console.log($scope.legend);
+		}
+		else {
+			angular.extend($scope, {
+				legend: null
+			});
+			$scope.mapControllerData.legendShown = false;
+		}
 	});
 
 	$scope.$on( "updateWikiLayers", function( event ) {

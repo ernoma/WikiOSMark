@@ -80,6 +80,11 @@
           <i class="icon ion-camera"></i>
           Take photo
         </ion-item>
+        <ion-item class="item item-icon-left" menu-close ng-click="showLegend()">
+          <i class="icon ion-information"></i>
+          <span ng-if="!mapControllerData.legendShown">Show OSM legend</span>
+          <span ng-if="mapControllerData.legendShown">Hide OSM legend</span>
+        </ion-item>
       </ion-list>
     </ion-content>
   </ion-side-menu>

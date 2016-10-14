@@ -23,7 +23,8 @@ angular.module('starter.controllers', [])
     changesToSave: false,
     changesetComment: "",
     OSMElementsShown: false,
-    WikiItemsShown: false
+    WikiItemsShown: false,
+    legendShown: false
   }
 
   $scope.searchResults = {
@@ -70,6 +71,10 @@ angular.module('starter.controllers', [])
   $scope.locateMe = function() {
     //console.log("in TabCtrl");
     $scope.$broadcast('locateMe');
+  }
+
+  $scope.showLegend = function() {
+    $scope.$broadcast('showLegend');
   }
 
   $scope.showOSMObjectPage = function() {
