@@ -103,3 +103,24 @@ body {
     margin-right: 8px;
     opacity: 0.7;
 }
+
+.settings-list-flag-icon {
+	margin-right: 10px;
+	border: 1px solid #dddddd;
+	width: 2em !important;
+	line-height: 1.5em !important;
+}
+
+.settings-country-flag-icon {
+	border: 1px solid #dddddd;
+	width: 40px !important;
+	line-height: 30px !important;
+	position: absolute;
+  top: 0px;
+  left: 0px;
+	margin-right: 10px;
+}
+
+.settings-country-heading {
+	font-size: x-large;
+}

@@ -73,6 +73,8 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 		if ($stateParams.coordinates != undefined) {
 			console.log($stateParams.coordinates);
+			// TODO check if the page has maplink/mapframe and
+			// if not then give the user easy way to add on the page
 		}
 
 		$scope.goTo = function(URL) {

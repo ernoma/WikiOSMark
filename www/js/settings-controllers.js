@@ -12,7 +12,7 @@ angular.module('settingsControllers', [])
     OSMSearchRadius: AppSettings.getOSMSearchRadius()
   };
 
-  console.log($scope.$parent);
+  //console.log($scope.$parent);
   //$scope.$parent.title = "Account";
 
   $scope.userDetails = {
@@ -80,5 +80,38 @@ angular.module('settingsControllers', [])
       console.log(jsonObj);
       $scope.userDetails.OSM = jsonObj;
     });
+  }
+})
+
+.controller('SettingsCountryCtrl', function($scope, $stateParams, AppSettings) {
+  $scope.settings = {
+    countryCode: $stateParams.countryCode
+  }
+
+  switch ($scope.settings.countryCode) {
+    case 'da':
+      $scope.settings.country = "Denmark";
+      $scope.settings.flagStyle = "flag-icon-dk";
+      break;
+    case 'et':
+      $scope.settings.country = "Estonia";
+      $scope.settings.flagStyle = "flag-icon-ee";
+      break;
+    case 'fi':
+      $scope.settings.country = "Finland";
+      $scope.settings.flagStyle = "flag-icon-fi";
+      break;
+    case 'is':
+      $scope.settings.country = "Iceland";
+      $scope.settings.flagStyle = "flag-icon-is";
+      break;
+    case 'no':
+      $scope.settings.country = "Norway";
+      $scope.settings.flagStyle = "flag-icon-no";
+      break;
+    case 'se':
+      $scope.settings.country = "Sweden";
+      $scope.settings.flagStyle = "flag-icon-se";
+      break;
   }
 });

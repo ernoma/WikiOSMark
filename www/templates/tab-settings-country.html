@@ -1,0 +1,14 @@
+
+<ion-view view-title="{{settings.country}} Open Data">
+  <ion-content class="padding">
+      <p class="settings-country-heading">
+        <span ng-if="settings.countryCode == 'da'" class="flag-icon flag-icon-dk settings-country-flag-icon" ng-style></span>
+        <span ng-if="settings.countryCode == 'et'" class="flag-icon flag-icon-ee settings-country-flag-icon" ng-style></span>
+        <span ng-if="settings.countryCode == 'fi'" class="flag-icon flag-icon-fi settings-country-flag-icon" ng-style></span>
+        <span ng-if="settings.countryCode == 'is'" class="flag-icon flag-icon-is settings-country-flag-icon" ng-style></span>
+        <span ng-if="settings.countryCode == 'no'" class="flag-icon flag-icon-no settings-country-flag-icon" ng-style></span>
+        <span ng-if="settings.countryCode == 'se'" class="flag-icon flag-icon-se settings-country-flag-icon" ng-style></span>
+        <span class="settings-country-heading">{{settings.country}}</span>
+      </p>
+  </ion-content>
+</ion-view>

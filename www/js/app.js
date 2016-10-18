@@ -90,6 +90,17 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
       }
     }
   })
+
+  .state('tab.settings-country', {
+    url: '/settings-country/:countryCode',
+    views: {
+      'tab-settings': {
+        templateUrl: 'templates/tab-settings-country.html',
+        controller: 'SettingsCountryCtrl'
+      }
+    }
+  })
+
   .state('osmlanding', {
     url: '/osmlanding?oauth_token={oauthToken}',
     template: '',
