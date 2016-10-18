@@ -61,6 +61,18 @@ angular.module('starter.controllers', [])
 })
 
 .controller('TabCtrl', function($scope, $rootScope, $ionicPopup, $cordovaCamera, GeoLocation, PhotoGallery, Wiki, OpenStreetMap, AppSettings) {
+  $scope.runTests = function() {
+    // Wiki.createWikiPage("testorienteerix", "hello", "world", function(response) {
+    //   console.log(response);
+    // });
+
+    var maplinkText = '<maplink zoom="13" longitude="10.25515" latitude="60.15995" />';
+
+    Wiki.editWikiPage("testorienteerix", "new", "maplink_test", maplinkText, "Added new section with a maplink", function(response) {
+      console.log(response);
+    });
+  }
+
   $scope.showOSMObjects = function() {
     //console.log("in TabCtrl");
     $scope.$broadcast('showOSMObjects');

@@ -71,6 +71,10 @@ var wikiControllers = angular.module('wikiControllers', [])
 		console.log(site);
 		console.log(id);
 
+		if ($stateParams.coordinates != undefined) {
+			console.log($stateParams.coordinates);
+		}
+
 		$scope.goTo = function(URL) {
 				//console.log("goTo: " + URL);
 				//e.preventDefault();

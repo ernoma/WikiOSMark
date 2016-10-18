@@ -63,6 +63,9 @@ angular.module('starter.services', [])
     setShowCommonsOnMap: function(value) {
       $window.localStorage["showCommonsOnMap"] = JSON.stringify(value);
     },
+    getWikiOSMarkServer: function(value) {
+      return "http://192.168.1.85:3000/wikipedia/"
+    }
     // set: function(key, value) {
 		//   $window.localStorage[key] = value;
 		// },
@@ -135,7 +138,7 @@ angular.module('starter.services', [])
     return photoGalleryService;
 })
 
-.factory('Wiki', function($http) {
+.factory('Wiki', function($http, AppSettings) {
   var wikiService = {
     getWikidataProperties: function(lang) {
 
@@ -214,8 +217,8 @@ angular.module('starter.services', [])
 		  });
     },
     geoQueryWikipedia: function(southWestPoint, northEastPoint, callback) {
-
-      var url = "https://en.wikipedia.org/w/api.php?action=query";
+      // TODO query at least in the language where is user is located (in addition to English)
+      var url = "https://" + AppSettings.getDefaultLanguage() + ".wikipedia.org/w/api.php?action=query";
       url += "&list=geosearch";
       url += "&gsbbox=" + northEastPoint.lat + "|" + southWestPoint.lng + "|" + southWestPoint.lat + "|" + northEastPoint.lng;
       url += "&gslimit=" + 200;
@@ -230,7 +233,7 @@ angular.module('starter.services', [])
   		  });
     },
     geoQueryCommons: function(southWestPoint, northEastPoint, callback) {
-
+      // TODO query at least in the language where is user is located (in addition to English)
       var url = "https://commons.wikimedia.org/w/api.php?action=query";
       url += "&list=geosearch";
       url += "&gsnamespace=6";
@@ -241,6 +244,83 @@ angular.module('starter.services', [])
 
       $http.jsonp(url).
   		  success(callback)
+  		  .error(function (data) {
+  		  	console.log('data error');
+  		    console.log(data);
+  		  });
+    },
+    createWikiPage: function(title, content, summary, callback) {
+
+      var serverAddress = AppSettings.getWikiOSMarkServer();
+      console.log(serverAddress);
+
+      // Get edit token
+      var tokenURL = serverAddress + "w/api.php?action=query&meta=tokens";
+      tokenURL += "&format=json";
+
+      $http.get(tokenURL).
+  		  success(function (data) {
+          console.log(data);
+          // have do this via own server
+          var url = serverAddress;
+          url += "w/api.php?action=edit";
+          url += "&createonly";
+          url += "&title=" + title;
+          url += "&summary=" + summary;
+          url += "&text=" + content;
+          //url += "&contentmodel=" + "text";
+          url += "&contentformat=" + "text/x-wiki";
+          url += "&format=json";
+
+          $http.post(url, { headers: {
+            'Content-type': 'application/x-www-form-urlencoded',
+            data: { token: data.query.tokens.csrftoken }
+          }}).
+          success(callback)
+          .error(function (data) {
+            console.log('data error');
+            console.log(data);
+          });
+        })
+  		  .error(function (data) {
+  		  	console.log('data error');
+  		    console.log(data);
+  		  });
+    },
+    editWikiPage: function(title, section, sectionTitle, content, summary, callback) {
+      var serverAddress = AppSettings.getWikiOSMarkServer();
+      console.log(serverAddress);
+      // Get edit token
+      var tokenURL = serverAddress + "w/api.php?action=query&meta=tokens";
+      tokenURL += "&format=json";
+
+      $http.get(tokenURL).
+  		  success(function (data) {
+          console.log(data);
+          // have do this via own server
+          var url = serverAddress;
+          url += "w/api.php?action=edit";
+          url += "&nocreate";
+          url += "&title=" + title;
+          url += "&section=" + section;
+          if (sectionTitle != null) {
+            url += "&sectiontitle=" + sectionTitle;
+          }
+          url += "&summary=" + summary;
+          url += "&text=" + content;
+          url += "&contentformat=" + "text/x-wiki";
+          url += "&format=json";
+
+          $http.post(url, { headers: {
+            'Content-type': 'application/x-www-form-urlencoded',
+            data: { token: data.query.tokens.csrftoken }
+          }}).
+          success(callback)
+          .error(function (data) {
+            console.log('data error');
+            console.log(data);
+          });
+        })
   		  .error(function (data) {
   		  	console.log('data error');
   		    console.log(data);

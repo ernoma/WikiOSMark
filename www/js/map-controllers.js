@@ -209,8 +209,27 @@ var mapControllers = angular.module('mapControllers', [])
 				//console.log("evt.model != undefined");
 				//$scope.selectedMapMarker = args;
 
-				// TODO: Wiki.queryMediaWiki, populate WikiDetailCtrl $scope data and show wiki-detail page
+				// TODO: 1. Wiki.queryMediaWiki,
+				// 2. populate WikiDetailCtrl $scope data,
+				// 2.1. include maplink and mapframe as suggested additions to the page and
+				// 3. show wiki-detail page
+
 				//tab.wiki-detail
+
+				if (args.modelName.includes("wikipedia")) {
+					$state.go("tab.wiki-detail", { wikiId: AppSettings.getDefaultLanguage() + "wikipedia+" + args.model.wikipediaItem.title, coordinates: "" + args.model.lat + "|" + args.model.lng});
+				}
+				else if (args.modelName.includes("wikidata")) {
+					// TODO
+				}
+				else if (args.modelName.includes("commons")) {
+					// TODO
+				}
+
+				//Wiki.createWikiPage("testorienteerix", "hello", "world", function(response) {
+				//	console.log(response);
+				//});
+
 			}
 			//$state.go("tab.photo-detail", { photoID: args.model.photoID });
 	});
