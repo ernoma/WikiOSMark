@@ -33,8 +33,100 @@
     <div ng-if="data.site == 'wikipedia'">
       <h2>{{data.title}}</h2>
       <p><a href="" ng-click="goTo(data.siteURL)">View the original article</a></p>
-      <img ng-src="{{articleImage}}" ng-if="articleImage != ''">
-      <p>{{introText}}</p>
+      <!--<img ng-src="{{articleImage}}" ng-if="articleImage != ''">
+      <p>{{introText}}</p>-->
+      <ion-list>
+      <div ng-repeat="section in sections">
+        <ion-item class="item-stable"
+                  ng-click="toggleGroup(section)"
+                  ng-class="{active: isGroupShown(section)}">
+            <i class="icon" ng-class="isGroupShown(section) ? 'ion-minus' : 'ion-plus'"></i>
+          &nbsp;
+          {{section.title}}
+        </ion-item>
+        <ion-item class="item item-accordion item-text-wrap"
+                  ng-show="isGroupShown(section)">
+          <div class="item">
+            <p class="wiki-article-section-text">{{section.content}}</p>
+          </div>
+          <div class="item">
+            <div class="item item-divider">
+              Mapframe
+            </div>
+            <div class="list">
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">text</span>
+                <input type="text" placeholder="shown below mapframe, e.g. Hønefoss">
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Longitude</span>
+                <input type="text" placeholder="10.2603">
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Latitude</span>
+                <input type="text" placeholder="60.1635">
+              </label>
+              <div class="item">
+                width
+                <div class="row">
+                </div>
+                <div class="item range">
+                  <i class="icon ion-minus-round"></i>
+                    <input type="range" name="width" min="10" max="2000" ng-model="mapframe.width">
+                  <i class="icon ion-plus-round"></i>
+                </div>
+                <div class="item item-input-inset">
+                  <label class="item-input-wrapper">
+                    <input type="text" ng-model="mapframe.width">
+                  </label>
+                  <span>
+                    &nbsp;pixels
+                  </span>
+                </div>
+              </div>
+              <div class="item">
+                height
+                <div class="row">
+                </div>
+                <div class="item range">
+                  <i class="icon ion-minus-round"></i>
+                    <input type="range" name="height" min="10" max="2000" ng-model="mapframe.height">
+                  <i class="icon ion-plus-round"></i>
+                </div>
+                <div class="item item-input-inset">
+                  <label class="item-input-wrapper">
+                    <input type="text" ng-model="mapframe.height">
+                  </label>
+                  <span>
+                    &nbsp;pixels
+                  </span>
+                </div>
+              </div>
+              <div class="item">
+                zoom
+                <div class="row">
+                </div>
+                <div class="item range">
+                  <i class="icon ion-minus-round"></i>
+                    <input type="range" name="zoom" min="1" max="20" ng-model="mapframe.zoom">
+                  <i class="icon ion-plus-round"></i>
+                </div>
+                <div class="item item-input-inset">
+                  <label class="item-input-wrapper">
+                    <input type="text" ng-model="mapframe.zoom" ng-change="mapframeChanged()">
+                  </label>
+                </div>
+              </div>
+              <div class="item">
+                <button class="button button-positive" ng-click="addToWikipedia()">
+                  Add to Wikipedia
+                </button>
+              </div>
+            </div>
+          </div>
+        </ion-item>
+      </div>
+    </ion-list>
     </div>
     <!------------------------------------------------------------------------------------------->
     <div ng-if="data.site == 'wikidata'">

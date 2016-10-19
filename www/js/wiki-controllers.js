@@ -67,15 +67,18 @@ var wikiControllers = angular.module('wikiControllers', [])
 			siteURL: ""
 		};
 
+		$scope.mapframe = {
+			text: "",
+			width: 250,
+			height: 250,
+			zoom: 13,
+			latitude: undefined,
+			longitude: undefined
+		}
+
 		console.log(lang);
 		console.log(site);
 		console.log(id);
-
-		if ($stateParams.coordinates != undefined) {
-			console.log($stateParams.coordinates);
-			// TODO check if the page has maplink/mapframe and
-			// if not then give the user easy way to add on the page
-		}
 
 		$scope.goTo = function(URL) {
 				//console.log("goTo: " + URL);
@@ -114,6 +117,34 @@ var wikiControllers = angular.module('wikiControllers', [])
 						for (var i = 0; i < textEntries.length; i++) {
 							$scope.introText += textEntries[i].text + " ";
 						}
+					}
+
+					$scope.sections = [];
+					parsedContent.text.forEach(function(sectionContent, key, map) {
+						var text = "";
+						for (var i = 0; i < sectionContent.length; i++) {
+							text += sectionContent[i].text + " ";
+						}
+						$scope.sections.push({
+							title: key,
+							content: text,
+							show: false
+						});
+					});
+					$scope.toggleGroup = function(section) {
+						section.show = !section.show;
+					};
+					$scope.isGroupShown = function(section) {
+						return section.show;
+					};
+
+					if ($stateParams.coordinates != undefined) {
+						console.log($stateParams.coordinates);
+						// TODO
+						// 1. check if a page section has maplink/mapframe and
+						// 2.1. if a section has maplink state it in the UI
+						// 2.2. if not then show a form to add maplink and mapframe with various parameters
+
 					}
 			  })
 			  .error(function (data) {
