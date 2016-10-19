@@ -307,7 +307,7 @@ angular.module('starter.services', [])
             url += "&sectiontitle=" + sectionTitle;
           }
           url += "&summary=" + summary;
-          url += "&text=" + content;
+          url += "&appendtext=" + content;
           url += "&contentformat=" + "text/x-wiki";
           url += "&format=json";
 

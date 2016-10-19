@@ -62,6 +62,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 		var site = parts[0].substring(2);
 		var id = parts[1];
 		$scope.data = {
+			lang: lang,
 			site: site,
 			title: id.replace(/_+/g, ' '),
 			siteURL: ""
@@ -73,12 +74,63 @@ var wikiControllers = angular.module('wikiControllers', [])
 			height: 250,
 			zoom: 13,
 			latitude: undefined,
-			longitude: undefined
+			longitude: undefined,
+			align: "right"
+		}
+
+
+		if ($stateParams.coordinates != undefined) {
+			console.log($stateParams.coordinates);
+			// TODO
+			// 1. check if a page section has maplink/mapframe and
+			// 2.1. if a section has maplink state it in the UI
+			// 2.2. if not then show a form to add maplink and mapframe with various parameters
+			var coordParts = $stateParams.coordinates.split("|");
+			$scope.mapframe.latitude = coordParts[0];
+			$scope.mapframe.longitude = coordParts[1];
 		}
 
 		console.log(lang);
 		console.log(site);
 		console.log(id);
+
+		$scope.addMapframeToWikipedia = function(sectionIndex, section) {
+
+			var mapframeHTML = '%0A%0A<mapframe text="' +
+				$scope.mapframe.text + '"' +
+				' width=' + $scope.mapframe.width +
+				' height=' + $scope.mapframe.height +
+				' zoom=' + $scope.mapframe.zoom +
+				' latitude=' + $scope.mapframe.latitude +
+				' longitude=' + $scope.mapframe.longitude +
+				' align=' + $scope.mapframe.align +
+				' />';
+
+			console.log(mapframeHTML);
+
+			Wiki.editWikiPage("testorienteerix", sectionIndex, null, mapframeHTML, "Added mapframe to the section " + section.title, function(response) {
+				console.log(response);
+			});
+		}
+
+		$scope.addMaplinkToWikipedia = function(sectionIndex, section) {
+
+			var maplinkHTML = '%0A%0A<maplink';
+			if ($scope.mapframe.text != "" ) {
+				maplinkHTML += ' text="' + $scope.mapframe.text + '"';
+			}
+			maplinkHTML +=
+				' zoom=' + $scope.mapframe.zoom +
+				' latitude=' + $scope.mapframe.latitude +
+				' longitude=' + $scope.mapframe.longitude +
+				' />';
+
+			console.log(maplinkHTML);
+
+			Wiki.editWikiPage("testorienteerix", sectionIndex, null, maplinkHTML, "Added maplink to the section " + section.title, function(response) {
+				console.log(response);
+			});
+		}
 
 		$scope.goTo = function(URL) {
 				//console.log("goTo: " + URL);
@@ -128,7 +180,10 @@ var wikiControllers = angular.module('wikiControllers', [])
 						$scope.sections.push({
 							title: key,
 							content: text,
-							show: false
+							show: false,
+							showMapframe: false,
+							showMaplink: false,
+							showRawSectionText: true
 						});
 					});
 					$scope.toggleGroup = function(section) {
@@ -137,15 +192,25 @@ var wikiControllers = angular.module('wikiControllers', [])
 					$scope.isGroupShown = function(section) {
 						return section.show;
 					};
+					$scope.toggleMapframe = function(section) {
+						section.showMapframe = !section.showMapframe;
+					};
+					$scope.isMapframeShown = function(section) {
+						return section.showMapframe;
+					};
+					$scope.toggleMaplink = function(section) {
+						section.showMaplink = !section.showMaplink;
+					};
+					$scope.isMaplinkShown = function(section) {
+						return section.showMaplink;
+					};
+					$scope.toggleRawSectionText = function(section) {
+						section.showRawSectionText = !section.showRawSectionText;
+					};
+					$scope.isRawSectionTextShown = function(section) {
+						return section.showRawSectionText;
+					};
 
-					if ($stateParams.coordinates != undefined) {
-						console.log($stateParams.coordinates);
-						// TODO
-						// 1. check if a page section has maplink/mapframe and
-						// 2.1. if a section has maplink state it in the UI
-						// 2.2. if not then show a form to add maplink and mapframe with various parameters
-
-					}
 			  })
 			  .error(function (data) {
 			  	console.log('data error');

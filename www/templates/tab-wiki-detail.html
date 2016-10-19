@@ -46,84 +46,144 @@
         </ion-item>
         <ion-item class="item item-accordion item-text-wrap"
                   ng-show="isGroupShown(section)">
-          <div class="item">
-            <p class="wiki-article-section-text">{{section.content}}</p>
-          </div>
-          <div class="item">
-            <div class="item item-divider">
-              Mapframe
-            </div>
+          <ion-item class="item-stable"
+                    ng-click="toggleMapframe(section)"
+                    ng-class="{active: isMapframeShown(section)}">
+              <i class="icon" ng-class="isMapframeShown(section) ? 'ion-minus' : 'ion-plus'"></i>
+            &nbsp;
+            Mapframe
+          </ion-item>
+          <ion-item class="item item-accordion item-text-wrap"
+                    ng-show="isMapframeShown(section)">
+            <div class="item">
             <div class="list">
               <label class="item item-input item-stacked-label">
                 <span class="input-label">text</span>
-                <input type="text" placeholder="shown below mapframe, e.g. Hønefoss">
+                <input type="text" placeholder="below mapframe, e.g. Hønefoss" ng-model="mapframe.text">
               </label>
-              <label class="item item-input item-stacked-label">
-                <span class="input-label">Longitude</span>
-                <input type="text" placeholder="10.2603">
-              </label>
-              <label class="item item-input item-stacked-label">
-                <span class="input-label">Latitude</span>
-                <input type="text" placeholder="60.1635">
-              </label>
-              <div class="item">
-                width
-                <div class="row">
-                </div>
-                <div class="item range">
-                  <i class="icon ion-minus-round"></i>
-                    <input type="range" name="width" min="10" max="2000" ng-model="mapframe.width">
-                  <i class="icon ion-plus-round"></i>
-                </div>
-                <div class="item item-input-inset">
-                  <label class="item-input-wrapper">
-                    <input type="text" ng-model="mapframe.width">
+              <div class="row"></div>
+              <div class="row wiki-mapframe-coords-row">
+                <div class="col col-50 wiki-mapframe-coords-col">
+                  <label class="item item-input item-stacked-label">
+                    <span class="input-label">lng</span>
+                    <input type="text" placeholder="10.2603" ng-model="mapframe.longitude">
                   </label>
-                  <span>
-                    &nbsp;pixels
-                  </span>
                 </div>
-              </div>
-              <div class="item">
-                height
-                <div class="row">
-                </div>
-                <div class="item range">
-                  <i class="icon ion-minus-round"></i>
-                    <input type="range" name="height" min="10" max="2000" ng-model="mapframe.height">
-                  <i class="icon ion-plus-round"></i>
-                </div>
-                <div class="item item-input-inset">
-                  <label class="item-input-wrapper">
-                    <input type="text" ng-model="mapframe.height">
-                  </label>
-                  <span>
-                    &nbsp;pixels
-                  </span>
-                </div>
-              </div>
-              <div class="item">
-                zoom
-                <div class="row">
-                </div>
-                <div class="item range">
-                  <i class="icon ion-minus-round"></i>
-                    <input type="range" name="zoom" min="1" max="20" ng-model="mapframe.zoom">
-                  <i class="icon ion-plus-round"></i>
-                </div>
-                <div class="item item-input-inset">
-                  <label class="item-input-wrapper">
-                    <input type="text" ng-model="mapframe.zoom" ng-change="mapframeChanged()">
+                <div class="col col-50 wiki-mapframe-coords-col">
+                  <label class="item item-input item-stacked-label">
+                    <span class="input-label">lat</span>
+                    <input type="text" placeholder="60.1635" ng-model="mapframe.latitude">
                   </label>
                 </div>
               </div>
-              <div class="item">
-                <button class="button button-positive" ng-click="addToWikipedia()">
-                  Add to Wikipedia
-                </button>
+              <div class="row"></div>
+              <label class="item item-input">
+                <span class="input-label">width in px</span>
+                <input type="text" ng-model="mapframe.width">
+              </label>
+              <div class="item range">
+                <i class="icon ion-minus-round"></i>
+                  <input type="range" name="width" min="10" max="2000" ng-model="mapframe.width">
+                <i class="icon ion-plus-round"></i>
               </div>
+              <div class="row"></div>
+              <label class="item item-input">
+                <span class="input-label">height in px</span>
+                <input type="text" ng-model="mapframe.height">
+              </label>
+              <div class="item range">
+                <i class="icon ion-minus-round"></i>
+                  <input type="range" name="height" min="10" max="2000" ng-model="mapframe.height">
+                <i class="icon ion-plus-round"></i>
+              </div>
+              <div class="row"></div>
+              <label class="item item-input">
+                <span class="input-label">zoom level</span>
+                <input type="text" ng-model="mapframe.zoom">
+              </label>
+              <div class="item range">
+                <i class="icon ion-minus-round"></i>
+                  <input type="range" name="zoom" min="1" max="20" ng-model="mapframe.zoom">
+                <i class="icon ion-plus-round"></i>
+              </div>
+              <div class="row"></div>
+              <label class="item item-input item-select">
+                <div class="input-label">
+                  Mapframe alignment
+                </div>
+                <select ng-model="mapframe.align" >
+                  <option>left</option>
+                  <option selected>center</option>
+                  <option>right</option>
+                </select>
+              </label>
+              <div class="row"></div>
+              <button class="button button-positive" ng-click="addMapframeToWikipedia($index, section)" ng-disabled="mapframe.text=='' || mapframe.latitude==undefined || mapframe.longitude==undefined">
+                Add to Wikipedia
+              </button>
             </div>
           </div>
+          </ion-item>
+          <ion-item class="item-stable"
+                    ng-click="toggleMaplink(section)"
+                    ng-class="{active: isMaplinkShown(section)}">
+              <i class="icon" ng-class="isMaplinkShown(section) ? 'ion-minus' : 'ion-plus'"></i>
+            &nbsp;
+            Maplink
+          </ion-item>
+          <ion-item class="item item-accordion item-text-wrap"
+                    ng-show="isMaplinkShown(section)">
+            <div class="item">
+            <div class="list">
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">text</span>
+                <input type="text" placeholder="link text, e.g. Hønefoss" ng-model="mapframe.text">
+              </label>
+              <div class="row"></div>
+              <div class="row wiki-mapframe-coords-row">
+                <div class="col col-50 wiki-mapframe-coords-col">
+                  <label class="item item-input item-stacked-label">
+                    <span class="input-label">lng</span>
+                    <input type="text" placeholder="10.2603" ng-model="mapframe.longitude">
+                  </label>
+                </div>
+                <div class="col col-50 wiki-mapframe-coords-col">
+                  <label class="item item-input item-stacked-label">
+                    <span class="input-label">lat</span>
+                    <input type="text" placeholder="60.1635" ng-model="mapframe.latitude">
+                  </label>
+                </div>
+              </div>
+              <div class="row"></div>
+              <label class="item item-input">
+                <span class="input-label">zoom level</span>
+                <input type="text" ng-model="mapframe.zoom">
+              </label>
+              <div class="item range">
+                <i class="icon ion-minus-round"></i>
+                  <input type="range" name="zoom" min="1" max="20" ng-model="mapframe.zoom">
+                <i class="icon ion-plus-round"></i>
+              </div>
+              <div class="row"></div>
+              <button class="button button-positive" ng-click="addMaplinkToWikipedia($index, section)" ng-disabled="mapframe.latitude==undefined || mapframe.longitude==undefined">
+                Add to Wikipedia
+              </button>
+            </div>
+          </div>
+          </ion-item>
+          <ion-item class="item-stable"
+                    ng-click="toggleRawSectionText(section)"
+                    ng-class="{active: isRawSectionTextShown(section)}">
+              <i class="icon" ng-class="isRawSectionTextShown(section) ? 'ion-minus' : 'ion-plus'"></i>
+            &nbsp;
+            Raw section text
+          </ion-item>
+          <ion-item class="item item-accordion item-text-wrap"
+                    ng-show="isRawSectionTextShown(section)">
+            <div class="item">
+              <p class="wiki-article-section-text">{{section.content}}</p>
+            </div>
+          </ion-item>
         </ion-item>
       </div>
     </ion-list>

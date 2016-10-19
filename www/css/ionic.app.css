@@ -9909,3 +9909,11 @@ body {
 
 .wiki-article-section-text {
   line-height: normal; }
+
+.wiki-mapframe-coords-row {
+  padding-left: 0;
+  padding-right: 0; }
+
+.wiki-mapframe-coords-col {
+  padding-left: 0;
+  padding-right: 0; }
