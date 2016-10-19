@@ -72,7 +72,10 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
     })
 
     .state('tab.wiki-detail', {
-      url: '/wiki/:wikiId/:coordinates',
+      url: '/wiki/:wikiId',
+      params: {
+            coordinates: null
+        },
       views: {
         'tab-wiki': {
           templateUrl: 'templates/tab-wiki-detail.html',

@@ -9,6 +9,7 @@
 
     <div ng-if="data.site == 'commons'">
       <h2>{{data.title}}</h2>
+      <p><a href="" ng-click="goTo(data.siteURL)">View at the Media Commons site</a></p>
 
       <p ng-if="imageCountLimitReached">There are more than {{imageCount}} images. Showing the first {{imageCount}}.</p>
 

@@ -220,10 +220,11 @@ var mapControllers = angular.module('mapControllers', [])
 					$state.go("tab.wiki-detail", { wikiId: AppSettings.getDefaultLanguage() + "wikipedia+" + args.model.wikipediaItem.title, coordinates: "" + args.model.lat + "|" + args.model.lng});
 				}
 				else if (args.modelName.includes("wikidata")) {
-					// TODO
+					var qURLparts = args.model.wikidataItem.q.value.split("/");
+					$state.go("tab.wiki-detail", { wikiId: AppSettings.getDefaultLanguage() + "wikidata+" + qURLparts[qURLparts.length-1], coordinates: "" + args.model.lat + "|" + args.model.lng});
 				}
 				else if (args.modelName.includes("commons")) {
-					// TODO
+					$state.go("tab.wiki-detail", { wikiId: AppSettings.getDefaultLanguage() + "commons+" + args.model.commonsItem.title, coordinates: "" + args.model.lat + "|" + args.model.lng});
 				}
 
 				//Wiki.createWikiPage("testorienteerix", "hello", "world", function(response) {

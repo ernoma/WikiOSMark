@@ -51,7 +51,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 	}
 })
 
-.controller('WikiDetailCtrl', function($scope, $stateParams, $http, Wiki) {
+.controller('WikiDetailCtrl', function($scope, $stateParams, $http, Wiki, AppSettings) {
 		console.log($stateParams.wikiId);
 
 		var IMAGE_COUNT_LIMIT = 10;
@@ -230,8 +230,17 @@ var wikiControllers = angular.module('wikiControllers', [])
 					if (data.entities[id].labels[lang] != undefined) {
 						$scope.data.title = data.entities[id].labels[lang].value + ' ';
 					}
+					else if (data.entities[id].labels[AppSettings.getDefaultLanguage()] != undefined) {
+						$scope.data.title = data.entities[id].labels[AppSettings.getDefaultLanguage()].value + ' ';
+					}
 					else if (data.entities[id].labels['en'] != undefined) {
 						$scope.data.title = data.entities[id].labels['en'].value + ' ';
+					}
+					else {
+						for (var key in data.entities[id].labels) {
+							$scope.data.title = data.entities[id].labels[key].value + ' ';
+							break;
+						}
 					}
 					$scope.data.title += "(" + id + ")";
 
@@ -300,103 +309,143 @@ var wikiControllers = angular.module('wikiControllers', [])
 				}
 		}
 		else { // site == commons
-			//TODO show page link and image thumbnails with links
+
+			// show image thumbnails with links
 			$scope.imageCount = -1;
 			$scope.imageCountLimitReached = false;
 			$scope.data.siteURL = "https://commons.wikimedia.org/wiki/" + id;
 			$scope.thumbs = [];
 
-			var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&prop=images&imlimit=" + IMAGE_COUNT_LIMIT + "&format=json&titles="
-			url += id;
+			if (id.includes("File:")) {
+				// var url = "https://";
+				// url += "commons.wikimedia.org/w/api.php?action=query";
+				// url += "&titles=" + id;
+				// url += "&prop=revisions&rvprop=content";
+				// url += "&callback=JSON_CALLBACK&format=json";
 
-			$http.jsonp(url).
-				success(function(data) {
-					console.log(data);
+				var thumbsUrl = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
+				 	+ id + "&format=json&prop=imageinfo&iiprop=url|comment|extmetadata|user&iiurlwidth="
+				 	+ IMAGE_THUMB_WIDTH;
 
-					for (var key in data.query.pages) { // there is just one key, so for runs only once
-						var imagesNames = data.query.pages[key].images;
+				$http.jsonp(thumbsUrl).
+					success(function(data) {
+						console.log(data);
 
-						if (data.continue != undefined) {
-							// TODO there exists more than IMAGE_COUNT_LIMIT images, note in the UI, otherwise maybe show number of images
-							$scope.imageCountLimitReached = true;
-							$scope.imageCount = imagesNames.length;
+						$scope.imageCountLimitReached = false;
+						$scope.imageCount = 1;
+						$scope.thumbs = [];
+						for (var thumbsPageKey in data.query.pages) { // there should be only one thumbsPageKey for "File:"
+							var thumbItem = createThumbItem(data.query.pages[thumbsPageKey]);
+							$scope.thumbs.push(thumbItem);
 						}
+					})
+					.error(function (data) {
+						console.log('data error');
+						console.log(data);
+					});
+			}
+			else {
+				var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&prop=images&imlimit=" + IMAGE_COUNT_LIMIT + "&format=json&titles="
+				url += id;
 
-						var titles = "";
+				$http.jsonp(url).
+					success(function(data) {
+						console.log(data);
 
-						for (var i = 0; i < imagesNames.length; i++) {
-							titles += imagesNames[i].title + "|";
-						}
-						titles = titles.slice(0, titles.length - 1);
-						var thumbsUrl = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
-							+ titles + "&format=json&prop=imageinfo&iiprop=url|comment|extmetadata|user&iiurlwidth="
-							+ IMAGE_THUMB_WIDTH;
+						for (var key in data.query.pages) { // there is just one key, so for runs only once
+							var imagesNames = data.query.pages[key].images;
 
-						$http.jsonp(thumbsUrl).
-							success(function(thumbsData) {
-								console.log(thumbsData);
+							if (data.continue != undefined) {
+								// TODO there exists more than IMAGE_COUNT_LIMIT images, note in the UI, otherwise maybe show number of images
+								$scope.imageCountLimitReached = true;
+								$scope.imageCount = imagesNames.length;
+							}
 
-								for (var thumbsPageKey in thumbsData.query.pages) {
-									var imageinfo = thumbsData.query.pages[thumbsPageKey].imageinfo[0];
-									var div = document.createElement("div");
-									div.innerHTML = imageinfo.extmetadata.ImageDescription.value;
-									var description = div.textContent || div.innerText || "";
-									//var description = imageinfo.extmetadata.ImageDescription.value;
-									div.innerHTML = imageinfo.extmetadata.Credit.value;
-									var source = div.textContent || div.innerText || "";
-									var date = imageinfo.extmetadata.DateTimeOriginal.value;
-									var author = "";
-									var permission = imageinfo.extmetadata.LicenseShortName.value;
-									var commentParts = imageinfo.comment.split("|");
-									for (var j = 1; j < commentParts.length; j++) {
-										var temp = commentParts[j].split("=");
-										switch (temp[0]) {
-											// case "Description ":
-											// case "Description":
-											// 		description = temp[1].substring(1);
-											// 	break;
-											case "Source ":
-											case "Source":
-													source = temp[1].substring(1);
-												break;
-											// case "Date ":
-											// case "Date":
-											// 		date = temp[1].substring(1);
-											// 	break;
-											case "Author ":
-											case "Author":
-													author = imageinfo.user;
-												break;
-											// case "Permission ":
-											// case "Permission":
-											// 		permission = temp[1].substring(1);
-												break;
-										}
+							var titles = "";
+
+							for (var i = 0; i < imagesNames.length; i++) {
+								titles += imagesNames[i].title + "|";
+							}
+							titles = titles.slice(0, titles.length - 1);
+							var thumbsUrl = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
+								+ titles + "&format=json&prop=imageinfo&iiprop=url|comment|extmetadata|user&iiurlwidth="
+								+ IMAGE_THUMB_WIDTH;
+
+							$http.jsonp(thumbsUrl).
+								success(function(thumbsData) {
+									console.log(thumbsData);
+
+									for (var thumbsPageKey in thumbsData.query.pages) {
+
+										var thumbItem = createThumbItem(thumbsData.query.pages[thumbsPageKey]);
+
+										$scope.thumbs.push(thumbItem);
 									}
+								})
+								.error(function (thumbsData) {
+									console.log('data error');
+									console.log(thumbsData);
+								});
+						}
 
-									$scope.thumbs.push({
-										image: imageinfo.thumburl,
-										title: thumbsData.query.pages[thumbsPageKey].title.split(":")[1],
-										date: date,
-										description: description,
-										source: source,
-										author: author,
-										permission: permission,
-										comment: imageinfo.comment,
-										descrUrl: imageinfo.descriptionurl
-									});
-								}
-							})
-							.error(function (thumbsData) {
-								console.log('data error');
-								console.log(thumbsData);
-							});
-					}
+					})
+					.error(function (data) {
+						console.log('data error');
+						console.log(data);
+					});
+			}
+		}
 
-				})
-				.error(function (data) {
-					console.log('data error');
-					console.log(data);
-				});
+		var createThumbItem = function(page) {
+			var imageinfo = page.imageinfo[0];
+			var div = document.createElement("div");
+			div.innerHTML = imageinfo.extmetadata.ImageDescription.value;
+			var description = div.textContent || div.innerText || "";
+			//var description = imageinfo.extmetadata.ImageDescription.value;
+			div.innerHTML = imageinfo.extmetadata.Credit.value;
+			var source = div.textContent || div.innerText || "";
+			var date = imageinfo.extmetadata.DateTimeOriginal.value;
+			var author = imageinfo.user != undefined ? imageinfo.user : "";
+			var permission = imageinfo.extmetadata.LicenseShortName.value;
+			var commentParts = imageinfo.comment.split("|");
+			for (var j = 1; j < commentParts.length; j++) {
+				var temp = commentParts[j].split("=");
+				switch (temp[0]) {
+					// case "Description ":
+					// case "Description":
+					// 		description = temp[1].substring(1);
+					// 	break;
+					case "Source ":
+					case "Source":
+							source = temp[1].substring(1);
+						break;
+					// case "Date ":
+					// case "Date":
+					// 		date = temp[1].substring(1);
+					// 	break;
+					case "Author ":
+					case "Author":
+							author = imageinfo.user;
+						break;
+					// case "Permission ":
+					// case "Permission":
+					// 		permission = temp[1].substring(1);
+						break;
+				}
+			}
+
+			var thumbItem = {
+				image: imageinfo.thumburl,
+				title: page.title.split(":")[1],
+				date: date,
+				description: description,
+				source: source,
+				author: author,
+				permission: permission,
+				comment: imageinfo.comment,
+				descrUrl: imageinfo.descriptionurl
+			}
+
+			return thumbItem;
 		}
 });
