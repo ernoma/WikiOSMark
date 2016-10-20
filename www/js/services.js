@@ -163,6 +163,60 @@ angular.module('starter.services', [])
       var URL = "https://commons.wikimedia.org/wiki/" + identifier;
       window.open(URL, '_system', 'location=yes');
     },
+    getItemWithCoordinates: function(site, itemID, callback) {
+
+      var url = null;
+
+      if (site == "wikipedia") {
+        lang = "en";
+        if (itemID.includes(":")) {
+          lang = itemID.split(":")[0];
+        }
+        url = "https://";
+  			url += lang;
+  			url += ".wikipedia.org/w/api.php?action=query";
+  			url += "&titles=" + itemID;
+  			url += "&prop=coordinates";
+  			url += "&callback=JSON_CALLBACK&format=json";
+      }
+      else if (site == "wikidata") {
+        url = "https://www.wikidata.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
+          + itemID + "&format=json&prop=coordinates";
+        }
+        else { // commons
+          url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
+  				 	+ itemID + "&format=json&prop=coordinates";
+        }
+
+        $http.jsonp(url).
+          success(function(data) {
+            console.log(data);
+
+            var item = null;
+
+            for (var key in data.query.pages) { // should be just one key in pages
+              if (key != -1) { // no page with that title
+                item = {
+                  pageTitle: data.query.pages[key].title,
+                  coordinates: null
+                }
+                if (data.query.pages[key].coordinates != undefined) {
+                  item.coordinates = {
+                    lat: data.query.pages[key].coordinates.lat,
+                    lng: data.query.pages[key].coordinates.lon
+                  }
+                }
+              }
+            }
+
+            callback(item);
+          })
+          .error(function (data) {
+            console.log('data error');
+            console.log(data);
+            callback(null);
+          });
+    },
     queryMediaWiki: function(site, language, searchText, callback) {
       //console.log(searchText);
 

@@ -101,7 +101,7 @@
       <ion-list ng-if="currentState == 'tab.map'">
         <ion-item class="item-osm-object">
           <button class="button button-positive" ng-click="saveWikiTagChanges()" ng-disabled="mapControllerData.changesToSave == false">
-            Save changes
+            Save OSM element changes
           </button>
         </ion-item>
         <div class="list list-inset">
@@ -136,7 +136,8 @@
             </ion-item>
           </ion-list>
           <ion-item class="item-osm-object">
-            <button class="button button-positive button-small wiki-map-button" ng-click="showWikidataPage()" ng-disabled="osmObjectInfo.wikidataTag == ''">View on wikidata.org</button>
+            <button class="button button-positive button-small wiki-map-button" ng-click="showWikidataPage()" ng-disabled="osmObjectInfo.wikidataItem == null">View on wikidata.org</button>
+            <button class="button button-positive button-small wiki-map-button" ng-click="addCoordinatesToWikidataItem()" ng-disabled="osmObjectInfo.wikidataItem == null || osmObjectInfo.wikidataItem.coordinates != null">Add coords</button>
           </ion-item>
           <ion-item class="item-osm-object">
             <label class="item item-input item-stacked-label">
@@ -151,7 +152,9 @@
             </ion-item>
           </ion-list>
           <ion-item class="item-osm-object">
-                <button class="button button-positive button-small wiki-map-button" ng-click="showWikipediaPage()" ng-disabled="osmObjectInfo.wikipediaTag == ''">View on wikipedia.org</button>          </ion-item>
+            <button class="button button-positive button-small wiki-map-button" ng-click="showWikipediaPage()" ng-disabled="osmObjectInfo.wikipediaItem == null">View on wikipedia.org</button>
+            <button class="button button-positive button-small wiki-map-button" ng-click="addCoordinatesToWikipediaItem()" ng-disabled="osmObjectInfo.wikipediaItem == null || osmObjectInfo.wikipediaItem.coordinates != null">Add coords</button>
+          </ion-item>
           <ion-item class="item-osm-object">
             <label class="item item-input item-stacked-label">
               <span class="input-label">Wikimedia Commons
@@ -165,7 +168,8 @@
             </ion-item>
           </ion-list>
           <ion-item class="item-osm-object">
-            <button class="button button-positive button-small wiki-map-button" ng-click="showCommonsPage()" ng-disabled="osmObjectInfo.wikimediaCommonsTag == ''">View on commons.wikimedia.org</button>
+            <button class="button button-positive button-small wiki-map-button" ng-click="showCommonsPage()" ng-disabled="osmObjectInfo.wikimediaCommonsItem == null">View on commons.wikimedia.org</button>
+            <!--<button class="button button-positive button-small wiki-map-button" ng-click="addCoordinatesToCommonsItem()" ng-disabled="osmObjectInfo.wikimediaCommonsItem == null ||osmObjectInfo.wikimediaCommonsItemCoordinates != null">Add coords</button>-->
           </ion-item>
           <div class="item item-divider">
             Other Tags

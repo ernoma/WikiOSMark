@@ -15,6 +15,9 @@ angular.module('starter.controllers', [])
     wikipediaTag: null,
     wikimediaCommonsTag: null,
     incompleteGeometry: false,
+    wikidataItem: null,
+    wikipediaItem: null,
+    wikimediaCommonsItem: null,
   }
 
   $scope.mapControllerData = {
@@ -97,7 +100,7 @@ angular.module('starter.controllers', [])
   }
 
   $scope.inputWikidataChange = function() {
-		// TODO search and suggest options when 2 or more characters in the input field
+		// search and suggest options when 2 or more characters in the input field
 		$scope.mapControllerData.changesToSave = true;
 		if ($scope.osmObjectInfo.wikidataTag.length >= 2) {
 			Wiki.queryMediaWiki("wikidata", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikidataTag, function(data) {
@@ -107,11 +110,13 @@ angular.module('starter.controllers', [])
 		}
 		else if ($scope.osmObjectInfo.wikidataTag.length == 0) {
 			$scope.searchResults.wikidataResults = "";
+      $scope.osmObjectInfo.wikidataTag == null;
+      $scope.osmObjectInfo.wikidataItem = null;
 		}
 	}
 
 	$scope.inputWikipediaChange = function() {
-		// TODO search and suggest options when enought characters in the input field
+		// search and suggest options when enought characters in the input field
 		$scope.mapControllerData.changesToSave = true;
 		if ($scope.osmObjectInfo.wikipediaTag.includes(":")) {
 			if ($scope.osmObjectInfo.wikipediaTag.length >= 6) {
@@ -132,6 +137,8 @@ angular.module('starter.controllers', [])
 		}
 		else if ($scope.osmObjectInfo.wikipediaTag.length == 0) {
 			$scope.searchResults.wikipediaResults = "";
+      $scope.osmObjectInfo.wikipediaTag == null;
+      $scope.osmObjectInfo.wikipediaItem = null;
 		}
 	}
 
@@ -147,11 +154,17 @@ angular.module('starter.controllers', [])
 		}
 		else if ($scope.osmObjectInfo.wikimediaCommonsTag.length == 0) {
 			$scope.searchResults.commonsResults = "";
+      $scope.osmObjectInfo.wikimediaCommonsTag == null;
+      $scope.osmObjectInfo.wikimediaCommonsItem = null;
 		}
 	}
 
 	$scope.selectWikidataSearchResult = function(item) {
 		$scope.osmObjectInfo.wikidataTag = item.label + " (" + item.id + ")";
+    Wiki.getItemWithCoordinates("wikidata", item.id, function (result) {
+        $scope.osmObjectInfo.wikidataItem = result;
+        //$scope.osmObjectInfo.wikimediaCommonsCoordinates = coordinates;
+    });
 		$scope.searchResults.wikidataResults = null;
 		// TODO: update wikipedia and commons tags if they can be found via Wiki search
 	}
@@ -163,12 +176,20 @@ angular.module('starter.controllers', [])
 		else {
 			$scope.osmObjectInfo.wikipediaTag = item;
 		}
+    Wiki.getItemWithCoordinates("wikipedia", $scope.osmObjectInfo.wikipediaTag, function (result) {
+        $scope.osmObjectInfo.wikipediaItem = result;
+        //$scope.osmObjectInfo.wikimediaCommonsCoordinates = coordinates;
+    });
 		$scope.searchResults.wikipediaResults = null;
 		// TODO: update wikidata tag if it can be found via Wiki search
 	}
 
 	$scope.selectCommonsSearchResult = function(item) {
 		$scope.osmObjectInfo.wikimediaCommonsTag = item;
+    Wiki.getItemWithCoordinates("commons", item, function (result) {
+        $scope.osmObjectInfo.wikimediaCommonsItem = result;
+        //$scope.osmObjectInfo.wikimediaCommonsCoordinates = coordinates;
+    });
 		$scope.searchResults.commonsResults = null;
 	}
 
@@ -193,6 +214,16 @@ angular.module('starter.controllers', [])
 		console.log("in showCommonsPage");
 		Wiki.showWikimediaCommonsPage($scope.osmObjectInfo.wikimediaCommonsTag);
 	}
+
+  $scope.addCoordinatesToWikidataItem = function() {
+    // TODO
+  }
+  $scope.addCoordinatesToWikipediaItem = function() {
+    // TODO
+  }
+  // $scope.addCoordinatesToCommonsItem = function() {
+  //   // TODO
+  // }
 
   $scope.saveWikiTagChanges = function() {
 		// TODO somehow ensure that user is logged in before trying to save changes
