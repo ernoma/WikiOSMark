@@ -64,8 +64,8 @@ angular.module('starter.services', [])
       $window.localStorage["showCommonsOnMap"] = JSON.stringify(value);
     },
     getWikiOSMarkServer: function(value) {
-      return "http://192.168.1.85:3000/wikipedia/"
-    }
+      return "http://192.168.1.85:3000/"
+    },
     // set: function(key, value) {
 		//   $window.localStorage[key] = value;
 		// },
@@ -309,7 +309,7 @@ angular.module('starter.services', [])
       console.log(serverAddress);
 
       // Get edit token
-      var tokenURL = serverAddress + "w/api.php?action=query&meta=tokens";
+      var tokenURL = serverAddress + "wikipedia/" + "w/api.php?action=query&meta=tokens";
       tokenURL += "&format=json";
 
       $http.get(tokenURL).
@@ -317,7 +317,7 @@ angular.module('starter.services', [])
           console.log(data);
           // have do this via own server
           var url = serverAddress;
-          url += "w/api.php?action=edit";
+          url += "wikipedia/" + "w/api.php?action=edit";
           url += "&createonly";
           url += "&title=" + title;
           url += "&summary=" + summary;
@@ -345,7 +345,7 @@ angular.module('starter.services', [])
       var serverAddress = AppSettings.getWikiOSMarkServer();
       console.log(serverAddress);
       // Get edit token
-      var tokenURL = serverAddress + "w/api.php?action=query&meta=tokens";
+      var tokenURL = serverAddress + "wikipedia/" + "w/api.php?action=query&meta=tokens";
       tokenURL += "&format=json";
 
       $http.get(tokenURL).
@@ -353,7 +353,7 @@ angular.module('starter.services', [])
           console.log(data);
           // have do this via own server
           var url = serverAddress;
-          url += "w/api.php?action=edit";
+          url += "wikipedia/" + "w/api.php?action=edit";
           url += "&nocreate";
           url += "&title=" + title;
           url += "&section=" + section;
@@ -379,6 +379,82 @@ angular.module('starter.services', [])
   		  	console.log('data error');
   		    console.log(data);
   		  });
+    },
+    addCoordinatesToItem: function(site, itemID, centerCoordinates, callback) {
+      var serverAddress = AppSettings.getWikiOSMarkServer();
+      console.log(serverAddress);
+
+      if (site == "wikidata") {
+        // Get edit token
+        var tokenURL = serverAddress + "wikidata/" + "w/api.php?action=query&meta=tokens";
+        tokenURL += "&format=json";
+
+        $http.get(tokenURL).
+    		  success(function (data) {
+            console.log(data);
+            // https://test.wikidata.org/w/api.php?action=help&modules=wbcreateclaim and https://www.mediawiki.org/wiki/Wikibase/API#wbcreateclaim
+            // have do this via own server
+
+            //itemID = "Q24231";
+            //var coordinatePropertyID = "P625"; // www.wikidata.org
+            var coordinatePropertyID = "P125"; // test.wikidata.org
+
+            var url = serverAddress;
+            url += "wikidata/" + "w/api.php?action=wbcreateclaim" +
+              "&entity=" + itemID +
+              "&property=" + "P625" +
+              "&snaktype=" + "value" +
+              "&value=" + '{"latitude":' + centerCoordinates.lat + ',"longitude":' + centerCoordinates.lng + ',"globe":"http://www.wikidata.org/entity/Q2","precision":0.0001}' +
+              "&format=json";
+
+            $http.post(url, { headers: {
+              'Content-type': 'application/x-www-form-urlencoded',
+              data: { token: data.query.tokens.csrftoken }
+            }}).
+            success(callback)
+            .error(function (data) {
+              console.log('data error');
+              console.log(data);
+            });
+          })
+    		  .error(function (data) {
+    		  	console.log('data error');
+    		    console.log(data);
+    		  });
+      }
+      else if (site == "wikipedia") {
+        // Get edit token
+        var tokenURL = serverAddress + "wikipedia/" + "w/api.php?action=query&meta=tokens";
+        tokenURL += "&format=json";
+
+        $http.get(tokenURL).
+    		  success(function (data) {
+            console.log(data);
+            // have do this via own server
+            var url = serverAddress;
+            url += "wikipedia/" + "w/api.php?action=edit";
+            url += "&nocreate";
+            url += "&title=" + itemID;
+            url += "&summary=" + "Added coordinates";
+            url += "&prependtext=" + "{{coord|" + centerCoordinates.lat + "|" + centerCoordinates.lng + "|display=title}}%0A%0A";
+            url += "&contentformat=" + "text/x-wiki";
+            url += "&format=json";
+
+            $http.post(url, { headers: {
+              'Content-type': 'application/x-www-form-urlencoded',
+              data: { token: data.query.tokens.csrftoken }
+            }}).
+            success(callback)
+            .error(function (data) {
+              console.log('data error');
+              console.log(data);
+            });
+          })
+          .error(function (data) {
+            console.log('data error');
+            console.log(data);
+          });
+      }
     }
   };
   return wikiService;

@@ -69,9 +69,22 @@ angular.module('starter.controllers', [])
     //   console.log(response);
     // });
 
-    var maplinkText = '<maplink zoom="13" longitude="10.25515" latitude="60.15995" />';
+    // var maplinkText = '<maplink zoom="13" longitude="10.25515" latitude="60.15995" />';
+    //
+    // Wiki.editWikiPage("testorienteerix", "new", "maplink_test", maplinkText, "Added new section with a maplink", function(response) {
+    //   console.log(response);
+    // });
 
-    Wiki.editWikiPage("testorienteerix", "new", "maplink_test", maplinkText, "Added new section with a maplink", function(response) {
+    centerCoordinates = {
+      lat: 61.498056,
+      lng: 23.760833
+    }
+
+    // Wiki.addCoordinatesToItem("wikidata", "Q11861126", centerCoordinates, function(response) {
+    //   console.log(response);
+    // });
+
+    Wiki.addCoordinatesToItem("wikipedia", "Testorienteerix", centerCoordinates, function(response) {
       console.log(response);
     });
   }
@@ -216,14 +229,53 @@ angular.module('starter.controllers', [])
 	}
 
   $scope.addCoordinatesToWikidataItem = function() {
-    // TODO
+    // TODO add claim
+    console.log($scope.mapControllerData.selectedFeature);
+    var centerCoordinates = undefined;
+
+    if ($scope.mapControllerData.selectedFeature.properties.type == "way") {
+      centerCoordinates = calculateCenterCoordinates($scope.mapControllerData.selectedFeature.properties.type, $scope.mapControllerData.selectedFeature.geometry.coordinates[0]);
+    }
+    else if ($scope.mapControllerData.selectedFeature.properties.type == "relation") {
+      centerCoordinates = calculateCenterCoordinates($scope.mapControllerData.selectedFeature.properties.type, $scope.mapControllerData.selectedFeature.geometry.coordinates); // may be multipolygon; may contain also other relations?
+    }
+    else { // node
+      centerCoordinates = calculateCenterCoordinates($scope.mapControllerData.selectedFeature.properties.type, $scope.mapControllerData.selectedFeature.geometry.coordinates);
+    }
+
+    console.log($scope.osmObjectInfo.wikidataItem.pageTitle);
+    console.log(centerCoordinates);
+    // Wiki.addCoordinatesToItem("wikidata", $scope.osmObjectInfo.wikidataItem.pageTitle, centerCoordinates, function(response) {
+    //   console.log(response);
+    // });
   }
   $scope.addCoordinatesToWikipediaItem = function() {
-    // TODO
+    // TODO https://blog.wikimedia.org/2013/01/31/geodata-a-new-age-of-geotagging-on-wikipedia/ & https://www.mediawiki.org/wiki/Extension:GeoData
   }
   // $scope.addCoordinatesToCommonsItem = function() {
-  //   // TODO
+  //   // TODO https://commons.wikimedia.org/wiki/Commons:Geocoding
   // }
+
+  var calculateCenterCoordinates = function(type, coordinates) {
+    console.log(coordinates);
+    var centerCoordinates = {
+      lat: undefined,
+      lng: undefined
+    }
+
+    if (type == "way") {
+
+    }
+    else if (type == "relation") {
+      // may be multipolygon; may contain also other relations?
+    }
+    else { // node
+      centerCoordinates.lat = $scope.mapControllerData.selectedFeature.coordinates[1];
+      centerCoordinates.lng = $scope.mapControllerData.selectedFeature.coordinates[0];
+    }
+
+    return centerCoordinates;
+  }
 
   $scope.saveWikiTagChanges = function() {
 		// TODO somehow ensure that user is logged in before trying to save changes
