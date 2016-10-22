@@ -8,7 +8,7 @@
     <ion-content ng-model="photo">
       <!-- TODO At minimum show the photo -->
       <div class="list card text-center">
-        <button class="button button-block button-positive" ng-click="uploadPhotoViaWikiShootMe()">
+        <button class="button button-block button-positive" ng-click="uploadPhotoViaWikiShootMe()" ng-if="photo.source != 'mapillary'">
           Upload via WikiShootMe!
         </button>
         <div class="item item-image">

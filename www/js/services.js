@@ -38,6 +38,17 @@ angular.module('starter.services', [])
     setFlickrPhotoMaxCount: function(count) {
       $window.localStorage["flickrPhotoMaxCount"] = JSON.stringify(count);
     },
+    getMapillaryPhotoMaxCount: function() {
+      if ($window.localStorage["mapillaryPhotoMaxCount"] != undefined) {
+        return JSON.parse($window.localStorage["mapillaryPhotoMaxCount"]);
+      }
+      else {
+        return 500;
+      }
+    },
+    setMapillaryPhotoMaxCount: function(count) {
+      $window.localStorage["mapillaryPhotoMaxCount"] = JSON.stringify(count);
+    },
     setShowUserPhotos: function(value) {
       $window.localStorage["showUserPhotos"] = JSON.stringify(value);
     },
@@ -228,6 +239,26 @@ angular.module('starter.services', [])
               console.log(data);
               callback(null);
             });
+      },
+      getMapillaryPhotos: function(bbox, maxCount, callback) {
+        var url = "https://a.mapillary.com/v2/search/im?" +
+        "client_id=" + mapillary_api_data.clientID +
+        "&min_lat=" + bbox.min_lat +
+        "&max_lat=" + bbox.max_lat +
+        "&min_lon=" + bbox.min_lng +
+        "&max_lon=" + bbox.max_lng +
+        "&limit=" + maxCount +
+        "&page=" + 0;
+
+        $http.get(url).
+          success(function(data) {
+            callback(data);
+          })
+          .error(function (data) {
+            console.log('data error');
+            console.log(data);
+            callback(null);
+          });
       }
     }
     return photoGalleryService;

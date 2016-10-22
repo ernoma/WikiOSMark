@@ -34,6 +34,10 @@ var photoGalleryControllers = angular.module('photoGalleryControllers', [])
       else if (toParams.source == "flickr") {
         $scope.photo = $scope.mapControllerData.selectedFlickrPhoto;
       }
+      else if (toParams.source == "mapillary") {
+        $scope.photo = $scope.mapControllerData.selectedMapillaryPhoto;
+        $scope.photo.source = "mapillary";
+      }
     }
   });
 

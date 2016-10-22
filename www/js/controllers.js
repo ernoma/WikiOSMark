@@ -28,8 +28,10 @@ angular.module('starter.controllers', [])
     OSMElementsShown: false,
     WikiItemsShown: false,
     flickrPhotosShown: false,
+    mapillaryPhotosShown: false,
     legendShown: false,
-    selectedFlickrPhoto: null
+    selectedFlickrPhoto: null,
+    selectedMapillaryPhoto: null
   }
 
   $scope.searchResults = {
@@ -90,7 +92,18 @@ angular.module('starter.controllers', [])
     //   console.log(response);
     // });
 
-    PhotoGallery.getFlickrPhotos(centerCoordinates, 10, 200, function(data) {
+    // PhotoGallery.getFlickrPhotos(centerCoordinates, 10, 200, function(data) {
+    //   console.log(data);
+    // });
+
+    var bbox = {
+      max_lat: 59.954838366826024,
+      max_lng: 10.845394134521484,
+      min_lat: 59.88488907142481,
+      min_lng: 10.660686492919922
+    }
+
+    PhotoGallery.getMapillaryPhotos(bbox, 10, function(data) {
       console.log(data);
     });
   }
@@ -104,6 +117,9 @@ angular.module('starter.controllers', [])
   }
   $scope.showFlickrPhotos = function() {
     $scope.$broadcast('showFlickrPhotos');
+  }
+  $scope.showMapillaryPhotos = function() {
+    $scope.$broadcast('showMapillaryPhotos');
   }
   $scope.locateMe = function() {
     //console.log("in TabCtrl");

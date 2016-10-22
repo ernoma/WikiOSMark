@@ -44,6 +44,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 	var photoLayer = null;
 	var flickrPhotoLayer = null;
+	var mapillaryPhotoLayer = null;
 	var osmGeoJsonLayer = null;
 
 	var tilesDict = {
@@ -180,6 +181,7 @@ var mapControllers = angular.module('mapControllers', [])
 					max_lng: bounds.getEast(),
 					max_lat: bounds.getNorth()
 				}
+				console.log(bbox);
 
 				//var data = {"photos":{"page":1,"pages":7528,"perpage":9,"total":"67746","photo":[{"id":"30488776035","owner":"11912988@N02","secret":"8b177af23e","server":"8577","farm":9,"title":"New fresh air is coming #aj20 #aljazeera #aj2016 #great #new_building #aja","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"25.314511","longitude":"51.496547","accuracy":"16","context":0,"place_id":"1yGIw8VUV7NaufVgQA","woeid":"55922532","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm9.staticflickr.com\/8577\/30488776035_8b177af23e_m.jpg","height_s":"240","width_s":"240","url_o":"https:\/\/farm9.staticflickr.com\/8577\/30488776035_b8587a5980_o.jpg","height_o":"1080","width_o":"1080"},{"id":"30401673871","owner":"148301490@N03","secret":"8b415de6f4","server":"8583","farm":9,"title":"Cascade Complex in 2014","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"40.189979","longitude":"44.515442","accuracy":"16","context":0,"place_id":"q62C_I9TULtsfefR","woeid":"2214662","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm9.staticflickr.com\/8583\/30401673871_8b415de6f4_m.jpg","height_s":"140","width_s":"240","url_o":"https:\/\/farm9.staticflickr.com\/8583\/30401673871_ca39cf918e_o.jpg","height_o":"432","width_o":"742"},{"id":"30432059555","owner":"51065046@N05","secret":"a0ec7322ee","server":"8267","farm":9,"title":"Enter the Lotfollah","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"32.657222","longitude":"51.678888","accuracy":"16","context":0,"place_id":"TBWrXzFTUL.szzcA","woeid":"2254572","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm9.staticflickr.com\/8267\/30432059555_a0ec7322ee_m.jpg","height_s":"240","width_s":"159","url_o":"https:\/\/farm9.staticflickr.com\/8267\/30432059555_bfcbddcd0e_o.jpg","height_o":"4066","width_o":"2699"},{"id":"29800432554","owner":"10485860@N00","secret":"71de4c5727","server":"5632","farm":6,"title":"Sunset","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"22.500121","longitude":"70.182529","accuracy":"16","context":0,"place_id":"68R_3hxQUL9x8wFmbg","woeid":"12586424","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5632\/29800432554_71de4c5727_m.jpg","height_s":"240","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5632\/29800432554_03a07ce9f4_o.jpg","height_o":"1080","width_o":"1080"},{"id":"30427000035","owner":"29436924@N00","secret":"6659d236e9","server":"5507","farm":6,"title":"Physical text...been a while... #visittoabookstore, #irresistibleurgetobuyeverything,  #missthesmell, #withdrawalsymtom, #misstouchingbooks, #goingbacktoebooksisgoingtobetough, #insearchofabirthdaygift, #lovebooks, #bookworm, #MeinKampfisstillabestseller,","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"19.135880","longitude":"72.825680","accuracy":"16","context":0,"place_id":"mY8Xe19YUrKH2eFJ.w","woeid":"90889080","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5507\/30427000035_6659d236e9_m.jpg","height_s":"240","width_s":"192","url_o":"https:\/\/farm6.staticflickr.com\/5507\/30427000035_310b492dc2_o.jpg","height_o":"1350","width_o":"1080"},{"id":"29768381463","owner":"145748390@N03","secret":"04d9aabb93","server":"5339","farm":6,"title":"Table is Set | Scubaspa Maldives","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"3.943295","longitude":"72.881477","accuracy":"16","context":0,"place_id":"AXtOfupTULyWt9gh","woeid":"2268295","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5339\/29768381463_04d9aabb93_m.jpg","height_s":"180","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5339\/29768381463_bd6b431969_o.jpg","height_o":"810","width_o":"1080"},{"id":"30349822616","owner":"145748390@N03","secret":"5efebaa7f1","server":"5576","farm":6,"title":"Fresh for Mojitos | Scubaspa Maldives","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"3.943295","longitude":"72.881477","accuracy":"16","context":0,"place_id":"AXtOfupTULyWt9gh","woeid":"2268295","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5576\/30349822616_5efebaa7f1_m.jpg","height_s":"198","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5576\/30349822616_a6447abc6d_o.jpg","height_o":"889","width_o":"1080"},{"id":"30268537602","owner":"53253289@N03","secret":"6bbb9aea85","server":"5589","farm":6,"title":"20161002_1205_Georgia_Lumia 930_077.jpg","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"41.836408","longitude":"43.389872","accuracy":"16","context":0,"place_id":"UvRj1hVQW7xvzGnD","woeid":"1962649","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5589\/30268537602_6bbb9aea85_m.jpg","height_s":"135","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5589\/30268537602_561bc174ae_o.jpg","height_o":"3024","width_o":"5376"},{"id":"30087727760","owner":"53253289@N03","secret":"2eeba74f41","server":"5641","farm":6,"title":"20160930_1901_Georgia_Lumia 930_096.jpg","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"41.687594","longitude":"44.805524","accuracy":"16","context":0,"place_id":"8IGWCv5QW7yShirL","woeid":"1965878","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5641\/30087727760_2eeba74f41_m.jpg","height_s":"135","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5641\/30087727760_b1f35990c8_o.jpg","height_o":"2701","width_o":"4802"}]},"stat":"ok"}
 				PhotoGallery.getFlickrPhotos(bbox, AppSettings.getFlickrPhotoMaxCount(), function(data) {
@@ -237,7 +239,78 @@ var mapControllers = angular.module('mapControllers', [])
 				$scope.mapControllerData.flickrPhotosShown = false;
 			});
 		}
-	})
+	});
+
+	$scope.$on( "showMapillaryPhotos", function (event) {
+		if (!$scope.mapControllerData.mapillaryPhotosShown) {
+			leafletData.getMap().then(function(map) {
+				//bbox.min_lng + "," + bbox.min_lat + "," + bbox.max_lng + "," + bbox.max_lat
+				var bounds = map.getBounds();
+				var bbox = {
+					min_lng: bounds.getWest(),
+					min_lat: bounds.getSouth(),
+					max_lng: bounds.getEast(),
+					max_lat: bounds.getNorth()
+				}
+				console.log(bbox);
+
+				//var data = {"photos":{"page":1,"pages":7528,"perpage":9,"total":"67746","photo":[{"id":"30488776035","owner":"11912988@N02","secret":"8b177af23e","server":"8577","farm":9,"title":"New fresh air is coming #aj20 #aljazeera #aj2016 #great #new_building #aja","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"25.314511","longitude":"51.496547","accuracy":"16","context":0,"place_id":"1yGIw8VUV7NaufVgQA","woeid":"55922532","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm9.staticflickr.com\/8577\/30488776035_8b177af23e_m.jpg","height_s":"240","width_s":"240","url_o":"https:\/\/farm9.staticflickr.com\/8577\/30488776035_b8587a5980_o.jpg","height_o":"1080","width_o":"1080"},{"id":"30401673871","owner":"148301490@N03","secret":"8b415de6f4","server":"8583","farm":9,"title":"Cascade Complex in 2014","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"40.189979","longitude":"44.515442","accuracy":"16","context":0,"place_id":"q62C_I9TULtsfefR","woeid":"2214662","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm9.staticflickr.com\/8583\/30401673871_8b415de6f4_m.jpg","height_s":"140","width_s":"240","url_o":"https:\/\/farm9.staticflickr.com\/8583\/30401673871_ca39cf918e_o.jpg","height_o":"432","width_o":"742"},{"id":"30432059555","owner":"51065046@N05","secret":"a0ec7322ee","server":"8267","farm":9,"title":"Enter the Lotfollah","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"32.657222","longitude":"51.678888","accuracy":"16","context":0,"place_id":"TBWrXzFTUL.szzcA","woeid":"2254572","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm9.staticflickr.com\/8267\/30432059555_a0ec7322ee_m.jpg","height_s":"240","width_s":"159","url_o":"https:\/\/farm9.staticflickr.com\/8267\/30432059555_bfcbddcd0e_o.jpg","height_o":"4066","width_o":"2699"},{"id":"29800432554","owner":"10485860@N00","secret":"71de4c5727","server":"5632","farm":6,"title":"Sunset","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"22.500121","longitude":"70.182529","accuracy":"16","context":0,"place_id":"68R_3hxQUL9x8wFmbg","woeid":"12586424","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5632\/29800432554_71de4c5727_m.jpg","height_s":"240","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5632\/29800432554_03a07ce9f4_o.jpg","height_o":"1080","width_o":"1080"},{"id":"30427000035","owner":"29436924@N00","secret":"6659d236e9","server":"5507","farm":6,"title":"Physical text...been a while... #visittoabookstore, #irresistibleurgetobuyeverything,  #missthesmell, #withdrawalsymtom, #misstouchingbooks, #goingbacktoebooksisgoingtobetough, #insearchofabirthdaygift, #lovebooks, #bookworm, #MeinKampfisstillabestseller,","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"19.135880","longitude":"72.825680","accuracy":"16","context":0,"place_id":"mY8Xe19YUrKH2eFJ.w","woeid":"90889080","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5507\/30427000035_6659d236e9_m.jpg","height_s":"240","width_s":"192","url_o":"https:\/\/farm6.staticflickr.com\/5507\/30427000035_310b492dc2_o.jpg","height_o":"1350","width_o":"1080"},{"id":"29768381463","owner":"145748390@N03","secret":"04d9aabb93","server":"5339","farm":6,"title":"Table is Set | Scubaspa Maldives","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"3.943295","longitude":"72.881477","accuracy":"16","context":0,"place_id":"AXtOfupTULyWt9gh","woeid":"2268295","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5339\/29768381463_04d9aabb93_m.jpg","height_s":"180","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5339\/29768381463_bd6b431969_o.jpg","height_o":"810","width_o":"1080"},{"id":"30349822616","owner":"145748390@N03","secret":"5efebaa7f1","server":"5576","farm":6,"title":"Fresh for Mojitos | Scubaspa Maldives","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"3.943295","longitude":"72.881477","accuracy":"16","context":0,"place_id":"AXtOfupTULyWt9gh","woeid":"2268295","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5576\/30349822616_5efebaa7f1_m.jpg","height_s":"198","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5576\/30349822616_a6447abc6d_o.jpg","height_o":"889","width_o":"1080"},{"id":"30268537602","owner":"53253289@N03","secret":"6bbb9aea85","server":"5589","farm":6,"title":"20161002_1205_Georgia_Lumia 930_077.jpg","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"41.836408","longitude":"43.389872","accuracy":"16","context":0,"place_id":"UvRj1hVQW7xvzGnD","woeid":"1962649","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5589\/30268537602_6bbb9aea85_m.jpg","height_s":"135","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5589\/30268537602_561bc174ae_o.jpg","height_o":"3024","width_o":"5376"},{"id":"30087727760","owner":"53253289@N03","secret":"2eeba74f41","server":"5641","farm":6,"title":"20160930_1901_Georgia_Lumia 930_096.jpg","ispublic":1,"isfriend":0,"isfamily":0,"latitude":"41.687594","longitude":"44.805524","accuracy":"16","context":0,"place_id":"8IGWCv5QW7yShirL","woeid":"1965878","geo_is_family":0,"geo_is_friend":0,"geo_is_contact":0,"geo_is_public":1,"url_s":"https:\/\/farm6.staticflickr.com\/5641\/30087727760_2eeba74f41_m.jpg","height_s":"135","width_s":"240","url_o":"https:\/\/farm6.staticflickr.com\/5641\/30087727760_b1f35990c8_o.jpg","height_o":"2701","width_o":"4802"}]},"stat":"ok"}
+				PhotoGallery.getMapillaryPhotos(bbox, AppSettings.getMapillaryPhotoMaxCount(), function(data) {
+					console.log(data);
+					//console.log(map);
+
+					mapillaryPhotoLayer = L.photo.cluster().on('click', function (evt) {
+						// var photo = evt.layer.photo,
+						// 	template = '<img src="{url}"/></a><p>{caption}</p>';
+						//
+						console.log(evt);
+						// 	evt.layer.bindPopup(L.Util.template(template, photo), {
+						// 		className: 'leaflet-popup-photo',
+						// 		minWidth: 400
+						// 	}).openPopup();
+
+						$scope.mapControllerData.selectedMapillaryPhoto = {
+							lat: evt.layer.photo.lat,
+							lng: evt.layer.photo.lng,
+							url: evt.layer.photo.url,
+							caption: evt.layer.photo.caption,
+							thumbnail: evt.layer.photo.thumbnail,
+							photoID: evt.layer.photo.photoID
+						}
+
+						if (evt.layer != undefined) {
+							$state.go("tab.photo-detail", { source: "mapillary", photoID: evt.layer.photo.photoID });
+						}
+					});
+
+					//console.log(map);
+					var photos = [];
+
+					var photoArray = data.ims;
+					for (var i = 0; i < photoArray.length; i++) {
+						photos.push({
+									lat: photoArray[i].lat,
+									lng: photoArray[i].lon,
+									url: "https://d1cuyjsrcm0gby.cloudfront.net/" + photoArray[i].key + "/thumb-2048.jpg",
+									caption: "Photo by " + photoArray[i].user,
+									thumbnail: "https://d1cuyjsrcm0gby.cloudfront.net/" + photoArray[i].key + "/thumb-320.jpg",
+									photoID: photoArray[i].key
+						});
+					}
+					//console.log(photos);
+					mapillaryPhotoLayer.add(photos).addTo(map);
+
+					$scope.mapControllerData.mapillaryPhotosShown = true;
+				});
+			});
+		}
+		else if (mapillaryPhotoLayer != null) {
+			leafletData.getMap().then(function(map) {
+				map.removeLayer(mapillaryPhotoLayer);
+				$scope.mapControllerData.mapillaryPhotosShown = false;
+			});
+		}
+	});
 
 	$scope.$on("$ionicView.enter", function(event, data){
    	// handle event

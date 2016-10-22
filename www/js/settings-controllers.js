@@ -10,7 +10,8 @@ angular.module('settingsControllers', [])
     showWikipediaOnMap: AppSettings.shouldShowWikipediaOnMap(),
     showCommonsOnMap: AppSettings.shouldShowCommonsOnMap(),
     OSMSearchRadius: AppSettings.getOSMSearchRadius(),
-    flickrPhotoMaxCount: AppSettings.getFlickrPhotoMaxCount()
+    flickrPhotoMaxCount: AppSettings.getFlickrPhotoMaxCount(),
+    mapillaryPhotoMaxCount: AppSettings.getMapillaryPhotoMaxCount(),
   };
 
   //console.log($scope.$parent);
@@ -27,6 +28,10 @@ angular.module('settingsControllers', [])
 
   $scope.changeFlickrPhotoMaxCount = function() {
     AppSettings.setFlickrPhotoMaxCount($scope.settings.flickrPhotoMaxCount);
+  }
+
+  $scope.changeMapillaryPhotoMaxCount = function() {
+    AppSettings.setMapillaryPhotoMaxCount($scope.settings.mapillaryPhotoMaxCount);
   }
 
   $scope.switchShowUserPhotos = function() {

@@ -81,6 +81,11 @@
           <span ng-if="!mapControllerData.flickrPhotosShown">Show Flickr Photos</span>
           <span ng-if="mapControllerData.flickrPhotosShown">Hide Flickr Photos</span>
         </ion-item>
+        <ion-item class="item item-icon-left" menu-close ng-click="showMapillaryPhotos()">
+          <i class="icon ion-camera"></i>
+          <span ng-if="!mapControllerData.mapillaryPhotosShown">Show Mapillary Photos</span>
+          <span ng-if="mapControllerData.mapillaryPhotosShown">Hide Mapillary Photos</span>
+        </ion-item>
         <ion-item class="item item-icon-left" menu-close ng-click="takePhoto()">
           <i class="icon ion-camera"></i>
           Take photo
