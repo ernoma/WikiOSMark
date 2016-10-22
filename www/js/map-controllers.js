@@ -1,7 +1,7 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $rootScope, $state, $timeout, $cordovaGeolocation, $http, leafletData, leafletMapEvents, leafletMarkerEvents, leafletBoundsHelpers, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings, GeoLocation, PhotoGallery) {
+.controller('MapCtrl', function($scope, $rootScope, $state, $timeout, $cordovaGeolocation, $http, leafletData, leafletMapEvents, leafletMarkerEvents, leafletBoundsHelpers, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings, GeoLocation, PhotoGallery, Wheelmap) {
 
 	//
 	// Variables & initialization
@@ -42,6 +42,7 @@ var mapControllers = angular.module('mapControllers', [])
 		}
   };
 
+	var wheelmapLayer = null;
 	var photoLayer = null;
 	var flickrPhotoLayer = null;
 	var mapillaryPhotoLayer = null;
@@ -319,6 +320,8 @@ var mapControllers = angular.module('mapControllers', [])
 
 		$scope.updatePhotoMapLayer();
 
+		$scope.updateWheelmapLayer();
+
 		//$scope.updateWikiLayers();
 	});
 
@@ -499,6 +502,35 @@ var mapControllers = angular.module('mapControllers', [])
 				markers: {}
 			});
 			$scope.mapControllerData.WikiItemsShown = false;
+		}
+	}
+
+	$scope.updateWheelmapLayer = function() {
+		if (AppSettings.shouldShowWheelmapNodesOnMap()) {
+
+			leafletData.getMap().then(function(map) {
+				var bounds = map.getBounds();
+				var bbox = {
+					min_lng: bounds.getWest(),
+					min_lat: bounds.getSouth(),
+					max_lng: bounds.getEast(),
+					max_lat: bounds.getNorth()
+				}
+				//console.log(bbox);
+
+				Wheelmap.getNodes(bbox, "yes", AppSettings.getWheelmapNodesMaxCount(), 1, function(data) {
+					console.log(data);
+				});
+			});
+		}
+		else if (wheelmapLayer != null){
+			// angular.extend($scope, {
+			// 	markers: {}
+			// });
+
+			leafletData.getMap().then(function(map) {
+				map.removeLayer(wheelmapLayer);
+			});
 		}
 	}
 

@@ -19,6 +19,28 @@ angular.module('starter.services', [])
     setOSMSearchRadius: function(value) {
       $window.localStorage["OSMSearchRadius"] = JSON.stringify(value);
     },
+    shouldShowWheelmapNodesOnMap: function() {
+      if ($window.localStorage["showWheelmapNodesOnMap"] != undefined) {
+        return JSON.parse($window.localStorage["showWheelmapNodesOnMap"]);
+      }
+      else {
+        return true;
+      }
+    },
+    setShowWheelmapNodesOnMap: function(value) {
+      $window.localStorage["showWheelmapNodesOnMap"] = JSON.stringify(value);
+    },
+    getWheelmapNodesMaxCount: function() {
+      if ($window.localStorage["wheelmapNodesMaxCount"] != undefined) {
+        return JSON.parse($window.localStorage["wheelmapNodesMaxCount"]);
+      }
+      else {
+        return 200;
+      }
+    },
+    setWheelmapNodesMaxCount: function(count) {
+      $window.localStorage["wheelmapNodesMaxCount"] = JSON.stringify(count);
+    },
     shouldShowUserPhotos: function() {
       if ($window.localStorage["showUserPhotos"] != undefined) {
         return JSON.parse($window.localStorage["showUserPhotos"]);
@@ -132,6 +154,36 @@ angular.module('starter.services', [])
     }
   }
   return locationService;
+})
+
+.factory('Wheelmap', function($window, $http, AppSettings) {
+  var wheelmapService = {
+    getNodes: function(bbox, filter, maxCount, page, callback) {
+
+      var serverAddress = AppSettings.getWikiOSMarkServer();
+      console.log(serverAddress);
+
+      // Get edit token
+      var wheelmapURL = serverAddress + "wheelmap/" + "api/nodes?" +
+        "api_key=" + wheelmap_api_data.auth_token +
+        "&bbox=" + bbox.min_lat + "," + bbox.min_lng + "," + bbox.max_lat + "," + bbox.max_lng +
+        "&page=" + page +
+        "&per_page=" + maxCount +
+        "&wheelchair=" + filter;
+
+      $http.get(wheelmapURL).
+        success(function(data) {
+          callback(data);
+        })
+        .error(function (data) {
+          console.log('data error');
+          console.log(data);
+          callback(null);
+        });
+    }
+  }
+
+  return wheelmapService;
 })
 
 .factory('PhotoGallery', function($window, $http) {

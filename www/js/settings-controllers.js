@@ -12,6 +12,8 @@ angular.module('settingsControllers', [])
     OSMSearchRadius: AppSettings.getOSMSearchRadius(),
     flickrPhotoMaxCount: AppSettings.getFlickrPhotoMaxCount(),
     mapillaryPhotoMaxCount: AppSettings.getMapillaryPhotoMaxCount(),
+    showWheelmapNodesOnMap: AppSettings.shouldShowWheelmapNodesOnMap(),
+    wheelmapNodesMaxCount: AppSettings.getWheelmapNodesMaxCount()
   };
 
   //console.log($scope.$parent);
@@ -26,12 +28,24 @@ angular.module('settingsControllers', [])
     AppSettings.setOSMSearchRadius($scope.settings.OSMSearchRadius);
   }
 
+  $scope.changeWheelmapNodesMaxCount = function() {
+    AppSettings.setWheelmapNodesMaxCount($scope.settings.wheelmapNodesMaxCount);
+  }
+
+
   $scope.changeFlickrPhotoMaxCount = function() {
     AppSettings.setFlickrPhotoMaxCount($scope.settings.flickrPhotoMaxCount);
   }
 
   $scope.changeMapillaryPhotoMaxCount = function() {
     AppSettings.setMapillaryPhotoMaxCount($scope.settings.mapillaryPhotoMaxCount);
+  }
+
+  $scope.switchShowWheelmapNodes = function() {
+    console.log("in switchShowWheelmapNodes");
+    //console.log($scope.settings.showUserPhotos);
+    AppSettings.setShowWheelmapNodesOnMap($scope.settings.showWheelmapNodesOnMap);
+    //console.log(AppSettings.shouldShowUserPhotos());
   }
 
   $scope.switchShowUserPhotos = function() {
