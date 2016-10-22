@@ -132,7 +132,16 @@ angular.module('starter.services', [])
         $window.localStorage["photoGallery"] = JSON.stringify(photoGallery);
       },
       getGallery: function() {
-        return photoGallery = JSON.parse($window.localStorage["photoGallery"]);
+        var photoGallery = null;
+        if ($window.localStorage["photoGallery"] != undefined) {
+          photoGallery = JSON.parse($window.localStorage["photoGallery"]);
+        }
+        else {
+          photoGallery = {
+            photos: []
+          }
+        }
+        return photoGallery;
       }
     }
     return photoGalleryService;
