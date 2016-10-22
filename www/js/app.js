@@ -52,7 +52,7 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
   })
 
   .state('tab.photo-detail', {
-    url: '/photo/:photoID',
+    url: '/photo/:source/:photoID',
     views: {
       'tab-map': {
         templateUrl: 'templates/tab-photo.html',

@@ -42,7 +42,7 @@
         </select>
       </label>
 
-      <div class="item" ng-model="settings.OSMSearchRadius">
+      <div class="item">
         OpenStreetMap elements search radius
         <div class="row">
         </div>
@@ -63,6 +63,21 @@
       <ion-toggle ng-model="settings.showUserPhotos" ng-change="switchShowUserPhotos()">
           Show my photos on the map
       </ion-toggle>
+      <div class="item">
+        Max count to fetch Flickr photos
+        <div class="row">
+        </div>
+        <div class="item range">
+          <i class="icon ion-minus-round"></i>
+            <input type="range" name="flickrPhotoMaxCount" min="1" max="500" ng-model="settings.flickrPhotoMaxCount"  ng-change="changeFlickrPhotoMaxCount()">
+          <i class="icon ion-plus-round"></i>
+        </div>
+        <div class="item item-input-inset">
+          <label class="item-input-wrapper">
+            <input type="text" ng-model="settings.flickrPhotoMaxCount" ng-change="changeFlickrPhotoMaxCount()">
+          </label>
+        </div>
+      </div>
       <div class="item item-divider">
         Country Specific Open Data
       </div>

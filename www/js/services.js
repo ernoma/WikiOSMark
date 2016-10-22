@@ -27,6 +27,17 @@ angular.module('starter.services', [])
         return true;
       }
     },
+    getFlickrPhotoMaxCount: function() {
+      if ($window.localStorage["flickrPhotoMaxCount"] != undefined) {
+        return JSON.parse($window.localStorage["flickrPhotoMaxCount"]);
+      }
+      else {
+        return 20;
+      }
+    },
+    setFlickrPhotoMaxCount: function(count) {
+      $window.localStorage["flickrPhotoMaxCount"] = JSON.stringify(count);
+    },
     setShowUserPhotos: function(value) {
       $window.localStorage["showUserPhotos"] = JSON.stringify(value);
     },
@@ -112,7 +123,7 @@ angular.module('starter.services', [])
   return locationService;
 })
 
-.factory('PhotoGallery', function($window) {
+.factory('PhotoGallery', function($window, $http) {
     var photoGalleryService = {
       addPhoto: function(imageURL, location) {
         var photoGallery = null;
@@ -142,6 +153,81 @@ angular.module('starter.services', [])
           }
         }
         return photoGallery;
+      },
+      getFlickrPhotos: function(bbox, maxCount, callback) {
+        var flickrURL = "https://api.flickr.com/services/rest/?&method=" +
+          "flickr.photos.search" +
+          "&api_key=" + flickr_api_data.key +
+          "&license=4,5,7,8,9,10" +
+          "&bbox=" + bbox.min_lng + "," + bbox.min_lat + "," + bbox.max_lng + "," + bbox.max_lat +
+          "&per_page=" + maxCount +
+          "&extras=geo,url_s,url_o" + // http://librdf.org/flickcurl/api/flickcurl-searching-search-extras.html & https://www.flickr.com/services/api/misc.urls.html
+          "&nojsoncallback=1&format=json";
+
+          $http.get(flickrURL).
+            success(function(data) {
+              callback(data);
+            })
+            .error(function (data) {
+              console.log('data error');
+              console.log(data);
+              callback(null);
+            });
+      },
+      getFlickrPhotosByRadius: function(centerCoordinates, radius, maxCount, callback) {
+        // var flickrURL = "https://api.flickr.com/services/rest/?&method=" +
+        //   "flickr.photos.licenses.getInfo" +
+        //   "&api_key=" + flickr_api_data.key +
+        //   "&ormat=json";
+        //
+        //   $http.get(flickrURL).
+        //     success(function(data) {
+        //       callback(data);
+        //     })
+        //     .error(function (data) {
+        //       console.log('data error');
+        //       console.log(data);
+        //       callback(null);
+        //     });
+
+        var flickrURL = "https://api.flickr.com/services/rest/?&method=" +
+          "flickr.photos.search" +
+          "&api_key=" + flickr_api_data.key +
+          "&license=4,5,7,8,9,10" +
+          "&lat=" + centerCoordinates.lat +
+          "&lon=" + centerCoordinates.lng +
+          "&radius=" + radius + // km
+          "&per_page=" + maxCount +
+          "&extras=geo,url_s,url_o" + // http://librdf.org/flickcurl/api/flickcurl-searching-search-extras.html & https://www.flickr.com/services/api/misc.urls.html
+          "&nojsoncallback=1&format=json";
+
+          $http.get(flickrURL).
+            success(function(data) {
+              callback(data);
+            })
+            .error(function (data) {
+              console.log('data error');
+              console.log(data);
+              callback(null);
+            });
+      },
+      getFlickrPhotoInfo: function(photoID, callback) {
+        var flickrURL = "https://api.flickr.com/services/rest/?&method=" +
+          "flickr.photos.getInfo" +
+          "&api_key=" + flickr_api_data.key +
+          "&photo_id=" + photoID +
+          //"&extras=url_o" + // http://librdf.org/flickcurl/api/flickcurl-searching-search-extras.html & https://www.flickr.com/services/api/misc.urls.html
+          "&nojsoncallback=1&format=json";
+
+          $http.get(flickrURL).
+            success(function(data) {
+              callback(data);
+            })
+            .error(function (data) {
+              console.log('data error');
+              console.log(data);
+              callback(null);
+            });
       }
     }
     return photoGalleryService;

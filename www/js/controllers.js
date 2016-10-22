@@ -27,7 +27,9 @@ angular.module('starter.controllers', [])
     changesetComment: "",
     OSMElementsShown: false,
     WikiItemsShown: false,
-    legendShown: false
+    flickrPhotosShown: false,
+    legendShown: false,
+    selectedFlickrPhoto: null
   }
 
   $scope.searchResults = {
@@ -84,8 +86,12 @@ angular.module('starter.controllers', [])
     //   console.log(response);
     // });
 
-    Wiki.addCoordinatesToItem("wikipedia", "Testorienteerix", centerCoordinates, function(response) {
-      console.log(response);
+    // Wiki.addCoordinatesToItem("wikipedia", "Testorienteerix", centerCoordinates, function(response) {
+    //   console.log(response);
+    // });
+
+    PhotoGallery.getFlickrPhotos(centerCoordinates, 10, 200, function(data) {
+      console.log(data);
     });
   }
 
@@ -95,6 +101,9 @@ angular.module('starter.controllers', [])
   }
   $scope.updateWikiLayers = function() {
     $scope.$broadcast('updateWikiLayers');
+  }
+  $scope.showFlickrPhotos = function() {
+    $scope.$broadcast('showFlickrPhotos');
   }
   $scope.locateMe = function() {
     //console.log("in TabCtrl");

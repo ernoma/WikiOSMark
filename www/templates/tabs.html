@@ -76,6 +76,11 @@
           <span ng-if="!mapControllerData.OSMElementsShown">Show OSM elements</span>
           <span ng-if="mapControllerData.OSMElementsShown">Hide OSM elements</span>
         </ion-item>
+        <ion-item class="item item-icon-left" menu-close ng-click="showFlickrPhotos()">
+          <i class="icon ion-camera"></i>
+          <span ng-if="!mapControllerData.flickrPhotosShown">Show Flickr Photos</span>
+          <span ng-if="mapControllerData.flickrPhotosShown">Hide Flickr Photos</span>
+        </ion-item>
         <ion-item class="item item-icon-left" menu-close ng-click="takePhoto()">
           <i class="icon ion-camera"></i>
           Take photo

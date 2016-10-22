@@ -14,20 +14,26 @@ var photoGalleryControllers = angular.module('photoGalleryControllers', [])
 
     if (toState.name == "tab.photo-detail" && toParams != {}) {
 
-      var gallery = PhotoGallery.getGallery();
-      var photos = [];
+      if(toParams.source == "camera") {
 
-      // TODO show photos on the map if in view
-      var urlParts = gallery.photos[toParams.photoID].photoURL.split("/");
-      $scope.photo = {
-            lat: gallery.photos[toParams.photoID].location.coords.latitude,
-            lng: gallery.photos[toParams.photoID].location.coords.longitude,
-            url: gallery.photos[toParams.photoID].photoURL,
-            caption: urlParts[urlParts.length-1],
-            thumbnail: gallery.photos[toParams.photoID].photoURL,
-            photoID: toParams.photoID
-      };
-      console.log($scope.photo);
+        var gallery = PhotoGallery.getGallery();
+        var photos = [];
+
+        // TODO show photos on the map if in view
+        var urlParts = gallery.photos[toParams.photoID].photoURL.split("/");
+        $scope.photo = {
+              lat: gallery.photos[toParams.photoID].location.coords.latitude,
+              lng: gallery.photos[toParams.photoID].location.coords.longitude,
+              url: gallery.photos[toParams.photoID].photoURL,
+              caption: urlParts[urlParts.length-1],
+              thumbnail: gallery.photos[toParams.photoID].photoURL,
+              photoID: toParams.photoID
+        };
+        console.log($scope.photo);
+      }
+      else if (toParams.source == "flickr") {
+        $scope.photo = $scope.mapControllerData.selectedFlickrPhoto;
+      }
     }
   });
 
