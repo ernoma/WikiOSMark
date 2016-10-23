@@ -17,7 +17,7 @@
         <div class="input-label">
           Search language
         </div>
-        <select ng-model="formData.language">
+        <select id="wiki_search_language_select" ng-model="formData.language" ng-disabled="formData.site == 'commons'">
           <option value="en">English (en)</option>
           <option value="da">Danish (da)</option>
           <option value="et">Estonian (et)</option>

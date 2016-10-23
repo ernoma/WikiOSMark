@@ -31,7 +31,9 @@ angular.module('starter.controllers', [])
     mapillaryPhotosShown: false,
     legendShown: false,
     selectedFlickrPhoto: null,
-    selectedMapillaryPhoto: null
+    selectedMapillaryPhoto: null,
+    watchPositionID: -1,
+
   }
 
   $scope.searchResults = {
@@ -112,12 +114,16 @@ angular.module('starter.controllers', [])
     });
   }
 
+  $scope.updateAllMapLayers = function() {
+    $scope.$broadcast('updateAllMapLayers');
+  }
+
   $scope.showOSMObjects = function() {
     //console.log("in TabCtrl");
     $scope.$broadcast('showOSMObjects');
   }
-  $scope.updateWikiLayers = function() {
-    $scope.$broadcast('updateWikiLayers');
+  $scope.showWikiLayers = function() {
+    $scope.$broadcast('showWikiLayers');
   }
   $scope.showFlickrPhotos = function() {
     $scope.$broadcast('showFlickrPhotos');

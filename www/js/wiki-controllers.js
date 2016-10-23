@@ -18,7 +18,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 			$scope.searchResults = [];
 
-			console.log(data);
+			//console.log(data);
 
 			if ($scope.formData.site == "wikidata") {
 				for (var i = 0; i < data.search.length; i++) {
@@ -52,7 +52,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 })
 
 .controller('WikiDetailCtrl', function($scope, $stateParams, $http, Wiki, AppSettings) {
-		console.log($stateParams.wikiId);
+		//console.log($stateParams.wikiId);
 
 		var IMAGE_COUNT_LIMIT = 10;
 		var IMAGE_THUMB_WIDTH = 80;
@@ -80,7 +80,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 
 		if ($stateParams.coordinates != undefined) {
-			console.log($stateParams.coordinates);
+			//console.log($stateParams.coordinates);
 			// TODO
 			// 1. check if a page section has maplink/mapframe and
 			// 2.1. if a section has maplink state it in the UI
@@ -90,9 +90,9 @@ var wikiControllers = angular.module('wikiControllers', [])
 			$scope.mapframe.longitude = coordParts[1];
 		}
 
-		console.log(lang);
-		console.log(site);
-		console.log(id);
+		// console.log(lang);
+		// console.log(site);
+		// console.log(id);
 
 		$scope.addMapframeToWikipedia = function(sectionIndex, section) {
 
@@ -125,10 +125,10 @@ var wikiControllers = angular.module('wikiControllers', [])
 				' longitude=' + $scope.mapframe.longitude +
 				' />';
 
-			console.log(maplinkHTML);
+			// console.log(maplinkHTML);
 
 			Wiki.editWikiPage("testorienteerix", sectionIndex, null, maplinkHTML, "Added maplink to the section " + section.title, function(response) {
-				console.log(response);
+				// console.log(response);
 			});
 		}
 
@@ -153,18 +153,18 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 			$http.jsonp(url).
 			  success(function(data) {
-			    console.log(data);
+			    // console.log(data);
 					for (var key in data.query.pages) { // there is just one key, so for runs only once
 						var content = data.query.pages[key].revisions[0]['*'];
 						var parsedContent = wtf_wikipedia.parse(content);
-						console.log(parsedContent);
+						// console.log(parsedContent);
 
 						if (parsedContent.images.length > 0) {
 							$scope.articleImage = parsedContent.images[0].thumb;
 						}
 
 						var textEntries = parsedContent.text.get("Intro");
-						console.log(textEntries);
+						// console.log(textEntries);
 
 						for (var i = 0; i < textEntries.length; i++) {
 							$scope.introText += textEntries[i].text + " ";
@@ -224,7 +224,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 			$http.jsonp(url).
 				success(function(data) {
-					console.log(data);
+					// console.log(data);
 
 					$scope.data.title = "";
 					if (data.entities[id].labels[lang] != undefined) {
@@ -247,10 +247,10 @@ var wikiControllers = angular.module('wikiControllers', [])
 					$scope.data.siteURL = "https://www.wikidata.org/wiki/" + id;
 
 					var simplifiedClaims = wdk.simplifyClaims(data.entities[id].claims);
-					console.log(simplifiedClaims);
+					// console.log(simplifiedClaims);
 
 					Wiki.getWikidataProperties('en').then(function(wikidataProperties) {
-						console.log(wikidataProperties.data);
+						// console.log(wikidataProperties.data);
 						if (lang != 'en') {
 							Wiki.getWikidataProperties(lang).then(function(langWikidataProperties) {
 								console.log(langWikidataProperties.data);
@@ -305,7 +305,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 							areLinks: areLinks
 						});
 					}
-					console.log($scope.claims);
+					// console.log($scope.claims);
 				}
 		}
 		else { // site == commons
@@ -329,7 +329,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 				$http.jsonp(thumbsUrl).
 					success(function(data) {
-						console.log(data);
+						// console.log(data);
 
 						$scope.imageCountLimitReached = false;
 						$scope.imageCount = 1;
@@ -344,13 +344,43 @@ var wikiControllers = angular.module('wikiControllers', [])
 						console.log(data);
 					});
 			}
+			else if(id.includes("Category:")) {
+				var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&format=json&action=query&generator=categorymembers&gcmlimit=" +
+					IMAGE_COUNT_LIMIT + "&gcmtype=file&gcmtitle=" +
+					id + "&prop=imageinfo&iiprop=url|comment|extmetadata|user&iiurlwidth="
+					+ IMAGE_THUMB_WIDTH;
+				//var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&prop=images&imlimit=" + IMAGE_COUNT_LIMIT + "&format=json&titles="
+				//url += id;
+
+				$http.jsonp(url).
+					success(function(data) {
+						// console.log(data);
+
+						if (data.continue != undefined) {
+							// TODO there exists more than IMAGE_COUNT_LIMIT images, note in the UI, otherwise maybe show number of images
+							$scope.imageCountLimitReached = true;
+							$scope.imageCount = IMAGE_COUNT_LIMIT;
+						}
+
+						for (var key in data.query.pages) { // there is just one key, so for runs only once
+
+							var thumbItem = createThumbItem(data.query.pages[key]);
+
+							$scope.thumbs.push(thumbItem);
+						}
+					})
+					.error(function (data) {
+						console.log('data error');
+						console.log(data);
+					});
+			}
 			else {
 				var url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&prop=images&imlimit=" + IMAGE_COUNT_LIMIT + "&format=json&titles="
 				url += id;
 
 				$http.jsonp(url).
 					success(function(data) {
-						console.log(data);
+						// console.log(data);
 
 						for (var key in data.query.pages) { // there is just one key, so for runs only once
 							var imagesNames = data.query.pages[key].images;
@@ -373,7 +403,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 							$http.jsonp(thumbsUrl).
 								success(function(thumbsData) {
-									console.log(thumbsData);
+									// console.log(thumbsData);
 
 									for (var thumbsPageKey in thumbsData.query.pages) {
 

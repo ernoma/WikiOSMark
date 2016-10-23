@@ -7,13 +7,13 @@ var wheelmapControllers = angular.module('wheelmapControllers', [])
   });
 
   $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
-    console.log("State changed: ", toState);
-    console.log("State changed: ", toParams);
-    console.log("State changed: ", fromState);
-    console.log("State changed: ", fromParams);
+    // console.log("State changed: ", toState);
+    // console.log("State changed: ", toParams);
+    // console.log("State changed: ", fromState);
+    // console.log("State changed: ", fromParams);
 
     if (toState.name == "tab.wheelmap-detail" && toParams != {}) {
-      console.log($scope.mapControllerData.selectedWheelmapNode);
+      // console.log($scope.mapControllerData.selectedWheelmapNode);
       var nodeTypeIdentifier = $scope.mapControllerData.selectedWheelmapNode.node_type.identifier.replace(/_+/g, ' ');
       nodeTypeIdentifier = nodeTypeIdentifier.charAt(0).toUpperCase() + nodeTypeIdentifier.slice(1);
       var category = $scope.mapControllerData.selectedWheelmapNode.category.identifier.replace(/_+/g, ' ');

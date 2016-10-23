@@ -5,7 +5,7 @@
       </ion-nav-back-button>
 
       <ion-nav-buttons side="right">
-        <button ng-if="currentState == 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="right"></button>
+        <button ng-if="currentState == 'tab.map' && mapControllerData.selectedFeature != null" class="button button-icon button-clear ion-navicon" menu-toggle="right"></button>
         <button ng-if="currentState != 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="right" ng-hide="true"></button>
       </ion-nav-buttons>
       <ion-nav-buttons side="left">
@@ -64,9 +64,14 @@
       <ion-list can-swipe="false" ng-if="currentState == 'tab.map'">
         <ion-item class="item item-icon-left" menu-close ng-click="locateMe()">
           <i class="icon ion-android-locate"></i>
-          Locate me
+          <span ng-if="mapControllerData.watchPositionID == -1">Start locating me</span>
+          <span ng-if="mapControllerData.watchPositionID != -1">Stop locating me</span>
         </ion-item>
-        <ion-item class="item item-icon-left" menu-close ng-click="updateWikiLayers()">
+        <ion-item class="item item-icon-left" menu-close ng-click="updateAllMapLayers()">
+          <i class="icon ion-loop"></i>
+          Update map data
+        </ion-item>
+        <ion-item class="item item-icon-left" menu-close ng-click="showWikiLayers()">
           <i class="icon ion-soup-can"></i>
           <span ng-if="!mapControllerData.WikiItemsShown">Show Wiki items</span>
           <span ng-if="mapControllerData.WikiItemsShown">Hide Wiki items</span>
@@ -76,24 +81,24 @@
           <span ng-if="!mapControllerData.OSMElementsShown">Show OSM elements</span>
           <span ng-if="mapControllerData.OSMElementsShown">Hide OSM elements</span>
         </ion-item>
+        <ion-item class="item item-icon-left" menu-close ng-click="showLegend()">
+          <i class="icon ion-information"></i>
+          <span ng-if="!mapControllerData.legendShown">Show OSM legend</span>
+          <span ng-if="mapControllerData.legendShown">Hide OSM legend</span>
+        </ion-item>
         <ion-item class="item item-icon-left" menu-close ng-click="showFlickrPhotos()">
-          <i class="icon ion-camera"></i>
+          <i class="icon ion-images"></i>
           <span ng-if="!mapControllerData.flickrPhotosShown">Show Flickr Photos</span>
           <span ng-if="mapControllerData.flickrPhotosShown">Hide Flickr Photos</span>
         </ion-item>
         <ion-item class="item item-icon-left" menu-close ng-click="showMapillaryPhotos()">
-          <i class="icon ion-camera"></i>
+          <i class="icon ion-images"></i>
           <span ng-if="!mapControllerData.mapillaryPhotosShown">Show Mapillary Photos</span>
           <span ng-if="mapControllerData.mapillaryPhotosShown">Hide Mapillary Photos</span>
         </ion-item>
         <ion-item class="item item-icon-left" menu-close ng-click="takePhoto()">
           <i class="icon ion-camera"></i>
           Take photo
-        </ion-item>
-        <ion-item class="item item-icon-left" menu-close ng-click="showLegend()">
-          <i class="icon ion-information"></i>
-          <span ng-if="!mapControllerData.legendShown">Show OSM legend</span>
-          <span ng-if="mapControllerData.legendShown">Hide OSM legend</span>
         </ion-item>
         <ion-item class="item item-icon-left" menu-close ng-click="runTests()">
           <i class="icon ion-nuclear"></i>

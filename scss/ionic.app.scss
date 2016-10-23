@@ -154,3 +154,9 @@ body {
 	padding-left: 0;
 	padding-right: 0;
 }
+
+#wiki_search_language_select:disabled {
+	background-color: #f8f8f8;
+  cursor: not-allowed;
+	color: #ccc;
+}

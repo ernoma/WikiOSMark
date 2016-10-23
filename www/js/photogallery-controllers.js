@@ -7,10 +7,10 @@ var photoGalleryControllers = angular.module('photoGalleryControllers', [])
   });
 
   $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams) {
-    console.log("State changed: ", toState);
-    console.log("State changed: ", toParams);
-    console.log("State changed: ", fromState);
-    console.log("State changed: ", fromParams);
+    // console.log("State changed: ", toState);
+    // console.log("State changed: ", toParams);
+    // console.log("State changed: ", fromState);
+    // console.log("State changed: ", fromParams);
 
     if (toState.name == "tab.photo-detail" && toParams != {}) {
 
@@ -29,7 +29,7 @@ var photoGalleryControllers = angular.module('photoGalleryControllers', [])
               thumbnail: gallery.photos[toParams.photoID].photoURL,
               photoID: toParams.photoID
         };
-        console.log($scope.photo);
+        // console.log($scope.photo);
       }
       else if (toParams.source == "flickr") {
         $scope.photo = $scope.mapControllerData.selectedFlickrPhoto;

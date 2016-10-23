@@ -42,33 +42,33 @@ angular.module('settingsControllers', [])
   }
 
   $scope.switchShowWheelmapNodes = function() {
-    console.log("in switchShowWheelmapNodes");
+    //console.log("in switchShowWheelmapNodes");
     //console.log($scope.settings.showUserPhotos);
     AppSettings.setShowWheelmapNodesOnMap($scope.settings.showWheelmapNodesOnMap);
     //console.log(AppSettings.shouldShowUserPhotos());
   }
 
   $scope.switchShowUserPhotos = function() {
-    console.log("in switchShowUserPhotos");
+    //console.log("in switchShowUserPhotos");
     //console.log($scope.settings.showUserPhotos);
     AppSettings.setShowUserPhotos($scope.settings.showUserPhotos);
     //console.log(AppSettings.shouldShowUserPhotos());
   }
 
   $scope.switchShowWikidataOnMap = function() {
-    console.log("in switchShowWikidataOnMap");
+    // console.log("in switchShowWikidataOnMap");
     //console.log($scope.settings.showUserPhotos);
     AppSettings.setShowWikidataOnMap($scope.settings.showWikidataOnMap);
     //console.log(AppSettings.shouldShowUserPhotos());
   }
   $scope.switchShowWikipediaOnMap = function() {
-    console.log("in switchShowWikipediaOnMap");
+    //console.log("in switchShowWikipediaOnMap");
     //console.log($scope.settings.showUserPhotos);
     AppSettings.setShowWikipediaOnMap($scope.settings.showWikipediaOnMap);
     //console.log(AppSettings.shouldShowUserPhotos());
   }
   $scope.switchShowCommonsOnMap = function() {
-    console.log("in switchShowCommonsOnMap");
+    //console.log("in switchShowCommonsOnMap");
     //console.log($scope.settings.showUserPhotos);
     AppSettings.setShowCommonsOnMap($scope.settings.showCommonsOnMap);
     //console.log(AppSettings.shouldShowUserPhotos());
@@ -101,7 +101,7 @@ angular.module('settingsControllers', [])
     OpenStreetMap.getUserDetails(function(details) {
       //console.log(details.getElementsByTagName("osm")[0].innerHTML);
       var jsonObj = x2js.xml_str2json( details.getElementsByTagName("osm")[0].innerHTML );
-      console.log(jsonObj);
+      //console.log(jsonObj);
       $scope.userDetails.OSM = jsonObj;
     });
   }

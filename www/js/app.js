@@ -45,7 +45,7 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
     url: '/map',
     views: {
       'tab-map': {
-        templateUrl: 'templates/tab-dash.html',
+        templateUrl: 'templates/tab-map.html',
         controller: 'MapCtrl'
       }
     }
@@ -98,7 +98,7 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
     url: '/settings',
     views: {
       'tab-settings': {
-        templateUrl: 'templates/tab-account.html',
+        templateUrl: 'templates/tab-settings.html',
         controller: 'SettingsCtrl'
       }
     }
