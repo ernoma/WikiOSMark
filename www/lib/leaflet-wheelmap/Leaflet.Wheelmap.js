@@ -1,3 +1,21 @@
+L.WheelmapDefaultIconPath = function () {
+  var scripts = document.getElementsByTagName('script'),
+      leafletWheelmapRe = /[\/^]Leaflet.Wheelmap[\-\._]?([\w\-\._]*)\.js\??/;
+  //console.log(scripts);
+
+  var i, len, src, matches, path;
+
+  for (i = 0, len = scripts.length; i < len; i++) {
+    src = scripts[i].src;
+    matches = src.match(leafletWheelmapRe);
+
+    if (matches) {
+      path = src.split(leafletWheelmapRe)[0];
+      return (path ? path + '/' : '') + 'icons';
+    }
+  }
+}
+
 L.Wheelmap = L.FeatureGroup.extend({
 	options: {
 		icon: {
@@ -10,8 +28,8 @@ L.Wheelmap = L.FeatureGroup.extend({
 
 	initialize: function (nodes, options) {
 		L.setOptions(this, options);
-    this.options.iconPath = this.options.iconPath != null ? this.options.iconPath : getDefaultWheelmapIconPath();
-    console.log(this.options.iconPath);
+    this.options.iconPath = this.options.iconPath != null ? this.options.iconPath : L.WheelmapDefaultIconPath();
+    //console.log(this.options.iconPath);
     this.options.wheelmap_nodetypes = this.options.wheelmap_nodetypes != null ? this.options.wheelmap_nodetypes : this.getWheelmapNodeTypes();
 		L.FeatureGroup.prototype.initialize.call(this, nodes);
 	},
@@ -52,24 +70,6 @@ L.wheelmap = function (nodes, options) {
 	return new L.Wheelmap(nodes, options);
 };
 
-var getDefaultWheelmapIconPath = function () {
-  var scripts = document.getElementsByTagName('script'),
-      leafletWheelmapRe = /[\/^]Leaflet.Wheelmap[\-\._]?([\w\-\._]*)\.js\??/;
-  //console.log(scripts);
-
-  var i, len, src, matches, path;
-
-  for (i = 0, len = scripts.length; i < len; i++) {
-    src = scripts[i].src;
-    matches = src.match(leafletWheelmapRe);
-
-    if (matches) {
-      path = src.split(leafletWheelmapRe)[0];
-      return (path ? path + '/' : '') + 'icons';
-    }
-  }
-}
-
 if (L.MarkerClusterGroup) {
 
 	L.Wheelmap.Cluster = L.MarkerClusterGroup.extend({
@@ -80,7 +80,7 @@ if (L.MarkerClusterGroup) {
 			iconCreateFunction: function(cluster) {
 				return new L.DivIcon(L.extend({
 					className: 'leaflet-marker-wheelmap',
-					html: '<div style="background-image: url(' + getDefaultWheelmapIconPath() + "/unknown.png" + ');"></div>​<b>' + cluster.getChildCount() + '</b>'
+					html: '<div style="background-image: url(' + L.WheelmapDefaultIconPath() + "/unknown.png" + ');"></div>​<b>' + cluster.getChildCount() + '</b>'
 				}, this.icon));
 		  },
       icon: {
@@ -103,8 +103,24 @@ if (L.MarkerClusterGroup) {
 		clear: function () {
 			this._nodes.clearLayers();
 			this.clearLayers();
-		}
+		},
+    getDefaultWheelmapIconPath: function () {
+      var scripts = document.getElementsByTagName('script'),
+          leafletWheelmapRe = /[\/^]Leaflet.Wheelmap[\-\._]?([\w\-\._]*)\.js\??/;
+      //console.log(scripts);
 
+      var i, len, src, matches, path;
+
+      for (i = 0, len = scripts.length; i < len; i++) {
+        src = scripts[i].src;
+        matches = src.match(leafletWheelmapRe);
+
+        if (matches) {
+          path = src.split(leafletWheelmapRe)[0];
+          return (path ? path + '/' : '') + 'icons';
+        }
+      }
+    }
 	});
 
 	L.wheelmap.cluster = function (options) {
