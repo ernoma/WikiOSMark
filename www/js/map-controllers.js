@@ -509,6 +509,11 @@ var mapControllers = angular.module('mapControllers', [])
 		if (AppSettings.shouldShowWheelmapNodesOnMap()) {
 
 			leafletData.getMap().then(function(map) {
+
+				if (wheelmapLayer != null) {
+					map.removeLayer(wheelmapLayer);
+				}
+
 				var bounds = map.getBounds();
 				var bbox = {
 					min_lng: bounds.getWest(),
@@ -518,8 +523,108 @@ var mapControllers = angular.module('mapControllers', [])
 				}
 				//console.log(bbox);
 
-				Wheelmap.getNodes(bbox, "yes", AppSettings.getWheelmapNodesMaxCount(), 1, function(data) {
+				wheelmapLayer = L.wheelmap.cluster().on('click', function (evt) {
+					console.log(evt);
+
+					Wheelmap.getNodeTypes("en", function(nodes) {
+						iconName = nodes[evt.layer.node.node_type.id - 1].icon;
+						$scope.mapControllerData.selectedWheelmapNode = {
+							lat: evt.layer.node.lat,
+							lng: evt.layer.node.lng,
+							category: evt.layer.node.category,
+							node_type: evt.layer.node.node_type,
+							caption: evt.layer.node.caption,
+							nodeID: evt.layer.node.nodeID,
+							wheelchair: evt.layer.node.wheelchair,
+							icon: "lib/leaflet-wheelmap/icons/" + evt.layer.node.wheelchair + "/" + iconName
+						}
+
+						if (evt.layer != undefined) {
+							$state.go("tab.wheelmap-detail", { nodeID: evt.layer.node.nodeID });
+						}
+					});
+				});
+
+				var nodes = [];
+
+				Wheelmap.getNodes(bbox, "yes", Math.ceil(AppSettings.getWheelmapNodesMaxCount() / 4), 1, function(data) {
 					console.log(data);
+
+					for (var i = 0; i < data.nodes.length; i++) {
+						var nodeTypeIdentifier = data.nodes[i].node_type.identifier.replace(/_+/g, ' ');
+						nodeTypeIdentifier = nodeTypeIdentifier.charAt(0).toUpperCase() + nodeTypeIdentifier.slice(1);
+						nodes.push({
+									lat: data.nodes[i].lat,
+									lng: data.nodes[i].lon,
+									category: data.nodes[i].category,
+									node_type: data.nodes[i].node_type, //data.nodes[i].photoURL,
+									caption: data.nodes[i].name != undefined ? data.nodes[i].name : nodeTypeIdentifier, // TODO look from the node types
+									nodeID: data.nodes[i].id,
+									wheelchair: data.nodes[i].wheelchair
+						});
+					}
+
+					Wheelmap.getNodes(bbox, "limited", Math.ceil(AppSettings.getWheelmapNodesMaxCount() / 4), 1, function(data) {
+						console.log(data);
+
+						for (var i = 0; i < data.nodes.length; i++) {
+							var nodeTypeIdentifier = data.nodes[i].node_type.identifier.replace(/_+/g, ' ');
+							nodeTypeIdentifier = nodeTypeIdentifier.charAt(0).toUpperCase() + nodeTypeIdentifier.slice(1);
+							nodes.push({
+										lat: data.nodes[i].lat,
+										lng: data.nodes[i].lon,
+										category: data.nodes[i].category,
+										node_type: data.nodes[i].node_type, //data.nodes[i].photoURL,
+										caption: data.nodes[i].name != undefined ? data.nodes[i].name : nodeTypeIdentifier, // TODO look from the node types
+										nodeID: data.nodes[i].id,
+										wheelchair: data.nodes[i].wheelchair
+							});
+						}
+
+						Wheelmap.getNodes(bbox, "no", Math.ceil(AppSettings.getWheelmapNodesMaxCount() / 4), 1, function(data) {
+							console.log(data);
+
+							for (var i = 0; i < data.nodes.length; i++) {
+								var nodeTypeIdentifier = data.nodes[i].node_type.identifier.replace(/_+/g, ' ');
+								nodeTypeIdentifier = nodeTypeIdentifier.charAt(0).toUpperCase() + nodeTypeIdentifier.slice(1);
+								nodes.push({
+											lat: data.nodes[i].lat,
+											lng: data.nodes[i].lon,
+											category: data.nodes[i].category,
+											node_type: data.nodes[i].node_type, //data.nodes[i].photoURL,
+											caption: data.nodes[i].name != undefined ? data.nodes[i].name : nodeTypeIdentifier, // TODO look from the node types
+											nodeID: data.nodes[i].id,
+											wheelchair: data.nodes[i].wheelchair
+								});
+							}
+
+							Wheelmap.getNodes(bbox, "unknown", Math.ceil(AppSettings.getWheelmapNodesMaxCount() / 4), 1, function(data) {
+								console.log(data);
+
+								//var data = {"conditions":{"page":1,"per_page":28,"format":"json","bbox":"-42.979,46.437,51.68,74.614"},"meta":{"page":1,"num_pages":4202,"item_count_total":117642,"item_count":28},"nodes":[{"name":"The Jeremy Bentham","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"no","node_type":{"id":21,"identifier":"pub"},"lat":51.5235442,"lon":-0.1355991,"id":108042,"category":{"id":2,"identifier":"food"},"street":"University Street","housenumber":"31","city":null,"postcode":null,"website":null,"phone":"020 7387 3033"},{"name":"Duke of Cumberland","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":21,"identifier":"pub"},"lat":51.0244,"lon":-0.726258,"id":262708,"category":{"id":2,"identifier":"food"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Darton","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":12,"identifier":"station"},"lat":53.5879909,"lon":-1.530826,"id":417909,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Hirschgartenallee","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":4,"identifier":"bus_stop"},"lat":48.1527491,"lon":11.5077339,"id":444575,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Adalbert-/Schloßstraße","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":15,"identifier":"tram_stop"},"lat":50.1193072,"lon":8.6445911,"id":559189,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"The Black Rock","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":21,"identifier":"pub"},"lat":53.6828141,"lon":-1.4989677,"id":581475,"category":{"id":2,"identifier":"food"},"street":"Cross Square","housenumber":"19","city":"Wakefield","postcode":null,"website":null,"phone":null},{"name":"Oranienstraße","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":4,"identifier":"bus_stop"},"lat":50.1026389,"lon":8.3990556,"id":586864,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Rhönring","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":15,"identifier":"tram_stop"},"lat":49.8845586,"lon":8.6516548,"id":604697,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Mozartturm","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":15,"identifier":"tram_stop"},"lat":49.8697722,"lon":8.6277147,"id":604795,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"DITIB Sinsheim Fatih Moschee","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":98,"identifier":"place_of_worship"},"lat":49.246026,"lon":8.881004,"id":3530749693,"category":{"id":10,"identifier":"misc"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Albrechtstraße","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":4,"identifier":"bus_stop"},"lat":47.6573481,"lon":9.4553253,"id":2105104,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Mainhausen","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":10,"identifier":"parking"},"lat":50.0031781,"lon":8.9908311,"id":2455376,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Fox and Hounds","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":21,"identifier":"pub"},"lat":52.164493,"lon":-0.5036502,"id":3865117,"category":{"id":2,"identifier":"food"},"street":"Milton Road","housenumber":"1","city":null,"postcode":"MK41 6AP","website":null,"phone":null},{"name":"The Swan","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":96,"identifier":"hotel"},"lat":52.1349288,"lon":-0.4655978,"id":4118139,"category":{"id":9,"identifier":"accommodation"},"street":"High Street","housenumber":"1","city":null,"postcode":"MK40 1RW","website":"http://www.bedfordswanhotel.co.uk/","phone":null},{"name":"STF Vandrarhem Zinkensdamm","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":95,"identifier":"hostel"},"lat":59.3147408,"lon":18.0442868,"id":8082103,"category":{"id":9,"identifier":"accommodation"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":"http://www.vandrarhemmetzinkensdamm.com/","phone":null},{"name":null,"wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":8,"identifier":"fuel"},"lat":46.6838171,"lon":7.6644266,"id":8082505,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Braine-l'Alleud","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":12,"identifier":"station"},"lat":50.6847958,"lon":4.3757651,"id":9779713,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":"http://www.belgianrail.be/fr/gares/recherche-gares/19/braine-l-alleud.aspx","phone":null},{"name":"Henne Mølle Å Badehotel","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":22,"identifier":"restaurant"},"lat":55.7205945,"lon":8.171297,"id":10477163,"category":{"id":2,"identifier":"food"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":"http://www.hennemoelleaa.dk/","phone":"+45 76524000"},{"name":"The Cormorant","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":21,"identifier":"pub"},"lat":50.8387358,"lon":-1.1175237,"id":11009741,"category":{"id":2,"identifier":"food"},"street":"Castle Street","housenumber":"181","city":null,"postcode":"PO16 9QX","website":"www.thecormorant.co.uk","phone":"+44-2392-379374"},{"name":"Heilbronner Straße","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":4,"identifier":"bus_stop"},"lat":51.0101985,"lon":13.701411,"id":11306937,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Nersingen","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":12,"identifier":"station"},"lat":48.4298795,"lon":10.1173108,"id":11420177,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"George Inn","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":21,"identifier":"pub"},"lat":50.6985959,"lon":-1.2953048,"id":11600986,"category":{"id":2,"identifier":"food"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"The Castle Inn","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":21,"identifier":"pub"},"lat":50.6993402,"lon":-1.2977975,"id":11604640,"category":{"id":2,"identifier":"food"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Cask and Crispin","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":21,"identifier":"pub"},"lat":50.6986117,"lon":-1.2988961,"id":11604643,"category":{"id":2,"identifier":"food"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Delitzscher/Essener Straße","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":4,"identifier":"bus_stop"},"lat":51.376082,"lon":12.3841904,"id":12351651,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Dietmannsried","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":12,"identifier":"station"},"lat":47.8128279,"lon":10.2905408,"id":13622060,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Landsberg (Lech) Schule","wheelchair":"limited","wheelchair_description":null,"wheelchair_toilet":"unknown","node_type":{"id":12,"identifier":"station"},"lat":48.0536747,"lon":10.8695596,"id":13796546,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null},{"name":"Lindau Hauptbahnhof","wheelchair":"limited","wheelchair_description":"WC nicht rollstuhlgerecht, überall Schwellen","wheelchair_toilet":"unknown","node_type":{"id":12,"identifier":"station"},"lat":47.544202,"lon":9.6808298,"id":13801901,"category":{"id":1,"identifier":"public_transfer"},"street":null,"housenumber":null,"city":null,"postcode":null,"website":null,"phone":null}]};
+								//console.log(data);
+								//console.log(wheelmap_nodetypes);
+
+								for (var i = 0; i < data.nodes.length; i++) {
+									var nodeTypeIdentifier = data.nodes[i].node_type.identifier.replace(/_+/g, ' ');
+									nodeTypeIdentifier = nodeTypeIdentifier.charAt(0).toUpperCase() + nodeTypeIdentifier.slice(1);
+									nodes.push({
+												lat: data.nodes[i].lat,
+												lng: data.nodes[i].lon,
+												category: data.nodes[i].category,
+												node_type: data.nodes[i].node_type, //data.nodes[i].photoURL,
+												caption: data.nodes[i].name != undefined ? data.nodes[i].name : nodeTypeIdentifier, // TODO look from the node types
+												nodeID: data.nodes[i].id,
+												wheelchair: data.nodes[i].wheelchair
+									});
+								}
+
+								console.log(nodes);
+								wheelmapLayer.add(nodes).addTo(map);
+
+							});
+						});
+					});
 				});
 			});
 		}

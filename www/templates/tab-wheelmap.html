@@ -1,0 +1,47 @@
+<!-- <ion-nav-bar>
+	<ion-nav-back-button class="button-clear"
+    ng-click="console.log('moi');goBack()">
+    <i class="ion-arrow-left-c"></i> Back
+	</ion-nav-back-button>
+</ion-nav-bar> -->
+  <ion-view view-title="Wheelmap.org place">
+    <ion-content ng-model="node">
+      <!-- TODO At minimum show the photo -->
+      <div class="list card text-center">
+        <button class="button button-block button-positive" ng-click="showAtWheelmapOrg()">
+          Show at Wheelmap.org
+        </button>
+        <div class="item item-avatar">
+            <img ng-src="{{node.icon}}" alt="{{node.caption}}">
+            <h2>{{node.caption}}</h2>
+            <p ng-if="node.wheelchair=='yes'">Fully wheelchair accessible</p>
+            <p ng-if="node.wheelchair=='limited'">Partly wheelchair accessible</p>
+            <p ng-if="node.wheelchair=='no'">Not wheelchair accessible</p>
+            <p ng-if="node.wheelchair=='unknown'">Wheelchair accessibility is unknown and needs to be marked.</p>
+
+        </div>
+        <div class="item text-left">
+          <p>Place type: {{node.prettified_node_type}}</p>
+          <p>Category: {{node.prettified_category}}</p>
+        </div>
+        <div class="item text-left">
+          <div class="row">
+            <div class="col col-50">
+              <p>Latitude</p>
+            </div>
+            <div class="col col-50">
+              <p>Longitude</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-50">
+              <p>{{node.lat}}</p>
+            </div>
+            <div class="col col-50">
+              <p>{{node.lng}}</p>
+            </div>
+          </div>
+        </div>
+      </diV>
+    </ion-content>
+  </ion-view>

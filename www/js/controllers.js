@@ -67,7 +67,7 @@ angular.module('starter.controllers', [])
   });
 })
 
-.controller('TabCtrl', function($scope, $rootScope, $ionicPopup, $cordovaCamera, GeoLocation, PhotoGallery, Wiki, OpenStreetMap, AppSettings) {
+.controller('TabCtrl', function($scope, $rootScope, $ionicPopup, $cordovaCamera, GeoLocation, PhotoGallery, Wiki, OpenStreetMap, AppSettings, Wheelmap) {
   $scope.runTests = function() {
     // Wiki.createWikiPage("testorienteerix", "hello", "world", function(response) {
     //   console.log(response);
@@ -103,7 +103,11 @@ angular.module('starter.controllers', [])
       min_lng: 10.660686492919922
     }
 
-    PhotoGallery.getMapillaryPhotos(bbox, 10, function(data) {
+    // PhotoGallery.getMapillaryPhotos(bbox, 10, function(data) {
+    //   console.log(data);
+    // });
+
+    Wheelmap.getNodeTypes("en", function(data) {
       console.log(data);
     });
   }
