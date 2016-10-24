@@ -123,6 +123,8 @@ angular.module('settingsControllers', [])
     case 'da':
       $scope.settings.country = "Denmark";
       $scope.settings.flagStyle = "flag-icon-dk";
+      $scope.settings.databases = ["Europeana collections"];
+      $scope.settings.license = { name: "PD, NOC, CC ZERO, CC BY or CC BY-SA", link: "http://labs.europeana.eu/api/search#reusability-parameter" };
       break;
     case 'et':
       $scope.settings.country = "Estonia";
@@ -131,6 +133,8 @@ angular.module('settingsControllers', [])
     case 'fi':
       $scope.settings.country = "Finland";
       $scope.settings.flagStyle = "flag-icon-fi";
+      $scope.settings.databases = ["Europeana collections"];
+      $scope.settings.license = { name: "PD, NOC, CC ZERO, CC BY or CC BY-SA", link: "http://labs.europeana.eu/api/search#reusability-parameter" };
       break;
     case 'is':
       $scope.settings.country = "Iceland";

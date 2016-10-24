@@ -795,6 +795,8 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.updateCountryDataLayer("no");
 		$scope.updateCountryDataLayer("is");
 		$scope.updateCountryDataLayer("se");
+		$scope.updateCountryDataLayer("da");
+		$scope.updateCountryDataLayer("fi");
 	}
 
 	$scope.updateCountryDataLayer = function(countryCode) {
@@ -1037,6 +1039,134 @@ var mapControllers = angular.module('mapControllers', [])
 			          console.log('data error');
 			          console.log(data);
 			        });
+					}
+				}
+				else if (countryCode == "da" || countryCode == "fi") {
+					var datasets = [
+						'Europeana'
+					];
+
+					for (var i = 0; i < datasets.length; i++) {
+						if (countryDataLayers[countryCode][datasets[i]] != undefined && countryDataLayers[countryCode][datasets[i]] != null) {
+							map.removeLayer(countryDataLayers[countryCode][datasets[i]]);
+						}
+
+						var start = 1;
+						var country = countryCode == "fi" ? "finland" : "denmark";
+						var Country = countryCode == "fi" ? "Finland" : "Denmark";
+						var queryURL = "https://www.europeana.eu/api/v2/search.json?wskey=K2WuC5gkM&thumbnail=true&profile=minimal&qf=COUNTRY:" + country + "&reusability=open&query=where:(" + Country + ")"
+							+ "&rows=100&start=" + start;
+
+						$http.get(queryURL).
+			        success(function(data) {
+								console.log(data);
+								if (data.items.length > 0) {
+									countryDataLayers[countryCode][datasets[i]] = L.countryFlag.cluster({ countryCode: countryCode == "da" ? "dk" : "fi"}).on('click', function (evt) {
+										console.log(evt);
+
+										$scope.mapControllerData.selectedCountryItem = {
+											lat: evt.layer.item.lat,
+											lng: evt.layer.item.lng,
+											caption: evt.layer.item.caption,
+											link: evt.layer.item.link,
+											itemID: evt.layer.item.itemID,
+											rights: evt.layer.item.rights,
+											provider: evt.layer.item.provider,
+											previewURL: evt.layer.item.previewURL,
+											type: evt.layer.item.type,
+											year: evt.layer.item.year,
+											place: evt.layer.item.place,
+											shownResults: evt.layer.item.shownResults,
+											totalResults: evt.layer.item.totalResults,
+											dataset: evt.layer.item.dataset
+										}
+
+										if (evt.layer != undefined) {
+											$state.go("tab.country-detail", { countryCode: countryCode, itemID: evt.layer.item.itemID });
+										}
+									});
+
+									var items = [];
+
+									for (var j = 0; j < data.items.length; j++) {
+										if (data.items[j].edmPlaceLatitude != undefined && data.items[j].edmPlaceLongitude != undefined) {
+											items.push({
+														lat: parseFloat(data.items[j].edmPlaceLatitude[0]),
+														lng: parseFloat(data.items[j].edmPlaceLongitude[0]),
+														caption: data.items[j].title[0],
+														link: data.items[j].edmIsShownAt != undefined ? data.items[j].edmIsShownAt[0] : undefined,
+														itemID: data.items[j].id.replace(/\//g, '_'),
+														rights: data.items[j].rights[0],
+														provider: data.items[j].dataProvider[0],
+														previewURL: data.items[j].edmPreview != undefined ? data.items[j].edmPreview[0] : undefined,
+														type: data.items[j].type,
+														year: data.items[j].year != undefined ? parseInt(data.items[j].year[0]) : undefined,
+														place: data.items[j].edmPlaceLabelLangAware.def[0],
+														shownResults: data.items.length,
+														totalResults: data.totalResults,
+														dataset: 'Europeana'
+											});
+										}
+									}
+
+									if (start + 100 < data.totalResults && start + 100 < 1000) {
+										doEuropeanaQuery(start + 100, countryCode, datasets, i, items, map);
+									}
+									else {
+										countryDataLayers[countryCode][datasets[i]].add(items).addTo(map);
+									}
+								}
+			        })
+			        .error(function (data) {
+			          console.log('data error');
+			          console.log(data);
+			        });
+					}
+
+					var doEuropeanaQuery = function(start, countryCode, datasets, i, items, map) {
+						var country = countryCode == "fi" ? "finland" : "denmark";
+						var Country = countryCode == "fi" ? "Finland" : "Denmark";
+						var queryURL = "https://www.europeana.eu/api/v2/search.json?wskey=K2WuC5gkM&thumbnail=true&profile=minimal&qf=COUNTRY:" + country + "&reusability=open&query=where:(" + Country + ")"
+							+ "&rows=100&start=" + start;
+
+						console.log(queryURL);
+
+						$http.get(queryURL).
+							success(function(data) {
+								console.log(data);
+
+								for (var j = 0; j < data.items.length; j++) {
+									if (data.items[j].edmPlaceLatitude != undefined && data.items[j].edmPlaceLongitude != undefined) {
+										items.push({
+													lat: parseFloat(data.items[j].edmPlaceLatitude[0]),
+													lng: parseFloat(data.items[j].edmPlaceLongitude[0]),
+													caption: data.items[j].title[0],
+													link: data.items[j].edmIsShownAt != undefined ? data.items[j].edmIsShownAt[0] : undefined,
+													itemID: data.items[j].id.replace(/\//g, '_'),
+													rights: data.items[j].rights[0],
+													provider: data.items[j].dataProvider[0],
+													previewURL: data.items[j].edmPreview != undefined ? data.items[j].edmPreview[0] : undefined,
+													type: data.items[j].type,
+													year: data.items[j].year != undefined ? parseInt(data.items[j].year[0]) : undefined,
+													place: data.items[j].edmPlaceLabelLangAware.def[0],
+													shownResults: data.items.length,
+													totalResults: data.totalResults,
+													dataset: 'Europeana'
+										});
+									}
+								}
+
+								if ((start + 100) < (data.totalResults - 100) && (start + 100) < 900) {
+									doEuropeanaQuery(start + 100, countryCode, datasets, i, items, map);
+								}
+								else {
+									countryDataLayers[countryCode][datasets[i]].add(items).addTo(map);
+								}
+							})
+							.error(function (data) {
+								console.log('data error');
+								console.log(data);
+							});
 					}
 				}
 			});

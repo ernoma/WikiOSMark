@@ -27,6 +27,14 @@
           <div class="item item-text-wrap">Created by {{country.item.createdBy}} on {{country.item.createdDate}}</div>
           <div class="item item-text-wrap" ng-if="country.item.modifiedBy != undefined">Modified by {{country.item.modifiedBy}} on {{country.item.modifiedDate}}</div>
         </div>
+        <div ng-if="country.countryCode == 'da' || country.countryCode == 'fi'" class="item text-left">
+          <div class="item item-text-wrap">Name: {{country.item.caption}}</div>
+          <div class="item item-text-wrap" ng-if="country.item.previewURL != undefined"><img ng-src="{{country.item.previewURL}}"></div>
+          <div class="item item-text-wrap">License: <a href="" ng-click="openLink(country.item.rights)">{{country.item.rights}}</a></div>
+          <div class="item item-text-wrap">Provider: {{country.item.provider}}</div>
+          <div class="item item-text-wrap">Placed at: {{country.item.place}}</div>
+          <div class="item item-text-wrap" ng-if="country.item.year != undefined">Year: {{country.item.year}}</div>
+        </div>
         <div class="list list-inset text-left">
           <div class="item">
             <div class="row">
