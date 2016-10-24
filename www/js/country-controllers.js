@@ -17,6 +17,8 @@ var countryControllers = angular.module('countryControllers', [])
       countryCode: null
     }
 
+    console.log($scope.mapControllerData.selectedCountryItem);
+
     if (toState.name == "tab.country-detail" && toParams != {}) {
         $scope.country.item = $scope.mapControllerData.selectedCountryItem;
         $scope.country.countryCode = toParams.countryCode;

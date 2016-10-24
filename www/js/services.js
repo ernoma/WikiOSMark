@@ -112,7 +112,7 @@ angular.module('starter.services', [])
         return JSON.parse($window.localStorage["shouldShowCountryData" + countryCode]);
       }
       else {
-        return false;
+        return true;
       }
     },
     setShowCountryDataOnMap: function(countryCode, value) {

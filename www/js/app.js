@@ -72,7 +72,7 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
   })
 
   .state('tab.country-detail', {
-    url: '/wheelmap/:country/:itemID',
+    url: '/country/:countryCode/:itemID',
     views: {
       'tab-map': {
         templateUrl: 'templates/tab-country-detail.html',

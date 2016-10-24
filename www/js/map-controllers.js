@@ -102,7 +102,7 @@ var mapControllers = angular.module('mapControllers', [])
 	var osmLayer = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
 			maxZoom: 20,
-			maxNativeZoom: 19
+			maxNativeZoom: 18
 	});
 	var osmCycleLayer = L.tileLayer('http://{s}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png', {
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, , Maps &copy; <a href="http://thunderforest.com/">Thunderforest</a>',
@@ -138,7 +138,7 @@ var mapControllers = angular.module('mapControllers', [])
 		//console.log("in ready");
 
 		$scope.showPhotoMapLayer();
-		$scope.showWheelmapLayer();
+		//$scope.showWheelmapLayer();
 	});
 
 	//
@@ -156,7 +156,7 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.updateWikiLayers();
 		$scope.updatFlickrLayer();
 		$scope.updateMapillaryLayer();
-		$scope.updateWheelmapLayer();
+		//$scope.updateWheelmapLayer();
 		$scope.updateCountryDataLayers();
 	});
 
@@ -789,6 +789,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 	$scope.updateCountryDataLayers = function() {
 		$scope.updateCountryDataLayer("no");
+		$scope.updateCountryDataLayer("is");
 	}
 
 	$scope.updateCountryDataLayer = function(countryCode) {
@@ -832,7 +833,7 @@ var mapControllers = angular.module('mapControllers', [])
 									}
 
 									if (evt.layer != undefined) {
-										$state.go("tab.country-detail", { country: countryCode, itemID: evt.layer.item.itemID });
+										$state.go("tab.country-detail", { countryCode: countryCode, itemID: evt.layer.item.itemID });
 									}
 								});
 
@@ -855,6 +856,65 @@ var mapControllers = angular.module('mapControllers', [])
 						});
 					}
 				}
+				else if (countryCode == "is") {
+					var datasets = [
+						'petrol'
+					];
+
+					for (var i = 0; i < datasets.length; i++) {
+						if (countryDataLayers[countryCode][datasets[i]] != undefined && countryDataLayers[countryCode][datasets[i]] != null) {
+							map.removeLayer(countryDataLayers[countryCode][datasets[i]]);
+						}
+						$http.get("http://apis.is/" + datasets[i]).
+			        success(function(data) {
+								console.log(data);
+								if (data.results.length > 0) {
+									countryDataLayers[countryCode][datasets[i]] = L.countryFlag.cluster({ countryCode: countryCode}).on('click', function (evt) {
+										console.log(evt);
+
+										$scope.mapControllerData.selectedCountryItem = {
+											lat: evt.layer.item.lat,
+											lng: evt.layer.item.lng,
+											caption: evt.layer.item.caption,
+											itemID: evt.layer.item.itemID,
+											company: evt.layer.item.company,
+											dataset: evt.layer.item.dataset
+										}
+
+										if (evt.layer != undefined) {
+											$state.go("tab.country-detail", { countryCode: countryCode, itemID: evt.layer.item.itemID });
+										}
+									});
+
+									var items = [];
+
+									for (var j = 0; j < data.results.length; j++) {
+										items.push({
+													lat: data.results[j].geo.lat,
+													lng: data.results[j].geo.lon,
+													caption: data.results[j].name,
+													itemID: data.results[j].key,
+													company: data.results[j].company,
+													dataset: 'Gas station'
+										});
+									}
+
+									//console.log(nodes);
+									countryDataLayers[countryCode][datasets[i]].add(items).addTo(map);
+								}
+			        })
+			        .error(function (data) {
+			          console.log('data error');
+			          console.log(data);
+			        });
+					}
+				}
+			});
+		}
+		else {
+			leafletData.getMap().then(function(map) {
+				// TODO remove all layers for the country
+				//map.removeLayer(flickrPhotoLayer);
 			});
 		}
 	}

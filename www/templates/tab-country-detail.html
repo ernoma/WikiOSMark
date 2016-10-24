@@ -4,15 +4,20 @@
     <i class="ion-arrow-left-c"></i> Back
 	</ion-nav-back-button>
 </ion-nav-bar> -->
-  <ion-view ng-model="country" view-title="{{country.item}}">
+  <ion-view ng-model="country">
+    <ion-nav-title>{{country.item.dataset}}</ion-nav-title>
     <ion-content>
       <div class="list card text-center">
-        <button class="button button-block button-positive" ng-click="openLink(country.item.link)">
+        <button ng-if="country.countryCode == 'no'" class="button button-block button-positive" ng-click="openLink(country.item.link)">
           Show external page
         </button>
-        <div class="item text-left">
+        <div ng-if="country.countryCode == 'no'" class="item text-left">
           <p>Title: {{country.item.caption}}</p>
           <p>Dataset: {{country.item.dataset}}</p>
+        </div>
+        <div ng-if="country.countryCode == 'is'" class="item text-left">
+          <p>Name: {{country.item.caption}}</p>
+          <p>Company: {{country.item.company}}</p>
         </div>
         <div class="item text-left">
           <div class="row">
