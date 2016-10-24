@@ -49,7 +49,11 @@ var mapControllers = angular.module('mapControllers', [])
 	var osmGeoJsonLayer = null;
 	var countryDataLayers = {
 		no: {},
-		is: {}
+		is: {},
+		se: {},
+		da: {},
+		fi: {},
+		et: {}
 	}
 
 	var knreiseapi = new KR.API();
@@ -790,6 +794,7 @@ var mapControllers = angular.module('mapControllers', [])
 	$scope.updateCountryDataLayers = function() {
 		$scope.updateCountryDataLayer("no");
 		$scope.updateCountryDataLayer("is");
+		$scope.updateCountryDataLayer("se");
 	}
 
 	$scope.updateCountryDataLayer = function(countryCode) {
@@ -854,6 +859,131 @@ var mapControllers = angular.module('mapControllers', [])
 								countryDataLayers[countryCode][datasets[i]].add(items).addTo(map);
 							}
 						});
+					}
+				}
+				else if (countryCode == "se") {
+					var bounds = map.getBounds();
+
+					var bbox = "" + bounds.getWest() + "," +
+						bounds.getSouth() + "," +
+						bounds.getEast() + "," +
+						bounds.getNorth();
+
+					var projEPSG3006 = "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+					var southWest = proj4(projEPSG3006, [bounds.getWest(), bounds.getSouth()]);
+					var northEast = proj4(projEPSG3006, [bounds.getEast(), bounds.getNorth()]);
+					console.log(southWest);
+					console.log(northEast);
+
+					var bbox = "" + Math.floor(southWest[0]) + "," + Math.floor(southWest[1]) + "," + Math.ceil(northEast[0]) + "," + Math.ceil(northEast[1]);
+					//var bbox = "703704,6587631,645676,6573078";
+					var datasets = [
+						'platsr'
+					];
+
+					for (var i = 0; i < datasets.length; i++) {
+						if (countryDataLayers[countryCode][datasets[i]] != undefined && countryDataLayers[countryCode][datasets[i]] != null) {
+							map.removeLayer(countryDataLayers[countryCode][datasets[i]]);
+						}
+
+						var queryURL = AppSettings.getWikiOSMarkServer() + "platsr/api/v1/place?bbox=" + bbox;
+						//+ "&extracted=true";
+
+						$http.get(queryURL).
+			        success(function(data) {
+								console.log(data);
+								if (data.Items != undefined) {
+									countryDataLayers[countryCode][datasets[i]] = L.countryFlag.cluster({ countryCode: countryCode}).on('click', function (evt) {
+										console.log(evt);
+
+										$scope.mapControllerData.selectedCountryItem = {
+											lat: evt.layer.item.lat,
+											lng: evt.layer.item.lng,
+											caption: evt.layer.item.caption,
+											itemID: evt.layer.item.itemID,
+											description: evt.layer.item.description,
+											collections: evt.layer.item.collections,
+											link: evt.layer.item.link,
+											createdBy: evt.layer.item.createdBy,
+											createdByUrl: evt.layer.item.createdByUrl,
+											createdDate: evt.layer.item.createdDate,
+											dataset: evt.layer.item.dataset
+										}
+										if (evt.layer.item.modifiedBy != undefined) {
+											$scope.mapControllerData.selectedCountryItem.modifiedBy = evt.layer.item.modifiedBy;
+											$scope.mapControllerData.selectedCountryItem.modifiedByUrl = evt.layer.item.modifiedByUrl;
+											$scope.mapControllerData.selectedCountryItem.modifiedDate = evt.layer.item.modifiedDate;
+										}
+
+										if (evt.layer != undefined) {
+											$state.go("tab.country-detail", { countryCode: countryCode, itemID: evt.layer.item.itemID });
+										}
+									});
+
+									var items = [];
+
+									var counter = 0;
+
+									for (var j = 0; j < data.Items.length; j++) {
+										var parts = data.Items[j].Href.split("/");
+										var placeID = parts[parts.length-1];
+										var placeQueryURL = AppSettings.getWikiOSMarkServer() + "platsr/api/v1/place/" + placeID;
+
+										$http.get(placeQueryURL).
+							        success(function(place) {
+												//console.log(place);
+
+												var gmlWGS84 = place.GmlWGS84;
+												var startPos = gmlWGS84.indexOf("<gml:coordinates>") + "<gml:coordinates>".length;
+												var endPos = gmlWGS84.indexOf("</gml:coordinates>");
+												var coordsPart = gmlWGS84.substring(startPos, endPos);
+												//console.log(coordsPart);
+												var lng = coordsPart.split(",")[0];
+												var lat = coordsPart.split(",")[1];
+												var parts = place.Href.split("/");
+												var placeID = parts[parts.length-1];
+												var creatorHrefParts = place.CreatedBy.Href.split("/");
+												var item = {
+													lat: lat,
+													lng: lng,
+													caption: place.Name,
+													itemID: placeID,
+													description: place.Description,
+													tags: place.Tags,
+													collections: place.Collections,
+													link: "http://www.platsr.se/platsr/visa/plats/id/" + placeID,
+													createdBy: creatorHrefParts[creatorHrefParts.length-1],
+													createdByUrl: place.CreatedBy.Href,
+													createdDate: place.Created,
+													dataset: "Platsr.se"
+												}
+												if (place.ModifiedBy != undefined) {
+													var modifierHrefParts = place.ModifiedBy.Href.split("/");
+													item.modifiedBy = modifierHrefParts[modifierHrefParts.length-1],
+													item.modifiedByUrl = place.ModifiedBy.Href,
+													item.modifiedDate = place.Modified
+												}
+												items.push(item);
+												counter++;
+												//console.log("length: ", data.Items.length);
+												if (counter == data.Items.length) {
+													countryDataLayers[countryCode][datasets[i]].add(items).addTo(map);
+												}
+											})
+											.error(function (place) {
+												console.log('data error');
+												console.log(data);
+											});
+									}
+									//
+									// //console.log(nodes);
+									//
+								}
+			        })
+			        .error(function (data) {
+			          console.log('data error');
+			          console.log(data);
+			        });
 					}
 				}
 				else if (countryCode == "is") {

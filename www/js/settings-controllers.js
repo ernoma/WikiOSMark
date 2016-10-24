@@ -25,6 +25,12 @@ angular.module('settingsControllers', [])
   }
 
   $scope.changeOSMSearchRadius = function() {
+    if ($scope.settings.OSMSearchRadius > 1000) {
+      $scope.settings.OSMSearchRadius = 1000;
+    }
+    else if ($scope.settings.OSMSearchRadius < 1) {
+      $scope.settings.OSMSearchRadius = 1;
+    }
     AppSettings.setOSMSearchRadius($scope.settings.OSMSearchRadius);
   }
 
@@ -130,7 +136,7 @@ angular.module('settingsControllers', [])
       $scope.settings.country = "Iceland";
       $scope.settings.flagStyle = "flag-icon-is";
       $scope.settings.databases = ["gas stations"];
-      $scope.settings.license = { name: "Unknown", link: null };
+      $scope.settings.license = { name: "Not specified", link: "http://docs.apis.is/#endpoint-petrol" };
       break;
     case 'no':
       $scope.settings.country = "Norway";
@@ -146,6 +152,8 @@ angular.module('settingsControllers', [])
     case 'se':
       $scope.settings.country = "Sweden";
       $scope.settings.flagStyle = "flag-icon-se";
+      $scope.settings.databases = ["Platsr.se, over 3500 places in Sweden added by people"];
+      $scope.settings.license = { name: "CC-BY and others", link: "http://www.platsr.nu/om-copyright-creative-commons/" };
       break;
   }
 

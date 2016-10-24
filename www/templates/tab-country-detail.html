@@ -5,35 +5,45 @@
 	</ion-nav-back-button>
 </ion-nav-bar> -->
   <ion-view ng-model="country">
-    <ion-nav-title>{{country.item.dataset}}</ion-nav-title>
+    <ion-nav-title>{{country.item.dataset}} item</ion-nav-title>
     <ion-content>
-      <div class="list card text-center">
-        <button ng-if="country.countryCode == 'no'" class="button button-block button-positive" ng-click="openLink(country.item.link)">
-          Show external page
-        </button>
+      <div class="list text-center">
+        <div class="item">
+          <button ng-if="country.item.link != undefined" class="button button-block button-positive" ng-click="openLink(country.item.link)">
+            Show external page
+          </button>
+        </div>
         <div ng-if="country.countryCode == 'no'" class="item text-left">
-          <p>Title: {{country.item.caption}}</p>
-          <p>Dataset: {{country.item.dataset}}</p>
+          <div class="item item-text-wrap">Title: {{country.item.caption}}</div>
+          <div class="item item-text-wrap">Dataset: {{country.item.dataset}}</div>
         </div>
         <div ng-if="country.countryCode == 'is'" class="item text-left">
-          <p>Name: {{country.item.caption}}</p>
-          <p>Company: {{country.item.company}}</p>
+          <div class="item item-text-wrap">Name: {{country.item.caption}}</div>
+          <div class="item item-text-wrap">Company: {{country.item.company}}</div>
         </div>
-        <div class="item text-left">
-          <div class="row">
-            <div class="col col-50">
-              <p>Latitude</p>
+        <div ng-if="country.countryCode == 'se'" class="item text-left">
+          <div class="item item-text-wrap">Name: {{country.item.caption}}</div>
+          <div class="item item-text-wrap">Description: {{country.item.description}}</div>
+          <div class="item item-text-wrap">Created by {{country.item.createdBy}} on {{country.item.createdDate}}</div>
+          <div class="item item-text-wrap" ng-if="country.item.modifiedBy != undefined">Modified by {{country.item.modifiedBy}} on {{country.item.modifiedDate}}</div>
+        </div>
+        <div class="list list-inset text-left">
+          <div class="item">
+            <div class="row">
+              <div class="col col-50">
+                <p>Latitude</p>
+              </div>
+              <div class="col col-50">
+                <p>Longitude</p>
+              </div>
             </div>
-            <div class="col col-50">
-              <p>Longitude</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col col-50">
-              <p>{{country.item.lat}}</p>
-            </div>
-            <div class="col col-50">
-              <p>{{country.item.lng}}</p>
+            <div class="row">
+              <div class="col col-50">
+                <p>{{country.item.lat}}</p>
+              </div>
+              <div class="col col-50">
+                <p>{{country.item.lng}}</p>
+              </div>
             </div>
           </div>
         </div>
