@@ -1,0 +1,37 @@
+<!-- <ion-nav-bar>
+	<ion-nav-back-button class="button-clear"
+    ng-click="console.log('moi');goBack()">
+    <i class="ion-arrow-left-c"></i> Back
+	</ion-nav-back-button>
+</ion-nav-bar> -->
+  <ion-view ng-model="country" view-title="{{country.item}}">
+    <ion-content>
+      <div class="list card text-center">
+        <button class="button button-block button-positive" ng-click="openLink(country.item.link)">
+          Show external page
+        </button>
+        <div class="item text-left">
+          <p>Title: {{country.item.caption}}</p>
+          <p>Dataset: {{country.item.dataset}}</p>
+        </div>
+        <div class="item text-left">
+          <div class="row">
+            <div class="col col-50">
+              <p>Latitude</p>
+            </div>
+            <div class="col col-50">
+              <p>Longitude</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col col-50">
+              <p>{{country.item.lat}}</p>
+            </div>
+            <div class="col col-50">
+              <p>{{country.item.lng}}</p>
+            </div>
+          </div>
+        </div>
+      </diV>
+    </ion-content>
+  </ion-view>

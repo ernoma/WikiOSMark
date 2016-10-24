@@ -109,8 +109,35 @@ angular.module('starter.controllers', [])
     //   console.log(data);
     // });
 
-    Wheelmap.getNodeTypes("en", function(data) {
-      console.log(data);
+    // Wheelmap.getNodeTypes("en", function(data) {
+    //   console.log(data);
+    // });
+
+    var knreiseapi = new KR.API();
+    //var bbox = '9.312543869018555,62.227315990693896,9.387989044189453,62.25362062502279';
+    var bbox = '4.84,57.95,12.38,61.07';
+    // var fangstgroper = {
+    //     api: 'kulturminnedata',
+    //     query: "Navn='Fangstgrop'",
+    //     getExtraData: true,
+    //     layer: 0
+    // };
+    // knreiseapi.getBbox(fangstgroper, bbox, function (res) {
+    //   console.log(res);
+    //   //$('#kulturminnedata_data').html(JSON.stringify(res, null, 4));
+    // });
+
+    var digitaltFortalt = {
+      api: 'norvegiana',
+      //dataset: 'MUSIT'
+      dataset: 'Naturbase'
+      //dataset: 'DiMu'
+      //dataset: 'difo'
+      //dataset: 'Industrimuseum'
+    };
+
+    knreiseapi.getBbox(digitaltFortalt, bbox, function (res) {
+      console.log(res);
     });
   }
 

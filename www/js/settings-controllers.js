@@ -109,7 +109,8 @@ angular.module('settingsControllers', [])
 
 .controller('SettingsCountryCtrl', function($scope, $stateParams, AppSettings) {
   $scope.settings = {
-    countryCode: $stateParams.countryCode
+    countryCode: $stateParams.countryCode,
+    showDataOnMap: AppSettings.shouldShowCountryData($stateParams.countryCode)
   }
 
   switch ($scope.settings.countryCode) {
@@ -128,14 +129,32 @@ angular.module('settingsControllers', [])
     case 'is':
       $scope.settings.country = "Iceland";
       $scope.settings.flagStyle = "flag-icon-is";
+      $scope.settings.databases = ["gas stations"];
+      $scope.settings.license = { name: "Unknown", link: null };
       break;
     case 'no':
       $scope.settings.country = "Norway";
       $scope.settings.flagStyle = "flag-icon-no";
+      $scope.settings.databases = [
+        "Norwegian university museum archeology data",
+        "DigitaltMuseum historical photographs, artifacts and art",
+        "DigitaltMuseum digital stories",
+        "Industrial museum photographs and stories",
+        "Norwegian Environment Agency nature data"];
+      $scope.settings.license = { name: "CC BY 3.0 NO", link: "https://creativecommons.org/licenses/by/3.0/no/"};
       break;
     case 'se':
       $scope.settings.country = "Sweden";
       $scope.settings.flagStyle = "flag-icon-se";
       break;
   }
+
+  $scope.showLicense = function(link) {
+    	window.open(link, '_system', 'location=yes');
+  }
+
+  $scope.switchShowData = function() {
+    AppSettings.setShowCountryDataOnMap($scope.settings.countryCode, $scope.settings.showDataOnMap);
+  }
+
 });

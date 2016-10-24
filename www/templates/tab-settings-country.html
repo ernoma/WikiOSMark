@@ -10,5 +10,24 @@
         <span ng-if="settings.countryCode == 'se'" class="flag-icon flag-icon-se settings-country-flag-icon" ng-style></span>
         <span class="settings-country-heading">{{settings.country}}</span>
       </p>
+      <ul class="list">
+        <ion-toggle ng-model="settings.showDataOnMap" ng-change="switchShowData()">
+            Show data on the map
+        </ion-toggle>
+        </li>
+        <li class="item">
+          License: {{settings.license.name}} <span ng-if="settings.license.link != null">(<a href="" ng-click="showLicense(settings.license.link)">view</a>)</span>
+        </li>
+        <li class="item">
+          <div class="item item-divider">
+            Data includes:
+          </div>
+          <ul>
+            <li class="item" ng-repeat="database in settings.databases">
+              {{database}}
+            </li>
+          </ul>
+        </li>
+      </ul>
   </ion-content>
 </ion-view>

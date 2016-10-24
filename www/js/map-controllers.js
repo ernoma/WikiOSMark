@@ -47,6 +47,12 @@ var mapControllers = angular.module('mapControllers', [])
 	var flickrPhotoLayer = null;
 	var mapillaryPhotoLayer = null;
 	var osmGeoJsonLayer = null;
+	var countryDataLayers = {
+		no: {},
+		is: {}
+	}
+
+	var knreiseapi = new KR.API();
 
 	var tilesDict = {
 		openstreetmap: {
@@ -151,6 +157,7 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.updatFlickrLayer();
 		$scope.updateMapillaryLayer();
 		$scope.updateWheelmapLayer();
+		$scope.updateCountryDataLayers();
 	});
 
 	$scope.$on( "showOSMObjects", function( event ) {
@@ -381,7 +388,6 @@ var mapControllers = angular.module('mapControllers', [])
 			// });
 		}
 	}
-
 	$scope.updatePhotoMapLayer = function() {
 		if (AppSettings.shouldShowUserPhotos()) {
 			leafletData.getMap().then(function(map) {
@@ -586,7 +592,6 @@ var mapControllers = angular.module('mapControllers', [])
 			});
 		}
 	}
-
 	$scope.updateMapillaryLayer = function() {
 		if ($scope.mapControllerData.mapillaryPhotosShown) {
 			leafletData.getMap().then(function(map) {
@@ -652,7 +657,6 @@ var mapControllers = angular.module('mapControllers', [])
 		});
 		}
 	}
-
 	$scope.updateWheelmapLayer = function() {
 		if (AppSettings.shouldShowWheelmapNodesOnMap()) {
 			leafletData.getMap().then(function(map) {
@@ -779,6 +783,78 @@ var mapControllers = angular.module('mapControllers', [])
 						});
 					});
 				});
+			});
+		}
+	}
+
+	$scope.updateCountryDataLayers = function() {
+		$scope.updateCountryDataLayer("no");
+	}
+
+	$scope.updateCountryDataLayer = function(countryCode) {
+		if (AppSettings.shouldShowCountryData(countryCode)) {
+			leafletData.getMap().then(function(map) {
+				//console.log(bbox);
+
+				if (countryCode == "no") {
+					var bounds = map.getBounds();
+					var bbox = "" + bounds.getWest() + "," +
+						bounds.getSouth() + "," +
+						bounds.getEast() + "," +
+						bounds.getNorth();
+
+					var datasets = [
+						'MUSIT',
+						'Naturbase',
+						'DiMu',
+						'difo',
+						'Industrimuseum'
+					];
+
+					for (var i = 0; i < datasets.length; i++) {
+						if (countryDataLayers[countryCode][datasets[i]] != undefined && countryDataLayers[countryCode][datasets[i]] != null) {
+							map.removeLayer(countryDataLayers[countryCode][datasets[i]]);
+						}
+						knreiseapi.getBbox({api: 'norvegiana', dataset: datasets[i]}, bbox, function (res) {
+							console.log(res);
+
+							if (res.features.length > 0) {
+								countryDataLayers[countryCode][datasets[i]] = L.countryFlag.cluster({ countryCode: countryCode}).on('click', function (evt) {
+									console.log(evt);
+
+									$scope.mapControllerData.selectedCountryItem = {
+										lat: evt.layer.item.lat,
+										lng: evt.layer.item.lng,
+										link: evt.layer.item.link,
+										caption: evt.layer.item.caption,
+										itemID: evt.layer.item.itemID,
+										dataset: evt.layer.item.dataset,
+									}
+
+									if (evt.layer != undefined) {
+										$state.go("tab.country-detail", { country: countryCode, itemID: evt.layer.item.itemID });
+									}
+								});
+
+								var items = [];
+
+								for (var j = 0; j < res.features.length; j++) {
+									items.push({
+												lat: res.features[j].geometry.coordinates[1],
+												lng: res.features[j].geometry.coordinates[0],
+												link: res.features[j].properties.link,
+												caption: res.features[j].properties.title,
+												itemID: res.features[j].id,
+												dataset: res.features[j].properties.dataset
+									});
+								}
+
+								//console.log(nodes);
+								countryDataLayers[countryCode][datasets[i]].add(items).addTo(map);
+							}
+						});
+					}
+				}
 			});
 		}
 	}

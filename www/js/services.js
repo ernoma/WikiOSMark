@@ -107,6 +107,17 @@ angular.module('starter.services', [])
     setShowCommonsOnMap: function(value) {
       $window.localStorage["showCommonsOnMap"] = JSON.stringify(value);
     },
+    shouldShowCountryData: function(countryCode) {
+      if ($window.localStorage["shouldShowCountryData" + countryCode] != undefined) {
+        return JSON.parse($window.localStorage["shouldShowCountryData" + countryCode]);
+      }
+      else {
+        return false;
+      }
+    },
+    setShowCountryDataOnMap: function(countryCode, value) {
+      $window.localStorage["shouldShowCountryData" + countryCode] = JSON.stringify(value);
+    },
     getWikiOSMarkServer: function(value) {
       return "http://192.168.1.85:3000/"
     },
