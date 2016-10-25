@@ -160,7 +160,7 @@ var mapControllers = angular.module('mapControllers', [])
 		$scope.updateWikiLayers();
 		$scope.updatFlickrLayer();
 		$scope.updateMapillaryLayer();
-		//$scope.updateWheelmapLayer();
+		$scope.updateWheelmapLayer();
 		$scope.updateCountryDataLayers();
 	});
 
@@ -374,22 +374,22 @@ var mapControllers = angular.module('mapControllers', [])
 		}
 
 		if ($scope.mapControllerData.OSMElementsShown) {
-			addOverpassDataToMap(overpass_test_data);
-			// data = "[out:json];(node(around:" + AppSettings.getOSMSearchRadius() + "," + $scope.center.lat + "," + $scope.center.lng + ");<;);out meta;";
-			// $http.get('http://www.overpass-api.de/api/interpreter?data=' + data)
-			// .success(function(data, status, headers,config){
-			// 	console.log('data success');
-			// 	//console.log(data); // for browser console
-			// 	//$scope.mapControllerData.overpassResult = data; // for UI
-			//
-			// 	addOverpassDataToMap(data);
-			// })
-			// .error(function(data, status, headers,config){
-			// 	console.log('data error');
-			// })
-			// .then(function(result){
-			// 	//things = result.data;
-			// });
+			//addOverpassDataToMap(overpass_test_data);
+			data = "[out:json];(node(around:" + AppSettings.getOSMSearchRadius() + "," + $scope.center.lat + "," + $scope.center.lng + ");<;);out meta;";
+			$http.get('http://www.overpass-api.de/api/interpreter?data=' + data)
+			.success(function(data, status, headers,config){
+				console.log('data success');
+				//console.log(data); // for browser console
+				//$scope.mapControllerData.overpassResult = data; // for UI
+
+				addOverpassDataToMap(data);
+			})
+			.error(function(data, status, headers,config){
+				console.log('data error');
+			})
+			.then(function(result){
+				//things = result.data;
+			});
 		}
 	}
 	$scope.updatePhotoMapLayer = function() {

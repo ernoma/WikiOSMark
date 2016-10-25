@@ -114,7 +114,7 @@ module.exports = function(o) {
             });
 
             if (o.singlepage) {
-                location.href = authorize_url;
+                window.location.href = authorize_url;
             } else {
                 popup.location = authorize_url;
             }

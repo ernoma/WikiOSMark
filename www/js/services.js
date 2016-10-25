@@ -771,6 +771,7 @@ angular.module('starter.services', [])
     },
     logout: function () {
       auth.logout();
+      userDetails = null;
     },
     authenticated: function() {
       return auth.authenticated();

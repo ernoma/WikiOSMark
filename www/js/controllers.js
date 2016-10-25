@@ -448,10 +448,10 @@ angular.module('starter.controllers', [])
       saveToPhotoAlbum: true
     }
 
-    storePhoto("https://upload.wikimedia.org/wikipedia/commons/8/85/Tesoman_palloiluhalli.jpg");
-    //$cordovaCamera.getPicture(options).then(storePhoto, function(err) {
-    //  console.log(err);
-    //});
+    //storePhoto("https://upload.wikimedia.org/wikipedia/commons/8/85/Tesoman_palloiluhalli.jpg");
+    $cordovaCamera.getPicture(options).then(storePhoto, function(err) {
+      console.log(err);
+    });
   }
 
   var storePhoto = function(imageURL) {
