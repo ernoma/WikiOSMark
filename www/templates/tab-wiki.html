@@ -6,7 +6,7 @@
         <div class="input-label">
           Search site
         </div>
-        <select ng-model="formData.site">
+        <select ng-model="formData.site" ng-change="inputSearchChange()">
           <option value="wikidata">Wikidata</option>
           <option value="commons">Wikimedia Commons</option>
           <option value="wikipedia">Wikipedia</option>
@@ -17,7 +17,7 @@
         <div class="input-label">
           Search language
         </div>
-        <select id="wiki_search_language_select" ng-model="formData.language" ng-disabled="formData.site == 'commons'">
+        <select id="wiki_search_language_select" ng-model="formData.language" ng-disabled="formData.site == 'commons'" ng-change="inputSearchChange()">
           <option value="en">English (en)</option>
           <option value="da">Danish (da)</option>
           <option value="et">Estonian (et)</option>
@@ -33,7 +33,7 @@
     <div class="list list-inset">
       <label class="item item-input">
         <i class="icon ion-search placeholder-icon"></i>
-        <input ng-model="formData.searchText" type="text" placeholder="Search Text">
+        <input ng-model="formData.searchText" type="text" placeholder="Search Text" ng-change="inputSearchChange()">
       </label>
     </div>
 

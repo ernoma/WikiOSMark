@@ -13,6 +13,61 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 	$scope.searchResults = [];
 
+	$scope.inputSearchChange = function() {
+		if ($scope.formData.searchText.length == 0) {
+			$scope.searchResults = [];
+		}
+		else {
+			switch ($scope.formData.site) {
+				case "wikidata":
+					if ($scope.formData.searchText.length >= 2) {
+						Wiki.queryMediaWiki($scope.formData.site, $scope.formData.language, $scope.formData.searchText, function(data) {
+								//console.log(data);
+								$scope.searchResults = [];
+								for (var i = 0; i < data.search.length; i++) {
+									$scope.searchResults.push({
+										id: $scope.formData.language + $scope.formData.site + "+" + data.search[i].id,
+										label: data.search[i].label + " (" + data.search[i].id + ")",
+										description: data.search[i].description
+									});
+								}
+						});
+					}
+					break;
+				case "wikipedia":
+					if ($scope.formData.searchText.length >= 3) {
+						Wiki.queryMediaWiki($scope.formData.site, $scope.formData.language, $scope.formData.searchText, function(data) {
+								//console.log(data);
+								$scope.searchResults = [];
+								for (var i = 0; i < data[1].length; i++) {
+									$scope.searchResults.push({
+										id: $scope.formData.language + $scope.formData.site + "+" + data[1][i].replace(/\s+/g, '_'),
+										label: data[1][i],
+										description: data[2][i]
+									});
+								}
+						});
+					}
+				case "commons":
+					if ($scope.formData.searchText.length >= 3) {
+						Wiki.queryMediaWiki($scope.formData.site, $scope.formData.language, $scope.formData.searchText, function(data) {
+								//console.log(data);
+								$scope.searchResults = [];
+								for (var i = 0; i < data[1].length; i++) {
+									$scope.searchResults.push({
+										id: $scope.formData.language + $scope.formData.site + "+" + data[1][i].replace(/\s+/g, '_'),
+										label: data[1][i],
+										description: data[3][i]
+									});
+								}
+						});
+					}
+				default:
+					// nothing
+			}
+		}
+	}
+
 	$scope.queryMediaWiki = function() {
 		Wiki.queryMediaWiki($scope.formData.site, $scope.formData.language, $scope.formData.searchText, function(data) {
 
