@@ -1,7 +1,7 @@
 
 angular.module('settingsControllers', [])
 
-.controller('SettingsCtrl', function($scope, $rootScope, $state, $location, OpenStreetMap, AppSettings) {
+.controller('SettingsCtrl', function($scope, $rootScope, $ionicSideMenuDelegate, $state, $location, OpenStreetMap, AppSettings) {
   $scope.settings = {
     enableFriends: true,
     showUserPhotos: AppSettings.shouldShowUserPhotos(),
@@ -23,6 +23,13 @@ angular.module('settingsControllers', [])
     OSM: null,
     Wiki: null
   }
+
+  $scope.$on('$ionicView.enter', function(){
+      $ionicSideMenuDelegate.canDragContent(false);
+    });
+  $scope.$on('$ionicView.leave', function(){
+      $ionicSideMenuDelegate.canDragContent(true);
+    });
 
   $scope.changeOSMSearchRadius = function() {
     if ($scope.settings.OSMSearchRadius > 1000) {
