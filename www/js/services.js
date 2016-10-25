@@ -119,7 +119,7 @@ angular.module('starter.services', [])
       $window.localStorage["shouldShowCountryData" + countryCode] = JSON.stringify(value);
     },
     getWikiOSMarkServer: function(value) {
-      return "http://192.168.1.85:3000/"
+      return "https://wikiosmark.herokuapp.com/"
     },
     // set: function(key, value) {
 		//   $window.localStorage[key] = value;
