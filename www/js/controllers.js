@@ -33,7 +33,9 @@ angular.module('starter.controllers', [])
     selectedFlickrPhoto: null,
     selectedMapillaryPhoto: null,
     watchPositionID: -1,
-
+    wikidataItems: null,
+    wikipediaItems: null,
+    commonsItems: null
   }
 
   $scope.searchResults = {
@@ -172,6 +174,46 @@ angular.module('starter.controllers', [])
       $scope.osmObjectInfo.type + "/" +
       $scope.osmObjectInfo.id,
       '_system', 'location=yes');
+  }
+
+  $scope.listNearbyWikiItems = function(site) {
+
+    switch (site) {
+      case "wikidata":
+        if ($scope.mapControllerData.wikidataItems != null) {
+          //console.log($scope.mapControllerData.wikidataItems);
+          $scope.searchResults.wikidataResults = [];
+          for (var i = 0; i < $scope.mapControllerData.wikidataItems.length; i++) {
+            var parts = $scope.mapControllerData.wikidataItems[i].q.value.split("/");
+            var id = parts[parts.length-1];
+            $scope.searchResults.wikidataResults.push({
+              id: id,
+              label: $scope.mapControllerData.wikidataItems[i].qLabel.value
+            });
+          }
+        }
+        break;
+      case "wikipedia":
+        if ($scope.mapControllerData.wikipediaItems != null) {
+          //console.log($scope.mapControllerData.wikipediaItems);
+          $scope.searchResults.wikipediaResults = [];
+          for (var i = 0; i < $scope.mapControllerData.wikipediaItems.length; i++) {
+            $scope.searchResults.wikipediaResults.push($scope.mapControllerData.wikipediaItems[i].title);
+          }
+        }
+        break;
+      case "commons":
+        if ($scope.mapControllerData.commonsItems != null) {
+          //console.log($scope.mapControllerData.commonsItems);
+          $scope.searchResults.commonsResults = [];
+          for (var i = 0; i < $scope.mapControllerData.commonsItems.length; i++) {
+            $scope.searchResults.commonsResults.push($scope.mapControllerData.commonsItems[i].title);
+          }
+        }
+        break;
+      default:
+        // nothing
+    }
   }
 
   $scope.inputWikidataChange = function() {

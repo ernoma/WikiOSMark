@@ -449,6 +449,7 @@ var mapControllers = angular.module('mapControllers', [])
 					console.log(data);
 
 					var items = data.results.bindings;
+			    $scope.mapControllerData.wikidataItems = items;
 					var markers = {};
 
 					var wikidataIcon = {
@@ -477,6 +478,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 						if (data.query != undefined) {
 							var items = data.query.geosearch;
+							$scope.mapControllerData.wikipediaItems = items;
 
 							var wikipediaIcon = {
 								iconUrl: 'img/wikipedia_no_text.png',
@@ -501,6 +503,7 @@ var mapControllers = angular.module('mapControllers', [])
 
 								if (data.query != undefined) {
 									var items = data.query.geosearch;
+									$scope.mapControllerData.commonsItems = items;
 
 									var commonsIcon = {
 										iconUrl: 'img/commons.png',

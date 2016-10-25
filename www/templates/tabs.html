@@ -108,13 +108,13 @@
     </ion-content>
   </ion-side-menu>
 
-  <ion-side-menu side="right" width="275">
+  <ion-side-menu side="right" width="300">
     <ion-header-bar class="bar-stable">
       <h1 class="title">{{sideMenuTitle}}</h1>
     </ion-header-bar>
     <ion-content>
       <ion-list ng-if="currentState == 'tab.map'">
-        <ion-item class="item-osm-object">
+        <ion-item class="item">
           <button class="button button-positive" ng-click="saveWikiTagChanges()" ng-disabled="mapControllerData.changesToSave == false">
             Save OSM element changes
           </button>
@@ -151,6 +151,7 @@
             </ion-item>
           </ion-list>
           <ion-item class="item-osm-object">
+            <button class="button button-positive button-small wiki-map-button" ng-click="listNearbyWikiItems('wikidata')" ng-disabled="mapControllerData.wikidataItems == null">Nearby?</button>
             <button class="button button-positive button-small wiki-map-button" ng-click="showWikidataPage()" ng-disabled="osmObjectInfo.wikidataItem == null">View on wikidata.org</button>
             <button class="button button-positive button-small wiki-map-button" ng-click="addCoordinatesToWikidataItem()" ng-disabled="osmObjectInfo.wikidataItem == null || osmObjectInfo.wikidataItem.coordinates != null">Add coords</button>
           </ion-item>
@@ -167,6 +168,7 @@
             </ion-item>
           </ion-list>
           <ion-item class="item-osm-object">
+            <button class="button button-positive button-small wiki-map-button" ng-click="listNearbyWikiItems('wikipedia')" ng-disabled="mapControllerData.wikipediaItems == null">Nearby?</button>
             <button class="button button-positive button-small wiki-map-button" ng-click="showWikipediaPage()" ng-disabled="osmObjectInfo.wikipediaItem == null">View on wikipedia.org</button>
             <button class="button button-positive button-small wiki-map-button" ng-click="addCoordinatesToWikipediaItem()" ng-disabled="osmObjectInfo.wikipediaItem == null || osmObjectInfo.wikipediaItem.coordinates != null">Add coords</button>
           </ion-item>
@@ -183,6 +185,7 @@
             </ion-item>
           </ion-list>
           <ion-item class="item-osm-object">
+            <button class="button button-positive button-small wiki-map-button" ng-click="listNearbyWikiItems('commons')" ng-disabled="mapControllerData.commonsItems == null">Nearby?</button>
             <button class="button button-positive button-small wiki-map-button" ng-click="showCommonsPage()" ng-disabled="osmObjectInfo.wikimediaCommonsItem == null">View on commons.wikimedia.org</button>
             <!--<button class="button button-positive button-small wiki-map-button" ng-click="addCoordinatesToCommonsItem()" ng-disabled="osmObjectInfo.wikimediaCommonsItem == null ||osmObjectInfo.wikimediaCommonsItemCoordinates != null">Add coords</button>-->
           </ion-item>
