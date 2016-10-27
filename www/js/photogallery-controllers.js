@@ -27,16 +27,18 @@ var photoGalleryControllers = angular.module('photoGalleryControllers', [])
               url: gallery.photos[toParams.photoID].photoURL,
               caption: urlParts[urlParts.length-1],
               thumbnail: gallery.photos[toParams.photoID].photoURL,
-              photoID: toParams.photoID
+              photoID: toParams.photoID,
+              source: toParams.source
         };
         // console.log($scope.photo);
       }
       else if (toParams.source == "flickr") {
         $scope.photo = $scope.mapControllerData.selectedFlickrPhoto;
+        $scope.photo.source = toParams.source;
       }
       else if (toParams.source == "mapillary") {
         $scope.photo = $scope.mapControllerData.selectedMapillaryPhoto;
-        $scope.photo.source = "mapillary";
+        $scope.photo.source = toParams.source;
       }
     }
   });
@@ -47,5 +49,9 @@ var photoGalleryControllers = angular.module('photoGalleryControllers', [])
       "&lng=" + $scope.photo.lng +
       "&zoom=17",
       '_system', 'location=yes');
+  }
+
+  $scope.openLink = function(link) {
+    window.open(link, '_system', 'location=yes');
   }
 });

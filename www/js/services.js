@@ -2,6 +2,14 @@ angular.module('starter.services', [])
 
 .factory('AppSettings', function($window) {
   var settingsService = {
+    isFirstStart: function() {
+      var firstStart = $window.localStorage["isFirstStart"];
+      if (firstStart == undefined) {
+        $window.localStorage["isFirstStart"] = false;
+        return true;
+      }
+      return false;
+    },
     getDefaultLanguage: function() {
       return $window.localStorage["defaultLanguage"] || "en";
     },

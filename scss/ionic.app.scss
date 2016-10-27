@@ -26,6 +26,25 @@ body {
 	min-height: 100%;
 }
 
+//
+// Welcome
+//
+.welcome_popup {
+
+}
+
+.welcome_popup_div {
+
+}
+
+.welcome_popup_button_text {
+
+}
+
+//
+// Map
+//
+
 .scroll, .angular-leaflet-map {
   height: 100%;
 }
@@ -33,6 +52,34 @@ body {
 .leaflet-bottom {
   bottom : 10px;
 }
+
+//
+// Map OSM legend
+//
+
+.legend {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    background: rgba(255,255,255, 0.9);
+    line-height: 18px;
+    border-radius: 5px;
+    color: #555;
+		width: 200px;
+}
+
+.legend i {
+    color: #777;
+    width: 16px;
+    height: 16px;
+    float: left;
+    margin-right: 8px;
+    opacity: 0.7;
+}
+
+//
+// Wiki detail tab
+//
 
 .custom-thumbnail, .custom-thumbnail .item-content {
     padding-top: 8px;
@@ -51,6 +98,10 @@ body {
     width: 100%;
 		/* height: 100%; */
 }
+
+//
+//
+//
 
 .row-osm-object-header {
 	padding: 0px;
@@ -84,25 +135,9 @@ body {
 		//right: 10px;
 }
 
-.legend {
-    padding: 6px 8px;
-    font: 14px/16px Arial, Helvetica, sans-serif;
-    box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    background: rgba(255,255,255, 0.9);
-    line-height: 18px;
-    border-radius: 5px;
-    color: #555;
-		width: 200px;
-}
-
-.legend i {
-    color: #777;
-    width: 16px;
-    height: 16px;
-    float: left;
-    margin-right: 8px;
-    opacity: 0.7;
-}
+//
+// Settings page
+//
 
 .settings-list-flag-icon {
 	margin-right: 10px;
@@ -125,7 +160,15 @@ body {
 	font-size: x-large;
 }
 
+#wiki_search_language_select:disabled {
+	background-color: #f8f8f8;
+  cursor: not-allowed;
+	color: #ccc;
+}
 
+//
+//
+//
 
 .list .item.item-accordion {
   line-height: 38px;
@@ -141,6 +184,10 @@ body {
   display: block !important;
 }
 
+//
+// Wiki details tab for Wikipedia article
+//
+
 .wiki-article-section-text {
 	line-height: normal;
 }
@@ -153,10 +200,4 @@ body {
 .wiki-mapframe-coords-col {
 	padding-left: 0;
 	padding-right: 0;
-}
-
-#wiki_search_language_select:disabled {
-	background-color: #f8f8f8;
-  cursor: not-allowed;
-	color: #ccc;
 }

@@ -1,7 +1,7 @@
 
 var mapControllers = angular.module('mapControllers', [])
 
-.controller('MapCtrl', function($scope, $rootScope, $state, $timeout, $cordovaGeolocation, $http, leafletData, leafletMapEvents, leafletMarkerEvents, leafletBoundsHelpers, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings, GeoLocation, PhotoGallery, Wheelmap) {
+.controller('MapCtrl', function($scope, $rootScope, $ionicPopup, $state, $timeout, $cordovaGeolocation, $http, leafletData, leafletMapEvents, leafletMarkerEvents, leafletBoundsHelpers, $ionicSideMenuDelegate, OpenStreetMap, Wiki, AppSettings, GeoLocation, PhotoGallery, Wheelmap) {
 
 	//
 	// Variables & initialization
@@ -113,18 +113,50 @@ var mapControllers = angular.module('mapControllers', [])
 			maxZoom: 20,
 			maxNativeZoom: 18
 	});
+	var stamenTonerLite = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
+		maxZoom: 20,
+		ext: 'png'
+	});
+	var stamenToner = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
+		maxZoom: 20,
+		ext: 'png'
+	});
 	var mapBoxLayer = L.tileLayer('http://{s}.tiles.mapbox.com/v3/' + 'ernoma.i04d787e' + '/{z}/{x}/{y}.png', {
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
 	    maxZoom: 20
 	});
-	var bingLayer = new L.BingLayer('Agf7Ot_un-nQxTrh4Vg6bqThCzQ5KH6kF2oLndffl3LlclN5dY3ELe80I6Kkj5Qd', {type: 'AerialWithLabels', maxZoom: 20,
-	maxNativeZoom: 18});
+	var bingLayer = new L.BingLayer('Agf7Ot_un-nQxTrh4Vg6bqThCzQ5KH6kF2oLndffl3LlclN5dY3ELe80I6Kkj5Qd', {
+		type: 'AerialWithLabels',
+		maxZoom: 20,
+		maxNativeZoom: 18
+	});
+	var openTopoMap = L.tileLayer('http://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+		maxZoom: 17,
+		attribution: 'Map data: &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+	});
+	var stamenTerrain = L.tileLayer('http://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
+		attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+		subdomains: 'abcd',
+		minZoom: 0,
+		maxZoom: 18,
+		ext: 'png'
+	});
 
 	var baseMaps = {
 			"OpenStreetMap": osmLayer,
 			"OpenCycleMap": osmCycleLayer,
 			"Bing aerial": bingLayer,
-			"MapBox": mapBoxLayer
+			"MapBox": mapBoxLayer,
+			"Stamen Toner": stamenToner,
+			"Stamen Toner-lite": stamenTonerLite,
+			"Stamen Terrain": stamenTerrain,
+			"OpenTopoMap": openTopoMap
 	}
 
 	angular.element(document).ready(function () {
@@ -245,6 +277,28 @@ var mapControllers = angular.module('mapControllers', [])
 	//
 	// Methods
 	//
+
+	$scope.showIntro = function() {
+		var welcomePopup = $ionicPopup.show({
+			template: '<div class="welcome_popup_div">Welcome to edit OpenStreetMap together with Wikidata, Wikipedia and Wikimedia Commons!</div>',
+			title: 'Welcome!',
+			cssClass: 'welcome_popup',
+			//subTitle: 'Please use normal things',
+			scope: $scope,
+			buttons: [
+				{ text: '<span class="welcome_popup_button_text">OK</span>',
+				type: 'button-positive'
+				}
+			]
+		});
+	}
+
+	var isFirstStart = AppSettings.isFirstStart();
+	console.log(isFirstStart);
+	if (isFirstStart == true) {
+		$scope.showIntro();
+	}
+
 
 	$scope.updateOSMObjects = function() {
 
@@ -571,6 +625,7 @@ var mapControllers = angular.module('mapControllers', [])
 							url: evt.layer.photo.url,
 							caption: evt.layer.photo.caption,
 							thumbnail: evt.layer.photo.thumbnail,
+							original: evt.layer.photo.original,
 							photoID: evt.layer.photo.photoID
 						}
 
@@ -587,8 +642,9 @@ var mapControllers = angular.module('mapControllers', [])
 						photos.push({
 									lat: parseFloat(photoArray[i].latitude),
 									lng: parseFloat(photoArray[i].longitude),
-									url: photoArray[i].url_o,
+									url: "https://www.flickr.com/photos/" + photoArray[i].owner + "/" + photoArray[i].id,
 									caption: photoArray[i].title,
+									original: photoArray[i].url_o,
 									thumbnail: photoArray[i].url_s,
 									photoID: parseInt(photoArray[i].id)
 						});
@@ -635,6 +691,7 @@ var mapControllers = angular.module('mapControllers', [])
 						lng: evt.layer.photo.lng,
 						url: evt.layer.photo.url,
 						caption: evt.layer.photo.caption,
+						original: evt.layer.photo.original,
 						thumbnail: evt.layer.photo.thumbnail,
 						photoID: evt.layer.photo.photoID
 					}
@@ -652,7 +709,8 @@ var mapControllers = angular.module('mapControllers', [])
 					photos.push({
 								lat: photoArray[i].lat,
 								lng: photoArray[i].lon,
-								url: "https://d1cuyjsrcm0gby.cloudfront.net/" + photoArray[i].key + "/thumb-2048.jpg",
+								url: "https://www.mapillary.com/app/user/" + photoArray[i].user + "?pKey=" + photoArray[i].key + "&focus=photo",
+								original: "https://d1cuyjsrcm0gby.cloudfront.net/" + photoArray[i].key + "/thumb-2048.jpg",
 								caption: "Photo by " + photoArray[i].user,
 								thumbnail: "https://d1cuyjsrcm0gby.cloudfront.net/" + photoArray[i].key + "/thumb-320.jpg",
 								photoID: photoArray[i].key

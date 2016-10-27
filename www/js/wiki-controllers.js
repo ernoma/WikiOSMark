@@ -168,6 +168,87 @@ var wikiControllers = angular.module('wikiControllers', [])
 			});
 		}
 
+		var doWikipediaSearch = function(url) {
+			$http.jsonp(url).
+			  success(function(data) {
+					console.log(data);
+			    // console.log(data);
+					for (var key in data.query.pages) { // there is just one key, so for runs only once
+						var content = data.query.pages[key].revisions[0]['*'];
+						var parsedContent = wtf_wikipedia.parse(content);
+						// console.log(parsedContent);
+
+						if (parsedContent.redirect != undefined) {
+							var url = "https://";
+							url += lang;
+							url += ".wikipedia.org/w/api.php?action=query";
+							url += "&titles=" + parsedContent.redirect;
+							url += "&prop=revisions&rvprop=content";
+							url += "&callback=JSON_CALLBACK&format=json";
+
+							doWikipediaSearch(url);
+						}
+						else {
+							if (parsedContent.images != undefined && parsedContent.images.length > 0) {
+								$scope.articleImage = parsedContent.images[0].thumb;
+							}
+
+							console.log(parsedContent);
+							$scope.sections = [];
+							parsedContent.text.forEach(function(sectionContent, key, map) {
+								var text = "";
+								for (var i = 0; i < sectionContent.length; i++) {
+									text += sectionContent[i].text + " ";
+								}
+								$scope.sections.push({
+									title: key,
+									content: text,
+									show: false,
+									showMapframe: false,
+									showMaplink: false,
+									showRawSectionText: true
+								});
+							});
+							$scope.toggleGroup = function(section) {
+								section.show = !section.show;
+							};
+							$scope.isGroupShown = function(section) {
+								return section.show;
+							};
+							$scope.toggleMapframe = function(section) {
+								section.showMapframe = !section.showMapframe;
+							};
+							$scope.isMapframeShown = function(section) {
+								return section.showMapframe;
+							};
+							$scope.toggleMaplink = function(section) {
+								section.showMaplink = !section.showMaplink;
+							};
+							$scope.isMaplinkShown = function(section) {
+								return section.showMaplink;
+							};
+							$scope.toggleRawSectionText = function(section) {
+								section.showRawSectionText = !section.showRawSectionText;
+							};
+							$scope.isRawSectionTextShown = function(section) {
+								return section.showRawSectionText;
+							};
+
+						// var textEntries = parsedContent.text.get("Intro");
+						// // console.log(textEntries);
+						//
+						// for (var i = 0; i < textEntries.length; i++) {
+						// 	$scope.introText += textEntries[i].text + " ";
+						// }
+						}
+					}
+			  })
+			  .error(function (data) {
+			  	console.log('data error');
+			    console.log(data);
+			  });
+		}
+
 		$scope.addMaplinkToWikipedia = function(sectionIndex, section) {
 
 			var maplinkHTML = '%0A%0A<maplink';
@@ -206,71 +287,7 @@ var wikiControllers = angular.module('wikiControllers', [])
 			url += "&prop=revisions&rvprop=content";
 			url += "&callback=JSON_CALLBACK&format=json";
 
-			$http.jsonp(url).
-			  success(function(data) {
-			    // console.log(data);
-					for (var key in data.query.pages) { // there is just one key, so for runs only once
-						var content = data.query.pages[key].revisions[0]['*'];
-						var parsedContent = wtf_wikipedia.parse(content);
-						// console.log(parsedContent);
-
-						if (parsedContent.images.length > 0) {
-							$scope.articleImage = parsedContent.images[0].thumb;
-						}
-
-						var textEntries = parsedContent.text.get("Intro");
-						// console.log(textEntries);
-
-						for (var i = 0; i < textEntries.length; i++) {
-							$scope.introText += textEntries[i].text + " ";
-						}
-					}
-
-					$scope.sections = [];
-					parsedContent.text.forEach(function(sectionContent, key, map) {
-						var text = "";
-						for (var i = 0; i < sectionContent.length; i++) {
-							text += sectionContent[i].text + " ";
-						}
-						$scope.sections.push({
-							title: key,
-							content: text,
-							show: false,
-							showMapframe: false,
-							showMaplink: false,
-							showRawSectionText: true
-						});
-					});
-					$scope.toggleGroup = function(section) {
-						section.show = !section.show;
-					};
-					$scope.isGroupShown = function(section) {
-						return section.show;
-					};
-					$scope.toggleMapframe = function(section) {
-						section.showMapframe = !section.showMapframe;
-					};
-					$scope.isMapframeShown = function(section) {
-						return section.showMapframe;
-					};
-					$scope.toggleMaplink = function(section) {
-						section.showMaplink = !section.showMaplink;
-					};
-					$scope.isMaplinkShown = function(section) {
-						return section.showMaplink;
-					};
-					$scope.toggleRawSectionText = function(section) {
-						section.showRawSectionText = !section.showRawSectionText;
-					};
-					$scope.isRawSectionTextShown = function(section) {
-						return section.showRawSectionText;
-					};
-
-			  })
-			  .error(function (data) {
-			  	console.log('data error');
-			    console.log(data);
-			  });
+			doWikipediaSearch(url);
 		}
 		else if (site == "wikidata") {
 			var url = wdk.getEntities(id);

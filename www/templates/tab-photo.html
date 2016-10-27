@@ -12,10 +12,13 @@
           Upload via WikiShootMe!
         </button>
         <div class="item item-image">
-            <img ng-src="{{photo.url}}" alt="{{photo.caption}}">
+            <img ng-src="{{photo.original}}" alt="{{photo.caption}}">
         </div>
-        <div class="item">
-          <h2>{{photo.caption}}</h2>
+        <div ng-if="photo.source == 'camera'" class="item">
+          <h2>{{photo.caption}}</h2>thumbnail
+        </div>
+        <div ng-if="photo.source == 'flickr' || photo.source == 'mapillary'" class="item">
+          <h2><a href="" ng-click="openLink(photo.url)">{{photo.caption}}</a></h2>
         </div>
         <div class="item text-left">
           <!--<div class="row">
