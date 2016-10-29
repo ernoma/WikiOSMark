@@ -322,19 +322,19 @@ var mapControllers = angular.module('mapControllers', [])
 					for (var key in feature.properties.tags) {
 						if (key == "wikipedia") {
 							$scope.osmObjectInfo.wikipediaTag = feature.properties.tags[key];
-							Wiki.getItemWithCoordinates("wikipedia", feature.properties.tags[key], function (item) {
+							Wiki.getItem("wikipedia", feature.properties.tags[key], ["coordinates"], function (item) {
 									$scope.osmObjectInfo.wikipediaItem = item;
 							});
 						}
 						else if (key == "wikidata") {
 							$scope.osmObjectInfo.wikidataTag = feature.properties.tags[key];
-							Wiki.getItemWithCoordinates("wikidata", feature.properties.tags[key], function (item) {
+							Wiki.getItem("wikidata", feature.properties.tags[key], ["coordinates"], function (item) {
 									$scope.osmObjectInfo.wikidataItem = item;
 							});
 						}
 						else if (key == "wikimedia_commons") {
 							$scope.osmObjectInfo.wikimediaCommonsTag = feature.properties.tags[key];
-							Wiki.getItemWithCoordinates("commons", feature.properties.tags[key], function (item) {
+							Wiki.getItem("commons", feature.properties.tags[key], ["coordinates"], function (item) {
 									$scope.osmObjectInfo.wikimediaCommonsItem = item;
 							});
 						}

@@ -1,0 +1,40 @@
+<!--
+  This template loads for the 'tab.friend-detail' state (app.js)
+  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
+  The FriendsCtrl pulls data from the Friends service (service.js)
+  The Friends service returns an array of friend data
+-->
+<ion-view view-title="Wikimedia Templates">
+  <ion-content>
+    <ion-list>
+      <ion-item>
+      <button class="button button-positive" ng-click="" ng-disabled="template.changesToSave == false">
+        Save
+      </button>
+      </ion-item>
+      <ion-item>
+      <label class="item item-input item-select">
+        <div class="input-label">
+          Select base template
+        </div>
+        <select ng-model="template.selectedBase" ng-change="selectBaseTemplate()">
+          <option value="foo">Foo</option>
+          <option value="maplink">Dummy maplink</option>
+          <option value="mapframe">Dummy mapframe</option>
+          <!--<option>Wikivoyage</option>-->
+        </select>
+      </label>
+      </ion-item>
+      <ion-item>
+      <label class="item item-input">
+        <span class="input-label">Name</span>
+        <input type="text" placeholder="Template:mytemplate">
+      </label>
+      <label class="item item-input">
+        <span class="input-label">Definition</span>
+        <textarea rows="6" placeholder="Template" ng-model="template.content"></textarea>
+      </label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

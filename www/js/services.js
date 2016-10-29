@@ -411,9 +411,15 @@ angular.module('starter.services', [])
       var URL = "https://commons.wikimedia.org/wiki/" + identifier;
       window.open(URL, '_system', 'location=yes');
     },
-    getItemWithCoordinates: function(site, itemID, callback) {
+    getItem: function(site, itemID, properties, callback) {
 
       var url = null;
+
+      var prop = "";
+      for (var i = 0; i < properties.length; i++) {
+        prop += properties[i] + "|";
+      }
+      prop = prop.slice(0, -1);
 
       if (site == "wikipedia") {
         lang = "en";
@@ -424,16 +430,16 @@ angular.module('starter.services', [])
   			url += lang;
   			url += ".wikipedia.org/w/api.php?action=query";
   			url += "&titles=" + itemID;
-  			url += "&prop=coordinates";
+  			url += "&prop=" + prop;
   			url += "&callback=JSON_CALLBACK&format=json";
       }
       else if (site == "wikidata") {
         url = "https://www.wikidata.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
-          + itemID + "&format=json&prop=coordinates";
+          + itemID + "&format=json&prop=" + prop;
         }
         else { // commons
           url = "https://commons.wikimedia.org/w/api.php?callback=JSON_CALLBACK&action=query&titles="
-  				 	+ itemID + "&format=json&prop=coordinates";
+  				 	+ itemID + "&format=json&prop=" + prop;
         }
 
         $http.jsonp(url).
@@ -444,9 +450,10 @@ angular.module('starter.services', [])
 
             for (var key in data.query.pages) { // should be just one key in pages
               if (key != -1) { // no page with that title
+                // TODO: include also other queried properties
                 item = {
                   pageTitle: data.query.pages[key].title,
-                  coordinates: null
+                  coordinates: null,
                 }
                 if (data.query.pages[key].coordinates != undefined) {
                   item.coordinates = {
@@ -458,6 +465,20 @@ angular.module('starter.services', [])
             }
 
             callback(item);
+          })
+          .error(function (data) {
+            console.log('data error');
+            console.log(data);
+            callback(null);
+          });
+    },
+    getWikidataWikipediaLinks: function(itemID, callback) {
+      url = "https://www.wikidata.org/w/api.php?callback=JSON_CALLBACK&action=wbgetentities&ids=" +
+        itemID + "&format=json&props=sitelinks%2Furls";
+        $http.jsonp(url).
+          success(function(data) {
+            console.log(data);
+            callback(data);
           })
           .error(function (data) {
             console.log('data error');

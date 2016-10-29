@@ -104,6 +104,16 @@ angular.module('starter', ['ionic', 'leaflet-directive', 'ngCordova', 'mapContro
       }
     })
 
+    .state('tab.wiki-template-edit', {
+      url: '/wikitemplate',
+      views: {
+        'tab-wiki': {
+          templateUrl: 'templates/tab-wiki-template.html',
+          controller: 'WikiTemplateCtrl'
+        }
+      }
+    })
+
   .state('tab.settings', {
     url: '/settings',
     views: {

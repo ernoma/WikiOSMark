@@ -1,7 +1,7 @@
 
 var wikiControllers = angular.module('wikiControllers', [])
 
-.controller('WikiCtrl', function($scope, $http, Wiki, AppSettings) {
+.controller('WikiCtrl', function($scope, $http, Wiki, AppSettings, $state, $ionicSideMenuDelegate) {
 
 	//console.log(window.wdk);
 
@@ -12,6 +12,15 @@ var wikiControllers = angular.module('wikiControllers', [])
 	};
 
 	$scope.searchResults = [];
+
+	$scope.$on( "editWikiTemplates", function( event ) {
+		$scope.editWikiTemplates();
+	});
+
+	$scope.editWikiTemplates = function() {
+		$ionicSideMenuDelegate.toggleRight(false);
+		$state.go("tab.wiki-template-edit");
+	}
 
 	$scope.inputSearchChange = function() {
 		if ($scope.formData.searchText.length == 0) {
@@ -550,4 +559,24 @@ var wikiControllers = angular.module('wikiControllers', [])
 
 			return thumbItem;
 		}
+})
+
+.controller('WikiTemplateCtrl', function($scope, $stateParams, $http, Wiki, AppSettings) {
+	$scope.template = {
+		content: "",
+		changesToSave: false,
+		selectedBase: "foo"
+	}
+
+	$scope.selectBaseTemplate = function() {
+		switch ($scope.template.selectedBase) {
+			case "foo":
+					$scope.template.content = "<noinclude>{{documentation}}</noinclude>\n\nfoo template";
+				break;
+			default:
+
+		}
+	}
+
+	$scope.selectBaseTemplate();
 });

@@ -9,8 +9,8 @@
         <button ng-if="currentState != 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="right" ng-hide="true"></button>
       </ion-nav-buttons>
       <ion-nav-buttons side="left">
-        <button ng-if="currentState == 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
-        <button ng-if="currentState != 'tab.map'" class="button button-icon button-clear ion-navicon" menu-toggle="left" ng-hide="true"></button>
+        <button ng-if="currentState == 'tab.map' || currentState == 'tab.wiki'" class="button button-icon button-clear ion-navicon" menu-toggle="left"></button>
+        <button ng-if="currentState != 'tab.map' && currentState != 'tab.wiki'" class="button button-icon button-clear ion-navicon" menu-toggle="left" ng-hide="true"></button>
       </ion-nav-buttons>
     </ion-nav-bar>
 
@@ -61,6 +61,12 @@
       <h1 class="title">{{mainMenuTitle}}</h1>
     </ion-header-bar>
     <ion-content>
+      <ion-list can-swipe="false" ng-if="currentState == 'tab.wiki'">
+        <ion-item class="item item-icon-left" menu-close ng-click="editWikiTemplates()">
+          <i class="icon ion-compose"></i>
+          <span>Edit Wiki templates</span>
+        </ion-item>
+      </ion-list>
       <ion-list can-swipe="false" ng-if="currentState == 'tab.map'">
         <ion-item class="item item-icon-left" menu-close ng-click="locateMe()">
           <i class="icon ion-android-locate"></i>

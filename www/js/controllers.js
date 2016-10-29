@@ -143,10 +143,13 @@ angular.module('starter.controllers', [])
     });
   }
 
+  //
+  // Tab map menu button events
+  //
+
   $scope.updateAllMapLayers = function() {
     $scope.$broadcast('updateAllMapLayers');
   }
-
   $scope.showOSMObjects = function() {
     //console.log("in TabCtrl");
     $scope.$broadcast('showOSMObjects');
@@ -164,9 +167,15 @@ angular.module('starter.controllers', [])
     //console.log("in TabCtrl");
     $scope.$broadcast('locateMe');
   }
-
   $scope.showLegend = function() {
     $scope.$broadcast('showLegend');
+  }
+
+  //
+  // Tab Wiki menu button events
+  //
+  $scope.editWikiTemplates = function() {
+    $scope.$broadcast('editWikiTemplates');
   }
 
   $scope.showOSMObjectPage = function() {
@@ -221,7 +230,7 @@ angular.module('starter.controllers', [])
 		$scope.mapControllerData.changesToSave = true;
 		if ($scope.osmObjectInfo.wikidataTag.length >= 2) {
 			Wiki.queryMediaWiki("wikidata", AppSettings.getDefaultLanguage(), $scope.osmObjectInfo.wikidataTag, function(data) {
-					//console.log(data);
+					console.log(data);
 					$scope.searchResults.wikidataResults = data.search;
 			});
 		}
@@ -278,22 +287,44 @@ angular.module('starter.controllers', [])
 
 	$scope.selectWikidataSearchResult = function(item) {
 		$scope.osmObjectInfo.wikidataTag = item.label + " (" + item.id + ")";
-    Wiki.getItemWithCoordinates("wikidata", item.id, function (result) {
-        $scope.osmObjectInfo.wikidataItem = result;
-        //$scope.osmObjectInfo.wikimediaCommonsCoordinates = coordinates;
+    Wiki.getItem("wikidata", item.id, ["coordinates", "sitelinks"], function (result) {
+      console.log(result);
+      $scope.osmObjectInfo.wikidataItem = result;
+      if ($scope.osmObjectInfo.wikipediaTag == "" || $scope.osmObjectInfo.wikipediaTag == null) {
+        Wiki.getWikidataWikipediaLinks(item.id, function(data) {
+          console.log(data);
+          for (var key in data.entities) { // should be just one
+            console.log(key);
+            $scope.searchResults.wikipediaResults = [];
+
+            for (var siteLinkKey in data.entities[key].sitelinks) {
+              var lang = "";
+              if (data.entities[key].sitelinks[siteLinkKey].site.endsWith("wiki")) {
+                var index = data.entities[key].sitelinks[siteLinkKey].site.indexOf("wiki");
+                if (index == 2) {
+                  lang = data.entities[key].sitelinks[siteLinkKey].site.substr(0, 2);
+                  $scope.searchResults.wikipediaResults.push(lang + ":" +
+                    data.entities[key].sitelinks[siteLinkKey].title);
+                }
+              }
+            }
+          }
+        });
+      }
+      //$scope.osmObjectInfo.wikimediaCommonsCoordinates = coordinates;
     });
 		$scope.searchResults.wikidataResults = null;
 		// TODO: update wikipedia and commons tags if they can be found via Wiki search
 	}
 
 	$scope.selectWikipediaSearchResult = function(item) {
-		if ($scope.osmObjectInfo.wikipediaTag.includes(":") && !item.includes(":")) {
+		if ($scope.osmObjectInfo.wikipediaTag != null && $scope.osmObjectInfo.wikipediaTag.includes(":") && !item.includes(":")) {
 			$scope.osmObjectInfo.wikipediaTag = $scope.osmObjectInfo.wikipediaTag.split(":")[0] + ":" + item;
 		}
 		else {
 			$scope.osmObjectInfo.wikipediaTag = item;
 		}
-    Wiki.getItemWithCoordinates("wikipedia", $scope.osmObjectInfo.wikipediaTag, function (result) {
+    Wiki.getItem("wikipedia", $scope.osmObjectInfo.wikipediaTag, ["coordinates"], function (result) {
         $scope.osmObjectInfo.wikipediaItem = result;
         //$scope.osmObjectInfo.wikimediaCommonsCoordinates = coordinates;
     });
@@ -303,7 +334,7 @@ angular.module('starter.controllers', [])
 
 	$scope.selectCommonsSearchResult = function(item) {
 		$scope.osmObjectInfo.wikimediaCommonsTag = item;
-    Wiki.getItemWithCoordinates("commons", item, function (result) {
+    Wiki.getItem("commons", item, ["coordinates"], function (result) {
         $scope.osmObjectInfo.wikimediaCommonsItem = result;
         //$scope.osmObjectInfo.wikimediaCommonsCoordinates = coordinates;
     });
